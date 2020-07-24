@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "649011854652",
+    "firebase_url": "https://justchatting-2d4cc.firebaseio.com",
+    "project_id": "justchatting-2d4cc",
+    "storage_bucket": "justchatting-2d4cc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:649011854652:android:a636f3d6e31a543faa3239",
+        "android_client_info": {
+          "package_name": "com.example.justchatting"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "649011854652-2o1s2r8g44gqab8slt2bhdetkvrnnm0j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.justchatting",
+            "certificate_hash": "d26c68d3236dee7b21da239aa0e89ac24bf43954"
+          }
+        },
+        {
+          "client_id": "649011854652-rsgl0j4r72dk733u390on5ldklnsvqmf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACk_Sy9TjaR5Q0MbqdL07kEzW3DRLrLBs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "649011854652-rsgl0j4r72dk733u390on5ldklnsvqmf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

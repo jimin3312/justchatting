@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Just Chatting</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="item_friend_title">friend</string>
+    <string name="item_chatting_title">chatting</string>
+    <string name="item_setttings_title">settings</string>
+</resources>
