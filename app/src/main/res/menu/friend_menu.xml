@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/friend_sync_button"
+        android:icon="@drawable/ic_sync_black_24dp"
+        app:showAsAction="ifRoom"
+        android:title="sync contacts" />
+
+    <item android:id="@+id/friend_add_friend_button"
+        android:icon="@drawable/ic_person_add_black_24dp"
+        app:showAsAction="ifRoom"
+        android:title="add friend"/>
+
+</menu>
