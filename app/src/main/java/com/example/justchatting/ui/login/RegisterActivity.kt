@@ -37,6 +37,7 @@ class RegisterActivity : AppCompatActivity() {
         register_button_register.setOnClickListener {
             performRegister()
         }
+
         phone_edittext_register.addTextChangedListener(PhoneNumberFormattingTextWatcher())
         aleady_have_account_textview_register.setOnClickListener {
             Log.d("RegisterActivity", "Try to show login activity")
@@ -63,7 +64,7 @@ class RegisterActivity : AppCompatActivity() {
             Log.d("RegisterActivity", "Photo was selected")
             selectedPhotoUri = data.data
 
-            val bitmap  = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhotoUri)
+            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhotoUri)
             select_photo_imageview_register.setImageBitmap(bitmap)
             select_photo_button_register.alpha = 0f
         }

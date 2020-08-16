@@ -1,5 +1,6 @@
 package com.example.justchatting
 
+import kotlinx.coroutines.*
 import org.junit.Test
 
 import org.junit.Assert.*

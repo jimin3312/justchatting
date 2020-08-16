@@ -16,7 +16,6 @@ class FriendViewModel(application: Application) : AndroidViewModel(application){
     var arrayList= ArrayList<User>()
     init
     {
-
         val uId = FirebaseAuth.getInstance().uid
         val myUserRef = FirebaseDatabase.getInstance().getReference("/users/$uId")
 
