@@ -28,7 +28,7 @@ class FriendUserRepository(private val userDao: UserDao, private val executor :E
 
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val myUser = snapshot.getValue(User::class.java) ?: return
-                    runBlocking {
+                    executor.execute{
                         userDao.insertUser(myUser)
                     }
                     setListener()
@@ -48,7 +48,6 @@ class FriendUserRepository(private val userDao: UserDao, private val executor :E
     }
 
     fun sync(application: Application){
-        executor.execute {
             var contactList = getContacts(application)
             val usersRef = FirebaseDatabase.getInstance().getReference("/users/")
             val myUserRef = FirebaseDatabase.getInstance().getReference("/users/$myUserId")
@@ -75,7 +74,8 @@ class FriendUserRepository(private val userDao: UserDao, private val executor :E
                                             .getReference("/friends/${user.uid}/$myUserId")
                                         fromRef.setValue(user)
                                         toRef.setValue(myUser)
-                                        runBlocking {
+
+                                        executor.execute {
                                             userDao.insertUser(user)
                                         }
                                     }
@@ -89,7 +89,7 @@ class FriendUserRepository(private val userDao: UserDao, private val executor :E
 
                 }
             })
-        }
+
     }
 
     private fun getContacts(application: Application): ArrayList<String> {
@@ -132,12 +132,16 @@ class FriendUserRepository(private val userDao: UserDao, private val executor :E
             }
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
                 val user = snapshot.getValue(User::class.java) ?: return
-
+                executor.execute {
+                    userDao.insertUser(user)
+                }
                 Log.d("FriendFragment", "onChildChanged : ${user.username}")
             }
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 val user = snapshot.getValue(User::class.java) ?: return
-
+                executor.execute {
+                    userDao.insertUser(user)
+                }
                 Log.d("FriendFragment", "onChildAdded : ${user.username}")
             }
             override fun onChildRemoved(snapshot: DataSnapshot) {

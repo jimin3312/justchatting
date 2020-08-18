@@ -15,7 +15,7 @@ interface UserDao {
     fun getUserById(userId: String): LiveData<User>
 
     @Insert(onConflict = REPLACE)
-    suspend fun insertUser(user: User)
+    fun insertUser(user: User)
 
     @Query("DELETE FROM users_tb WHERE uid = (:uId)")
     fun delete(uId: String)
