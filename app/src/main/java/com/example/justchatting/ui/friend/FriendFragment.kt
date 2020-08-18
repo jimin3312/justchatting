@@ -1,6 +1,5 @@
 package com.example.justchatting.ui.friend
 
-
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
@@ -9,14 +8,18 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.databinding.DataBindingUtil
+
 import androidx.databinding.Observable
+
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.justchatting.R
 import com.example.justchatting.base.BaseFragment
 import com.example.justchatting.databinding.FragmentFriendBinding
-import com.example.kotlinmessenger.registerlogin.RegisterActivity
+
 import com.squareup.picasso.Picasso
+import com.example.justchatting.ui.login.RegisterActivity
+
 import kotlinx.android.synthetic.main.fragment_friend.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

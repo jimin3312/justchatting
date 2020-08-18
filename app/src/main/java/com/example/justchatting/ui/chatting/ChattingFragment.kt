@@ -2,8 +2,10 @@ package com.example.justchatting.ui.chatting
 
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
 import android.view.View
+import android.view.ViewGroup
 import com.example.justchatting.R
 import com.example.justchatting.base.BaseFragment
 import com.example.justchatting.databinding.FragmentChattingBinding
@@ -18,7 +20,18 @@ class ChattingFragment : BaseFragment<FragmentChattingBinding>() {
 
     override fun getLayoutId(): Int = R.layout.fragment_chatting
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding.lifecycleOwner = this
+        binding.viewModel = viewModel
+        return binding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
     }
 }

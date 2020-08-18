@@ -13,13 +13,49 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
     private val userRepository : FriendUserRepository by inject()
     lateinit var myUser: LiveData<User>
     lateinit var users: LiveData<List<User>>
-
     fun getMyUser(){
         myUser = userRepository.getMyUser(getApplication())
     }
 
     fun getUsers() {
         users = userRepository.load(getApplication())
+
+    fun setListener()
+    {
+        val uId = FirebaseAuth.getInstance().uid
+        val ref = FirebaseDatabase.getInstance().getReference("/friends/$uId")
+
+        ref.addChildEventListener(object : ChildEventListener{
+            override fun onCancelled(error: DatabaseError) {
+            }
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+
+            }
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                val user = snapshot.getValue(User::class.java) ?: return
+
+//                usersMutableLiveData.value?.forEach {
+//                    Log.d("FriendFragment", "onChildChanged : ${it.username}")
+//                    arrayList.add(it)
+//                }
+                Log.d("FriendFragment", "onChildChanged : ${user.username}")
+                arrayList.add(user)
+                usersMutableLiveData.postValue(arrayList)
+            }
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val user = snapshot.getValue(User::class.java) ?: return
+
+//                usersMutableLiveData.value?.forEach {
+//                    Log.d("FriendFragment", "onChildAdded : ${it.username}")
+//                    arrayList.add(it)
+//                }
+                Log.d("FriendFragment", "onChildAdded : ${user.username}")
+                arrayList.add(user)
+                usersMutableLiveData.postValue(arrayList)
+            }
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+            }
+        })
     }
 
     fun sync() {
