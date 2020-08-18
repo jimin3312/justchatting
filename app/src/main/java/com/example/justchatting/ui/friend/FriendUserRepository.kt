@@ -14,10 +14,10 @@ import org.koin.core.KoinComponent
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
-class FriendUserRepository(private val userDao: UserDao) : KoinComponent {
+class FriendUserRepository(private val userDao: UserDao, private val executor :Executor ){
 
     var myUserId = FirebaseAuth.getInstance().uid?: ""
-    private val executor: Executor = Executors.newSingleThreadExecutor()
+
     init
     {
         val myUserRef = FirebaseDatabase.getInstance().getReference("/users/$myUserId")
@@ -101,8 +101,7 @@ class FriendUserRepository(private val userDao: UserDao) : KoinComponent {
                 val id: String = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID))
                 val name: String = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
                 if (cur.getInt(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
-                    val pCur: Cursor? = cr.query(
-                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                    val pCur: Cursor? = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                         null,
                         ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
                         arrayOf(id),

@@ -32,7 +32,8 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding : FragmentFriendBinding = DataBindingUtil.inflate(inflater, getLayoutId(), container, false)
+        val binding: FragmentFriendBinding =
+            DataBindingUtil.inflate(inflater, getLayoutId(), container, false)
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         setHasOptionsMenu(true)
@@ -46,13 +47,11 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId)
-        {
-            R.id.friend_sync_button->{
+        when (item.itemId) {
+            R.id.friend_sync_button -> {
                 viewModel.sync()
-                viewModel.load()
             }
-            R.id.friend_add_friend_button->{
+            R.id.friend_add_friend_button -> {
 
             }
         }
@@ -62,34 +61,22 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setPermission()
-
     }
-    private fun setPermission(){
+
+    private fun setPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(
-                this.requireContext(), Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS),
+                this.requireContext(), Manifest.permission.READ_CONTACTS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(
+                arrayOf(Manifest.permission.READ_CONTACTS),
                 RegisterActivity.PERMISSIONS_REQUEST_READ_CONTACTS
             )
-        } else
-        {
-            val friendRecyclerViewAdapter = FriendAdapter(viewModel.getUsers())
-            friend_recyclerview.adapter = friendRecyclerViewAdapter
-            friend_recyclerview.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-
-            viewModel.getUsers().observe(viewLifecycleOwner, Observer {
-                friendRecyclerViewAdapter.notifyDataSetChanged()
-            })
-
-            viewModel.getMyUser().observe(viewLifecycleOwner, Observer { myUser->
-                if(myUser != null) {
-                    friend_my_textview_username.text = myUser.username
-                    Picasso.get().load(myUser.profileImageUrl)
-                        .placeholder(R.drawable.person)
-                        .into(friend_my_imageview_profile_image)
-                }
-            })
+        } else {
+            initFriends()
         }
     }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -97,12 +84,38 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
     ) {
         if (requestCode == RegisterActivity.PERMISSIONS_REQUEST_READ_CONTACTS) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                setPermission()
-            } else
-            {
+                initFriends()
+            } else {
                 requireActivity().finish()
             }
         }
     }
 
+    private fun initFriends() {
+        
+        viewModel.getMyUser()
+        viewModel.getUsers()
+
+        val friendRecyclerViewAdapter = FriendAdapter(viewModel.users)
+        friend_recyclerview.adapter = friendRecyclerViewAdapter
+        friend_recyclerview.addItemDecoration(
+            DividerItemDecoration(
+                requireContext(),
+                DividerItemDecoration.VERTICAL
+            )
+        )
+
+        viewModel.users.observe(viewLifecycleOwner, Observer {
+            friendRecyclerViewAdapter.notifyDataSetChanged()
+        })
+
+        viewModel.myUser.observe(viewLifecycleOwner, Observer { myUser ->
+            if (myUser != null) {
+                friend_my_textview_username.text = myUser.username
+                Picasso.get().load(myUser.profileImageUrl)
+                    .placeholder(R.drawable.person)
+                    .into(friend_my_imageview_profile_image)
+            }
+        })
+    }
 }

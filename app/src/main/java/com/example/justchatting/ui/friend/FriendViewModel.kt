@@ -4,7 +4,6 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.example.justchatting.User
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -12,25 +11,22 @@ import org.koin.core.inject
 class FriendViewModel(application: Application) : AndroidViewModel(application), KoinComponent{
 
     private val userRepository : FriendUserRepository by inject()
+    lateinit var myUser: LiveData<User>
+    lateinit var users: LiveData<List<User>>
 
-    private var myUserLiveData = userRepository.getMyUser(getApplication())
-    private var usersMutableLiveData = userRepository.load(getApplication())
-    fun getMyUser() :  LiveData<User>{
-        return myUserLiveData
+    fun getMyUser(){
+        myUser = userRepository.getMyUser(getApplication())
     }
-    fun getUsers(): LiveData<List<User>> {
-        return usersMutableLiveData
-    }
-    fun load() {
-        userRepository.load(getApplication())
-        userRepository.load(getApplication())
+
+    fun getUsers() {
+        users = userRepository.load(getApplication())
     }
 
     fun sync() {
         Log.d("FriendViewModel","sync start")
         userRepository.sync(getApplication())
-        usersMutableLiveData = userRepository.load(getApplication())
-        myUserLiveData = userRepository.getMyUser(getApplication())
+        users = userRepository.load(getApplication())
+        myUser = userRepository.getMyUser(getApplication())
     }
 //    fun erase()
 //    {
