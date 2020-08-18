@@ -1,4 +1,4 @@
-package com.example.kotlinmessenger.registerlogin
+package com.example.justchatting.ui.login
 
 import android.app.Activity
 import android.content.Intent
@@ -14,12 +14,10 @@ import com.example.justchatting.MainActivity
 import com.example.justchatting.R
 import com.example.justchatting.base.BaseActivity
 import com.example.justchatting.databinding.ActivityRegisterBinding
-import com.example.justchatting.ui.login.LoginVIewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_register.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import androidx.lifecycle.Observer
-
 
 class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
 
@@ -46,7 +44,7 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
         viewModel.selectingPhoto.observe(this, Observer {
             val intent = Intent(Intent.ACTION_PICK)
             intent.type = "image/*"
-            startActivityForResult(intent, 0)
+            startActivityForResult(intent, PERMISSIONS_REQUEST_READ_CONTACTS)
         })
 
         viewModel.successSignUp.observe(this, Observer {
@@ -59,7 +57,7 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == 0 && resultCode == Activity.RESULT_OK && data != null )
+        if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS && resultCode == Activity.RESULT_OK && data != null )
         {
             Log.d("RegisterActivity", "Photo was selected")
             viewModel.selectedPhotoUri = data.data

@@ -5,4 +5,6 @@ data class User(
     val username: String,
     val phoneNumber: String,
     val profileImageUrl: String?
-)
+){
+    constructor(): this("","","","")
+}
