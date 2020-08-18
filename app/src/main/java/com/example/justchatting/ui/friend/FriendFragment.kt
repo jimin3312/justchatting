@@ -8,12 +8,18 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.databinding.DataBindingUtil
+
+import androidx.databinding.Observable
+
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.justchatting.R
 import com.example.justchatting.base.BaseFragment
 import com.example.justchatting.databinding.FragmentFriendBinding
+
+import com.squareup.picasso.Picasso
 import com.example.justchatting.ui.login.RegisterActivity
+
 import kotlinx.android.synthetic.main.fragment_friend.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -21,7 +27,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  * A simple [Fragment] subclass.
  */
 class FriendFragment : BaseFragment<FragmentFriendBinding>() {
-    private val model: FriendViewModel by viewModel()
+    private val viewModel: FriendViewModel by viewModel()
 
     override fun getLayoutId(): Int = R.layout.fragment_friend
     override fun onCreateView(
@@ -29,10 +35,12 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding : FragmentFriendBinding = DataBindingUtil.inflate(inflater, getLayoutId(), container, false)
-        binding.viewModel = model
+        val binding: FragmentFriendBinding =
+            DataBindingUtil.inflate(inflater, getLayoutId(), container, false)
+        binding.viewModel = viewModel
         binding.lifecycleOwner = this
         setHasOptionsMenu(true)
+
         return binding.root
     }
 
@@ -42,48 +50,33 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId)
-        {
-            R.id.friend_sync_button->{
-                model.sync()
+        when (item.itemId) {
+            R.id.friend_sync_button -> {
+                viewModel.sync()
             }
-            R.id.friend_add_friend_button->{
+            R.id.friend_add_friend_button -> {
 
             }
         }
-
         return super.onOptionsItemSelected(item)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val friendRecyclerViewAdapter = FriendAdapter(model.getUsers())
-        friend_recyclerview.adapter = friendRecyclerViewAdapter
-        friend_recyclerview.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        model.getUsers().observe(viewLifecycleOwner, Observer {
-//            val uId = FirebaseAuth.getInstance().uid
-//            val myUserRef = FirebaseDatabase.getInstance().getReference("/users/$uId")
-//            myUserRef.addListenerForSingleValueEvent(object : ValueEventListener {
-//                override fun onCancelled(error: DatabaseError) {
-//                }
-//                override fun onDataChange(snapshot: DataSnapshot) {
-//                    val myUser = snapshot.getValue(User::class.java)?:return
-//                    it.add(0,myUser)
-//                }
-//            })
-            friendRecyclerViewAdapter.notifyDataSetChanged()
-        })
-
-        syncContacts()
+        setPermission()
     }
-    private fun syncContacts() {
+
+    private fun setPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(
-                this.requireContext(), Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS),
+                this.requireContext(), Manifest.permission.READ_CONTACTS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(
+                arrayOf(Manifest.permission.READ_CONTACTS),
                 RegisterActivity.PERMISSIONS_REQUEST_READ_CONTACTS
             )
-        } else{
-            model.sync()
+        } else {
+            initFriends()
         }
     }
 
@@ -94,12 +87,38 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
     ) {
         if (requestCode == RegisterActivity.PERMISSIONS_REQUEST_READ_CONTACTS) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                model.sync()
-            } else
-            {
+                initFriends()
+            } else {
                 requireActivity().finish()
             }
         }
     }
 
+    private fun initFriends() {
+        
+        viewModel.getMyUser()
+        viewModel.getUsers()
+
+        val friendRecyclerViewAdapter = FriendAdapter(viewModel.users)
+        friend_recyclerview.adapter = friendRecyclerViewAdapter
+        friend_recyclerview.addItemDecoration(
+            DividerItemDecoration(
+                requireContext(),
+                DividerItemDecoration.VERTICAL
+            )
+        )
+
+        viewModel.users.observe(viewLifecycleOwner, Observer {
+            friendRecyclerViewAdapter.notifyDataSetChanged()
+        })
+
+        viewModel.myUser.observe(viewLifecycleOwner, Observer { myUser ->
+            if (myUser != null) {
+                friend_my_textview_username.text = myUser.username
+                Picasso.get().load(myUser.profileImageUrl)
+                    .placeholder(R.drawable.person)
+                    .into(friend_my_imageview_profile_image)
+            }
+        })
+    }
 }
