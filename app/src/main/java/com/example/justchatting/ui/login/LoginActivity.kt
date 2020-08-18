@@ -1,9 +1,7 @@
-package com.example.kotlinmessenger.registerlogin
+package com.example.justchatting.ui.login
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.annotation.LayoutRes
 import androidx.lifecycle.Observer
 import com.example.justchatting.MainActivity
@@ -11,7 +9,6 @@ import com.example.justchatting.R
 import com.example.justchatting.base.BaseActivity
 import com.example.justchatting.databinding.ActivityLoginBinding
 import com.example.justchatting.ui.login.LoginVIewModel
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_login.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

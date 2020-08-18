@@ -18,6 +18,8 @@ class FriendViewModel(application: Application) : AndroidViewModel(application){
     {
         val uId = FirebaseAuth.getInstance().uid
         val myUserRef = FirebaseDatabase.getInstance().getReference("/users/$uId")
+        Log.d("디버깅 로그", "$uId")
+        Log.d("디버깅 로그", "$myUserRef")
 
         myUserRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
@@ -30,6 +32,7 @@ class FriendViewModel(application: Application) : AndroidViewModel(application){
             }
         })
     }
+
     fun setListener()
     {
         val uId = FirebaseAuth.getInstance().uid
@@ -43,7 +46,6 @@ class FriendViewModel(application: Application) : AndroidViewModel(application){
             }
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
                 val user = snapshot.getValue(User::class.java) ?: return
-
 
 //                usersMutableLiveData.value?.forEach {
 //                    Log.d("FriendFragment", "onChildChanged : ${it.username}")

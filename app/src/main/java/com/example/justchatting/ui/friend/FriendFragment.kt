@@ -1,32 +1,20 @@
 package com.example.justchatting.ui.friend
 
-
 import android.Manifest
 import android.content.pm.PackageManager
-import android.database.Cursor
 import android.os.Build
 import android.os.Bundle
-import android.provider.ContactsContract
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.databinding.DataBindingUtil
-import androidx.databinding.adapters.ViewGroupBindingAdapter.setListener
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.justchatting.R
-import com.example.justchatting.User
 import com.example.justchatting.base.BaseFragment
 import com.example.justchatting.databinding.FragmentFriendBinding
-import com.example.kotlinmessenger.registerlogin.RegisterActivity
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.example.justchatting.ui.login.RegisterActivity
 import kotlinx.android.synthetic.main.fragment_friend.*
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
