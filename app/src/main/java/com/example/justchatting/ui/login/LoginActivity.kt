@@ -1,4 +1,4 @@
-package com.example.kotlinmessenger.registerlogin
+package com.example.justchatting.ui.login
 
 import android.content.Intent
 import android.os.Bundle
