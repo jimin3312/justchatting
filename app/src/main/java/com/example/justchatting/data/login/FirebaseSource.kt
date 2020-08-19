@@ -27,6 +27,7 @@ class FirebaseSource {
         }
     }
 
+
     fun signUp(email: String, password: String): Completable = Completable.create{ emitter ->
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener{

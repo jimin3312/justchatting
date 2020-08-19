@@ -13,5 +13,5 @@ import java.util.concurrent.Executors
 val databaseModule = module{
     single { Room.databaseBuilder(get(), UserDatabase::class.java,"user_db").build()}
     single { get<UserDatabase>().userDao() }
-    single { FriendUserRepository(get(), Executors.newSingleThreadExecutor()) }
+    single { FriendUserRepository(get())}
 }

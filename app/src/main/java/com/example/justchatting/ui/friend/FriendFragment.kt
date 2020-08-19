@@ -97,10 +97,10 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
 
     private fun initFriends() {
         
-        viewModel.getMyUser()
-        viewModel.getUsers()
+        viewModel.loadMyUser()
+        viewModel.loadUsers()
 
-        val friendRecyclerViewAdapter = FriendAdapter(viewModel.users)
+        val friendRecyclerViewAdapter = FriendAdapter(viewModel.getUsers())
         friend_recyclerview.adapter = friendRecyclerViewAdapter
         friend_recyclerview.addItemDecoration(
             DividerItemDecoration(
@@ -109,17 +109,11 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
             )
         )
 
-        viewModel.users.observe(viewLifecycleOwner, Observer {
-
-            Log.d("FriendFrag","----------------${it.size}")
-
-            it.forEach{user->
-                Log.d("FriendFrag",user.username)
-            }
+        viewModel.getUsers().observe(viewLifecycleOwner, Observer {
             friendRecyclerViewAdapter.notifyDataSetChanged()
         })
 
-        viewModel.myUser.observe(viewLifecycleOwner, Observer { myUser ->
+        viewModel.getMyUser().observe(viewLifecycleOwner, Observer { myUser ->
             if (myUser != null) {
                 friend_my_textview_username.text = myUser.username
                 Picasso.get().load(myUser.profileImageUrl)
