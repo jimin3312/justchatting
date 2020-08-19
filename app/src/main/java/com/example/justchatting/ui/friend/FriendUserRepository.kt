@@ -20,22 +20,9 @@ class FriendUserRepository(private val userDao: UserDao, private val executor :E
 
     init
     {
-        val myUserRef = FirebaseDatabase.getInstance().getReference("/users/$myUserId")
-
-            myUserRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onCancelled(error: DatabaseError) {
-                }
-
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val myUser = snapshot.getValue(User::class.java) ?: return
-                    executor.execute{
-                        userDao.insertUser(myUser)
-                    }
-                    setListener()
-                }
-            })
-
+        setListener()
     }
+
     fun getMyUser(application: Application) : LiveData<User> {
         if(userDao.getAnyUser().value == null)
             sync(application)
@@ -48,47 +35,42 @@ class FriendUserRepository(private val userDao: UserDao, private val executor :E
     }
 
     fun sync(application: Application){
-            var contactList = getContacts(application)
-            val usersRef = FirebaseDatabase.getInstance().getReference("/users/")
-            val myUserRef = FirebaseDatabase.getInstance().getReference("/users/$myUserId")
 
-            myUserRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onCancelled(error: DatabaseError) {}
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val myUser = snapshot.getValue(User::class.java) ?: return
-                    Log.d("FriendViewModel", "myUser : ${myUser.username}")
-                    usersRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        val myUserRef = FirebaseDatabase.getInstance().getReference("/users/$myUserId")
+
+        myUserRef.addListenerForSingleValueEvent(object :ValueEventListener{
+            override fun onCancelled(error: DatabaseError) {
+            }
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val myUser = snapshot.getValue(User::class.java)?: return
+                Log.d("FriendViewModel:", "my username: ${myUser.username}")
+
+                var contactList = getContacts(application)
+                contactList.forEach{ number->
+                    val ref = FirebaseDatabase.getInstance().getReference("/phone/$number")
+                    Log.d("REPO","number : $number")
+                    ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onCancelled(error: DatabaseError) {}
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            for (currentSnapshot in snapshot.children) {
-                                val user = currentSnapshot.getValue(User::class.java) ?: return
-                                if (user.uid == myUserId) {
-                                    Log.d("FriendViewModel", "add Me : ${myUser.username}")
-                                    continue
-                                }
-                                Log.d("FriendViewModel", "username: ${user.username}")
-                                contactList.forEach {
-                                    if (it == user.phoneNumber) {
-                                        val fromRef = FirebaseDatabase.getInstance()
-                                            .getReference("/friends/$myUserId/${user.uid}")
-                                        val toRef = FirebaseDatabase.getInstance()
-                                            .getReference("/friends/${user.uid}/$myUserId")
-                                        fromRef.setValue(user)
-                                        toRef.setValue(myUser)
+                            val user = snapshot.getValue(User::class.java) ?: return
+                            Log.d("FriendRepoSync uid", user.uid)
+                            Log.d("FriendRepoSync", user.username)
 
-                                        executor.execute {
-                                            userDao.insertUser(user)
-                                        }
-                                    }
-                                }
+                            val fromRef = FirebaseDatabase.getInstance().getReference("/friends/${myUserId}/${user.uid}")
+                            fromRef.setValue(user)
+
+                            if(user.uid != myUserId) {
+                                val toRef = FirebaseDatabase.getInstance().getReference("/friends/${user.uid}/$myUserId")
+                                toRef.setValue(myUser)
                             }
-                        }
 
-                        override fun onCancelled(error: DatabaseError) {
                         }
                     })
-
                 }
-            })
+            }
+        })
+
+
 
     }
 
@@ -108,7 +90,12 @@ class FriendUserRepository(private val userDao: UserDao, private val executor :E
                         null
                     )
                     while (pCur!!.moveToNext()) {
-                        val phoneNo: String = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                        val temp : String = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                        var phoneNo : String = ""
+                        temp.forEach {
+                            if(it.isDigit())
+                                phoneNo+=it
+                        }
                         contactList.add(phoneNo)
                     }
                     pCur.close()
@@ -121,9 +108,7 @@ class FriendUserRepository(private val userDao: UserDao, private val executor :E
 
     fun setListener()
     {
-        val uId = FirebaseAuth.getInstance().uid
-        val ref = FirebaseDatabase.getInstance().getReference("/friends/$uId")
-
+        val ref = FirebaseDatabase.getInstance().getReference("/friends/$myUserId")
         ref.addChildEventListener(object : ChildEventListener {
             override fun onCancelled(error: DatabaseError) {
             }
@@ -131,18 +116,33 @@ class FriendUserRepository(private val userDao: UserDao, private val executor :E
 
             }
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                val user = snapshot.getValue(User::class.java) ?: return
-                executor.execute {
-                    userDao.insertUser(user)
+
+                if(snapshot.child("phoneNumber").exists() &&
+                        snapshot.child("profileImageUrl").exists() &&
+                        snapshot.child("uid").exists() &&
+                        snapshot.child("username").exists()) {
+
+                    val user = snapshot.getValue(User::class.java) ?: return
+                    Log.d("FriendRepoChanged", user.username)
+                    executor.execute {
+                        userDao.insertUser(user)
+                    }
+                    Log.d("FriendFragment", "onChildChanged : ${user.username}")
                 }
-                Log.d("FriendFragment", "onChildChanged : ${user.username}")
             }
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                val user = snapshot.getValue(User::class.java) ?: return
-                executor.execute {
-                    userDao.insertUser(user)
+                if(snapshot.child("phoneNumber").exists() &&
+                    snapshot.child("profileImageUrl").exists() &&
+                    snapshot.child("uid").exists() &&
+                    snapshot.child("username").exists())
+                {
+                    val user = snapshot.getValue(User::class.java) ?: return
+                    Log.d("FriendRepoADD", user.username)
+                    executor.execute {
+                        userDao.insertUser(user)
+                    }
+                    Log.d("FriendFragment", "onChildAdded : ${user.username}")
                 }
-                Log.d("FriendFragment", "onChildAdded : ${user.username}")
             }
             override fun onChildRemoved(snapshot: DataSnapshot) {
             }
