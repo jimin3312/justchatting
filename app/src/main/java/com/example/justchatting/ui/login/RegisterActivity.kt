@@ -34,8 +34,6 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
-        phone_edittext_register.addTextChangedListener(PhoneNumberFormattingTextWatcher())
-
         aleady_have_account_textview_register.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)

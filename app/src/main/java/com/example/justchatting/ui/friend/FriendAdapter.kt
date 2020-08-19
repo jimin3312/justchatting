@@ -32,6 +32,7 @@ class FriendAdapter(var UserList : LiveData<List<User>>): RecyclerView.Adapter<R
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         holder.itemView.friend_textview_username.text = UserList.value!![position].username
         val targetImageView = holder.itemView.friend_imageview_profile_image ?: return
+
         Picasso.get().load(UserList.value!![position].profileImageUrl)
             .placeholder(R.drawable.person)
             .into(targetImageView)

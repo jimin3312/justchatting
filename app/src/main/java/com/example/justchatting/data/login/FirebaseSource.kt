@@ -71,7 +71,10 @@ class FirebaseSource {
         ref.setValue(user)
             .addOnSuccessListener {
                 Log.d("RegisterActivity", "Finally we saved the user to Firebase database")
-                emitter.onComplete()
+                val ref = FirebaseDatabase.getInstance().getReference("/phone/$phoneNumber")
+                ref.setValue(user).addOnSuccessListener {
+                    emitter.onComplete()
+                }
             }
             .addOnFailureListener{
                 emitter.onError(it)

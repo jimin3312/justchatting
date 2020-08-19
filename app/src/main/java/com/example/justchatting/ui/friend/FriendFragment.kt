@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat.checkSelfPermission
@@ -109,6 +110,12 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         )
 
         viewModel.users.observe(viewLifecycleOwner, Observer {
+
+            Log.d("FriendFrag","----------------${it.size}")
+
+            it.forEach{user->
+                Log.d("FriendFrag",user.username)
+            }
             friendRecyclerViewAdapter.notifyDataSetChanged()
         })
 

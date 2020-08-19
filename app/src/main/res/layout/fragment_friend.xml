@@ -45,8 +45,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/friend_my_imageview_profile_image"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="username"
-                />
+                tools:text="username" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -57,7 +56,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
