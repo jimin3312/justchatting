@@ -18,18 +18,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         verifyUserIsLoggedIn()
-
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-
-        val navController = findNavController(R.id.nav_host_fragment)
-        binding.bottomNavigationView.setupWithNavController(navController)
-
     }
     private fun verifyUserIsLoggedIn() {
         if (FirebaseAuth.getInstance().currentUser == null) {
             val intent = Intent(this, RegisterActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
+        } else {
+            binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+            val navController = findNavController(R.id.nav_host_fragment)
+            binding.bottomNavigationView.setupWithNavController(navController)
         }
     }
 }

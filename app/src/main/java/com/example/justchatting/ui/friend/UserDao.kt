@@ -17,9 +17,6 @@ interface UserDao {
     @Insert(onConflict = REPLACE)
     fun insertUser(user: User)
 
-    @Query("DELETE FROM users_tb WHERE uid = (:uId)")
-    fun delete(uId: String)
-
     @Query("SELECT * FROM users_tb LIMIT 1")
     fun getAnyUser() : LiveData<User>
 }
