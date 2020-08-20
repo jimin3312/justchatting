@@ -44,7 +44,7 @@ class FirebaseSource {
 
         return Completable.create{emitter ->
             val filename = UUID.randomUUID().toString()
-            val ref = FirebaseStorage.getInstance().getReference("/images/$filename")
+            val ref = FirebaseStorage.getInstance().getReference("/profileImages/$filename")
             ref.putFile(uri)
                 .addOnSuccessListener {
                     Log.d("Register", "Successfully uploaded image: ${it.metadata?.path}")

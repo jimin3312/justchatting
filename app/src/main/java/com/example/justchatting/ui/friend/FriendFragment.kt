@@ -20,6 +20,7 @@ import com.example.justchatting.databinding.FragmentFriendBinding
 
 import com.squareup.picasso.Picasso
 import com.example.justchatting.ui.login.RegisterActivity
+import io.reactivex.disposables.CompositeDisposable
 
 import kotlinx.android.synthetic.main.fragment_friend.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -29,6 +30,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  */
 class FriendFragment : BaseFragment<FragmentFriendBinding>() {
     private val viewModel: FriendViewModel by viewModel()
+    private val friendAdapter = FriendAdapter()
+    private val disposable = CompositeDisposable()
 
     override fun getLayoutId(): Int = R.layout.fragment_friend
     override fun onCreateView(
@@ -41,7 +44,6 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         setHasOptionsMenu(true)
-
         return binding.root
     }
 
@@ -100,18 +102,8 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         viewModel.loadMyUser()
         viewModel.loadUsers()
 
-        val friendRecyclerViewAdapter = FriendAdapter(viewModel.getUsers())
-        friend_recyclerview.adapter = friendRecyclerViewAdapter
-        friend_recyclerview.addItemDecoration(
-            DividerItemDecoration(
-                requireContext(),
-                DividerItemDecoration.VERTICAL
-            )
-        )
-
-        viewModel.getUsers().observe(viewLifecycleOwner, Observer {
-            friendRecyclerViewAdapter.notifyDataSetChanged()
-        })
+        friend_recyclerview.adapter = friendAdapter
+        disposable.add(viewModel.users.subscribe(friendAdapter::submitList))
 
         viewModel.getMyUser().observe(viewLifecycleOwner, Observer { myUser ->
             if (myUser != null) {
@@ -121,5 +113,10 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
                     .into(friend_my_imageview_profile_image)
             }
         })
+    }
+
+    override fun onStop() {
+        super.onStop()
+        disposable.clear()
     }
 }

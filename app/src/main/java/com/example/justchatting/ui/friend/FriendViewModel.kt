@@ -6,11 +6,13 @@ import android.provider.ContactsContract
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.paging.PagedList
+import androidx.paging.toObservable
 import com.example.justchatting.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import io.reactivex.Observable
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import org.koin.core.KoinComponent
@@ -22,17 +24,22 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
     private val userRepository : FriendUserRepository by inject()
     private var myUserId = FirebaseAuth.getInstance().uid
     private lateinit var myUser: LiveData<User>
-    private lateinit var users: LiveData<List<User>>
+
+    lateinit var users : Observable<PagedList<User>>
+    private lateinit var config : PagedList.Config
 
     init {
         setListener()
+
+        config =  PagedList.Config.Builder()
+            .setPageSize(30)
+            .setEnablePlaceholders(false)
+            .build()
     }
+
 
     fun getMyUser() : LiveData<User>{
         return myUser
-    }
-    fun getUsers() : LiveData<List<User>> {
-        return users
     }
 
     fun loadMyUser() {
@@ -43,12 +50,12 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
     fun loadUsers(){
         if(userRepository.getAnyUser().value == null )
             makeFirebaseFriendRelation()
-        users = userRepository.getUsers(myUserId!!)
+        users = userRepository.getUsers(myUserId!!).toObservable(pageSize = 30)
     }
     fun sync(){
         makeFirebaseFriendRelation()
         myUser = userRepository.getUserById(myUserId!!)
-        users = userRepository.getUsers(myUserId!!)
+        users = userRepository.getUsers(myUserId!!).toObservable(pageSize = 30)
     }
 
     fun insert(user : User) {
