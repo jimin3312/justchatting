@@ -6,6 +6,7 @@ import android.provider.ContactsContract
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.paging.DataSource
 import com.example.justchatting.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -19,7 +20,7 @@ import java.util.concurrent.Executors
 
 class FriendUserRepository(private val userDao: UserDao){
 
-    fun getUsers(myId : String) : LiveData<List<User>>{
+    fun getUsers(myId : String) : DataSource.Factory<Int, User>{
         return userDao.getAll(myId)
     }
 

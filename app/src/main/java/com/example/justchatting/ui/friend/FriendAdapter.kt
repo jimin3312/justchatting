@@ -5,37 +5,35 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.paging.PagedListAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.justchatting.R
 import com.example.justchatting.User
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_friend_item.view.*
 
-class FriendAdapter(var UserList : LiveData<List<User>>): RecyclerView.Adapter<RecyclerView.ViewHolder>()
+class FriendAdapter(): PagedListAdapter<User, UserViewHolder>(DIFF_CALLBACK)
 {
-    override fun getItemViewType(position: Int): Int {
-        return position
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
+        return UserViewHolder(parent)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.fragment_friend_item, parent, false)
-        return userViewHolder(view)
+    override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
+        val user : User? = getItem(position)
+        holder.bindTo(user)
     }
 
-    override fun getItemCount(): Int {
-        if(UserList.value == null)
-            return 0
-        else
-            return UserList.value!!.size
-    }
+    companion object {
+        private val DIFF_CALLBACK = object :
+            DiffUtil.ItemCallback<User>() {
+            // Concert details may have changed if reloaded from the database,
+            // but ID is fixed.
+            override fun areItemsTheSame(oldUser : User,
+                                         newUser : User) = oldUser.uid == newUser.uid
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        holder.itemView.friend_textview_username.text = UserList.value!![position].username
-        val targetImageView = holder.itemView.friend_imageview_profile_image ?: return
-
-        Picasso.get().load(UserList.value!![position].profileImageUrl)
-            .placeholder(R.drawable.person)
-            .into(targetImageView)
+            override fun areContentsTheSame(oldUser: User,
+                                            newUser: User) = oldUser == newUser
+        }
     }
-    inner class userViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 }
