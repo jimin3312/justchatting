@@ -6,7 +6,7 @@ import com.example.justchatting.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
-import io.reactivex.rxjava3.core.Completable
+import io.reactivex.Completable
 import java.util.*
 
 class FirebaseSource {

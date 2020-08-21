@@ -1,7 +1,7 @@
 package com.example.justchatting.repository.login
 
 import android.net.Uri
-import io.reactivex.rxjava3.core.Completable
+import io.reactivex.Completable
 
 interface UserRepository {
     fun loginWithEmail(email: String, pass: String) : Completable

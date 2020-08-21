@@ -3,7 +3,9 @@ package com.example.justchatting.ui.friend
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import com.example.justchatting.User
-import io.reactivex.rxjava3.core.Completable
+import io.reactivex.Completable
+import io.reactivex.Observable
+import io.reactivex.Single
 
 class FriendUserRepository(private val userDao: UserDao){
 
@@ -11,14 +13,14 @@ class FriendUserRepository(private val userDao: UserDao){
         return userDao.getAll(myId)
     }
 
-    fun getUserById(userId: String): LiveData<User>{
-        return userDao.getUserById(userId)
+    fun getMyUser(myId: String): Observable<User>{
+        return userDao.getMyUser(myId)
     }
 
     fun insertUser(user: User): Completable {
-        return Completable.fromCallable{userDao.insertUser(user)}
+        return userDao.insertUser(user)
     }
-    fun getAnyUser() : LiveData<User> {
+    fun getAnyUser() : Single<User> {
         return userDao.getAnyUser()
     }
 }

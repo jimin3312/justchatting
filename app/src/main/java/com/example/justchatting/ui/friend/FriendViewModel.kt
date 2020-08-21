@@ -1,5 +1,6 @@
 package com.example.justchatting.ui.friend
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.database.Cursor
 import android.provider.ContactsContract
@@ -11,12 +12,14 @@ import androidx.paging.toObservable
 import com.example.justchatting.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-
+import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.Scheduler
 
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -26,32 +29,21 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
     private val compositeDisposable : CompositeDisposable = CompositeDisposable()
     private val userRepository : FriendUserRepository by inject()
     private var myUserId = FirebaseAuth.getInstance().uid
-    private lateinit var myUser: LiveData<User>
-
+    lateinit var myUser: Observable<User>
+//    lateinit var myUser: LiveData<User>
     lateinit var users : Observable<PagedList<User>>
 
-    init {
+//    init {
 //        setListener()
-    }
-    fun getMyUser() : LiveData<User>{
-        return myUser
-    }
-    fun isUserRepositoryEmpty() : Boolean
-    {
-        return userRepository.getAnyUser().value == null
-    }
-
+//    }
     fun loadMyUser() {
-        myUser = userRepository.getUserById(myUserId!!)
+        myUser = userRepository.getMyUser(myUserId!!)
     }
-    fun loadUsers(){
+    fun loadUsers() {
         users = userRepository.getUsers(myUserId!!).toObservable(pageSize = 30)
     }
-    fun sync(){
-        makeFirebaseFriendRelation()
-        setUserDatabase()
-        myUser = userRepository.getUserById(myUserId!!)
-        users = userRepository.getUsers(myUserId!!).toObservable(pageSize = 30)
+    fun getAnyUser() : Single<User> {
+        return userRepository.getAnyUser()
     }
 
     fun insert(user : User) {
@@ -65,8 +57,7 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
             })
         )
     }
-
-    fun makeFirebaseFriendRelation(){
+    fun makeFriendRelation(){
         val myUserRef = FirebaseDatabase.getInstance().getReference("/users/$myUserId")
 
         myUserRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -79,6 +70,7 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
                 var contactList = getContacts(getApplication())
                 contactList.add(myUser.phoneNumber)
                 contactList.forEach{ number->
+
                     val ref = FirebaseDatabase.getInstance().getReference("/phone/$number")
                     Log.d("REPO","number : $number")
                     ref.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -138,6 +130,7 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
 
     fun setUserDatabase()
     {
+
         val ref = FirebaseDatabase.getInstance().getReference("/friends/$myUserId")
         ref.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onCancelled(error: DatabaseError) {
@@ -151,40 +144,40 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
             }
         })
     }
-//    private fun setListener()
-//    {
-//        val ref = FirebaseDatabase.getInstance().getReference("/friends/$myUserId")
-//        ref.addChildEventListener(object : ChildEventListener {
-//            override fun onCancelled(error: DatabaseError) {
-//            }
-//            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-//
-//            }
-//            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-//
-//                if(snapshot.child("phoneNumber").exists() &&
-//                    snapshot.child("profileImageUrl").exists() &&
-//                    snapshot.child("uid").exists() &&
-//                    snapshot.child("username").exists()) {
-//
-//                    val user = snapshot.getValue(User::class.java) ?: return
-//                    insert(user)
-//                }
-//            }
-//            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-//                if(snapshot.child("phoneNumber").exists() &&
-//                    snapshot.child("profileImageUrl").exists() &&
-//                    snapshot.child("uid").exists() &&
-//                    snapshot.child("username").exists())
-//                {
-//                    val user = snapshot.getValue(User::class.java) ?: return
-//                    insert(user)
-//                }
-//            }
-//            override fun onChildRemoved(snapshot: DataSnapshot) {
-//            }
-//        })
-//    }
+    private fun setListener()
+    {
+        val ref = FirebaseDatabase.getInstance().getReference("/friends/$myUserId")
+        ref.addChildEventListener(object : ChildEventListener {
+            override fun onCancelled(error: DatabaseError) {
+            }
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+
+            }
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+
+                if(snapshot.child("phoneNumber").exists() &&
+                    snapshot.child("profileImageUrl").exists() &&
+                    snapshot.child("uid").exists() &&
+                    snapshot.child("username").exists()) {
+
+                    val user = snapshot.getValue(User::class.java) ?: return
+                    insert(user)
+                }
+            }
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                if(snapshot.child("phoneNumber").exists() &&
+                    snapshot.child("profileImageUrl").exists() &&
+                    snapshot.child("uid").exists() &&
+                    snapshot.child("username").exists())
+                {
+                    val user = snapshot.getValue(User::class.java) ?: return
+                    insert(user)
+                }
+            }
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+            }
+        })
+    }
 
     override fun onCleared() {
         super.onCleared()
