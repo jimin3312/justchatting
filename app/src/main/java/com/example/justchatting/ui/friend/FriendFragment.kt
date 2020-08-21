@@ -13,12 +13,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.Observable
 import androidx.lifecycle.Observer
 import com.example.justchatting.R
+import com.example.justchatting.User
 import com.example.justchatting.base.BaseFragment
 import com.example.justchatting.databinding.FragmentFriendBinding
 import com.example.justchatting.ui.friend.dialog.TabDialogFragment
 
 import com.squareup.picasso.Picasso
 import com.example.justchatting.ui.login.RegisterActivity
+import com.google.firebase.auth.FirebaseAuth
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -34,6 +36,7 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
     private val viewModel: FriendViewModel by viewModel()
     private val friendAdapter = FriendAdapter()
     private val disposable = CompositeDisposable()
+    private var myUserId = FirebaseAuth.getInstance().uid
 
     override fun getLayoutId(): Int = R.layout.fragment_friend
 
@@ -54,7 +57,7 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.friend_sync_button -> {
-                sync()
+
             }
             R.id.friend_add_friend_button -> {
                 var tabDialogFragment = TabDialogFragment()
@@ -108,49 +111,30 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                load()
+                viewModel.loadUser(myUserId!!)
+                viewModel.loadUsers()
                 setObserver()
             },{
-                sync()
+                viewModel.sync()
+                viewModel.loadUser(myUserId!!)
+                viewModel.loadUsers()
                 setObserver()
             })
     }
-    private fun sync()
-    {
-        viewModel.makeFriendRelation()
-        viewModel.setUserDatabase()
-        load()
-    }
-    private fun load()
-    {
-        viewModel.loadMyUser()
-        viewModel.loadUsers()
-    }
+
     @SuppressLint("CheckResult")
     private fun setObserver()
     {
         disposable.add(viewModel.users.subscribe(friendAdapter::submitList))
-//        viewModel.myUser.observe(viewLifecycleOwner, Observer {myUser->
-//            if(myUser!= null) {
-//                Log.d("FriendFragment myuser", myUser.username)
-//                friend_my_textview_username.text = myUser.username
-//                Picasso.get().load(myUser.profileImageUrl)
-//                    .placeholder(R.drawable.person)
-//                    .into(friend_my_imageview_profile_image)
-//            }
-//        })
-
-        viewModel.myUser.subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({myUser->
-                if(myUser != null) {
-                    Log.d("FriendFragment myuser", myUser.username)
-                    friend_my_textview_username.text = myUser.username
-                    Picasso.get().load(myUser.profileImageUrl)
-                        .placeholder(R.drawable.person)
-                        .into(friend_my_imageview_profile_image)
-                }
-            },{})
+        viewModel.myUser.observe(viewLifecycleOwner, Observer {myUser->
+            if(myUser!= null) {
+                Log.d("FriendFragment myuser", myUser.username)
+                friend_my_textview_username.text = myUser.username
+                Picasso.get().load(myUser.profileImageUrl)
+                    .placeholder(R.drawable.person)
+                    .into(friend_my_imageview_profile_image)
+            }
+        })
     }
     override fun onStop() {
         super.onStop()

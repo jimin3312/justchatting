@@ -14,7 +14,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.Scheduler
 
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -29,19 +28,20 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
     private val compositeDisposable : CompositeDisposable = CompositeDisposable()
     private val userRepository : FriendUserRepository by inject()
     private var myUserId = FirebaseAuth.getInstance().uid
-    lateinit var myUser: Observable<User>
-//    lateinit var myUser: LiveData<User>
+
+    lateinit var myUser: LiveData<User>
     lateinit var users : Observable<PagedList<User>>
 
-//    init {
-//        setListener()
-//    }
-    fun loadMyUser() {
-        myUser = userRepository.getMyUser(myUserId!!)
+    init {
+        setListener()
+    }
+    fun loadUser(userId : String){
+        myUser = userRepository.getMyUser(userId)
     }
     fun loadUsers() {
         users = userRepository.getUsers(myUserId!!).toObservable(pageSize = 30)
     }
+
     fun getAnyUser() : Single<User> {
         return userRepository.getAnyUser()
     }
@@ -57,7 +57,9 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
             })
         )
     }
-    fun makeFriendRelation(){
+
+    fun sync(){
+
         val myUserRef = FirebaseDatabase.getInstance().getReference("/users/$myUserId")
 
         myUserRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -87,7 +89,6 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
                                 val toRef = FirebaseDatabase.getInstance().getReference("/friends/${user.uid}/$myUserId")
                                 toRef.setValue(myUser)
                             }
-
                         }
                     })
                 }
@@ -128,22 +129,21 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
         return contactList
     }
 
-    fun setUserDatabase()
-    {
-
-        val ref = FirebaseDatabase.getInstance().getReference("/friends/$myUserId")
-        ref.addListenerForSingleValueEvent(object : ValueEventListener{
-            override fun onCancelled(error: DatabaseError) {
-            }
-            override fun onDataChange(snapshot: DataSnapshot) {
-                snapshot.children.forEach{ child->
-                    val user = child.getValue(User::class.java)
-                    if(user != null)
-                        insert(user)
-                }
-            }
-        })
-    }
+//    fun setUserDatabase()
+//    {
+//        val ref = FirebaseDatabase.getInstance().getReference("/friends/$myUserId")
+//        ref.addListenerForSingleValueEvent(object : ValueEventListener{
+//            override fun onCancelled(error: DatabaseError) {
+//            }
+//            override fun onDataChange(snapshot: DataSnapshot) {
+//                snapshot.children.forEach{ child->
+//                    val user = child.getValue(User::class.java)
+//                    if(user != null)
+//                        insert(user)
+//                }
+//            }
+//        })
+//    }
     private fun setListener()
     {
         val ref = FirebaseDatabase.getInstance().getReference("/friends/$myUserId")
@@ -154,15 +154,6 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
 
             }
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-
-                if(snapshot.child("phoneNumber").exists() &&
-                    snapshot.child("profileImageUrl").exists() &&
-                    snapshot.child("uid").exists() &&
-                    snapshot.child("username").exists()) {
-
-                    val user = snapshot.getValue(User::class.java) ?: return
-                    insert(user)
-                }
             }
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 if(snapshot.child("phoneNumber").exists() &&
@@ -178,7 +169,6 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
             }
         })
     }
-
     override fun onCleared() {
         super.onCleared()
         compositeDisposable.dispose()

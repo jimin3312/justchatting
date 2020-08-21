@@ -13,8 +13,8 @@ class FriendUserRepository(private val userDao: UserDao){
         return userDao.getAll(myId)
     }
 
-    fun getMyUser(myId: String): Observable<User>{
-        return userDao.getMyUser(myId)
+    fun getMyUser(userId: String): LiveData<User>{
+        return userDao.getUserById(userId)
     }
 
     fun insertUser(user: User): Completable {
