@@ -57,7 +57,7 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.friend_sync_button -> {
-
+                viewModel.sync()
             }
             R.id.friend_add_friend_button -> {
                 var tabDialogFragment = TabDialogFragment()
