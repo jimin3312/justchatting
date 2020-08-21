@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
         verifyUserIsLoggedIn()
     }
     private fun verifyUserIsLoggedIn() {
-        if (FirebaseAuth.getInstance().currentUser == null) {
+        if (FirebaseAuth.getInstance().uid == null) {
             val intent = Intent(this, RegisterActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)

@@ -10,18 +10,15 @@ import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.databinding.DataBindingUtil
 
-import androidx.databinding.Observable
-
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.justchatting.R
 import com.example.justchatting.base.BaseFragment
 import com.example.justchatting.databinding.FragmentFriendBinding
+import com.example.justchatting.ui.friend.dialog.TabDialogFragment
 
 import com.squareup.picasso.Picasso
 import com.example.justchatting.ui.login.RegisterActivity
 import io.reactivex.disposables.CompositeDisposable
-
 import kotlinx.android.synthetic.main.fragment_friend.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -34,17 +31,15 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
     private val disposable = CompositeDisposable()
 
     override fun getLayoutId(): Int = R.layout.fragment_friend
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val binding: FragmentFriendBinding =
-            DataBindingUtil.inflate(inflater, getLayoutId(), container, false)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         setHasOptionsMenu(true)
-        return binding.root
+
+        setPermission()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -58,16 +53,24 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
                 viewModel.sync()
             }
             R.id.friend_add_friend_button -> {
+                var tabDialogFragment = TabDialogFragment()
+                var fragmentManager = requireActivity()
+                    .supportFragmentManager
+                    .beginTransaction()
+//                    .addToBackStack(null)
+//
+//                var prev = requireActivity().supportFragmentManager.findFragmentByTag("dialog")
+//                if(prev != null)
+//                    fragmentManager.remove(prev)
+
+                tabDialogFragment.show(fragmentManager,"dialog")
 
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setPermission()
-    }
+
 
     private fun setPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(
@@ -98,11 +101,18 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
     }
 
     private fun initFriends() {
-        
+
+        friend_recyclerview.adapter = friendAdapter
+
+        if(viewModel.isUserRepositoryEmpty())
+        {
+            viewModel.makeFirebaseFriendRelation()
+            viewModel.setUserDatabase()
+        }
         viewModel.loadMyUser()
         viewModel.loadUsers()
 
-        friend_recyclerview.adapter = friendAdapter
+
         disposable.add(viewModel.users.subscribe(friendAdapter::submitList))
 
         viewModel.getMyUser().observe(viewLifecycleOwner, Observer { myUser ->

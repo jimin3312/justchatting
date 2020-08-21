@@ -20,18 +20,10 @@ class ChattingFragment : BaseFragment<FragmentChattingBinding>() {
 
     override fun getLayoutId(): Int = R.layout.fragment_chatting
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding.lifecycleOwner = this
-        binding.viewModel = viewModel
-        return binding.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        binding.lifecycleOwner = this
+        binding.viewModel = viewModel
+        setHasOptionsMenu(true)
     }
 }
