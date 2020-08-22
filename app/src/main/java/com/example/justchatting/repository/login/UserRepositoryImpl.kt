@@ -2,7 +2,6 @@ package com.example.justchatting.repository.login
 
 import android.net.Uri
 import com.example.justchatting.data.login.FirebaseSource
-import io.reactivex.rxjava3.core.Completable
 
 class UserRepositoryImpl(
     private val firebaseSource: FirebaseSource

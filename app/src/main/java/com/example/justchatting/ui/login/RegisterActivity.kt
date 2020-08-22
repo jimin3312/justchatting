@@ -71,6 +71,7 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
                 ImageDecoder.decodeBitmap(source)
             }
 
+
             select_photo_imageview_register.setImageBitmap(bitmap)
             select_photo_button_register.alpha = 0f
         }

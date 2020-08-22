@@ -1,6 +1,7 @@
 package com.example.justchatting.ui.friend
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -9,16 +10,22 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.databinding.DataBindingUtil
-
+import androidx.databinding.Observable
 import androidx.lifecycle.Observer
 import com.example.justchatting.R
+import com.example.justchatting.User
 import com.example.justchatting.base.BaseFragment
 import com.example.justchatting.databinding.FragmentFriendBinding
 import com.example.justchatting.ui.friend.dialog.TabDialogFragment
 
 import com.squareup.picasso.Picasso
 import com.example.justchatting.ui.login.RegisterActivity
+import com.google.firebase.auth.FirebaseAuth
+import io.reactivex.Completable
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_friend.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -29,6 +36,7 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
     private val viewModel: FriendViewModel by viewModel()
     private val friendAdapter = FriendAdapter()
     private val disposable = CompositeDisposable()
+    private var myUserId = FirebaseAuth.getInstance().uid
 
     override fun getLayoutId(): Int = R.layout.fragment_friend
 
@@ -38,7 +46,6 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         setHasOptionsMenu(true)
-
         setPermission()
     }
 
@@ -57,20 +64,17 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
                 var fragmentManager = requireActivity()
                     .supportFragmentManager
                     .beginTransaction()
-//                    .addToBackStack(null)
-//
-//                var prev = requireActivity().supportFragmentManager.findFragmentByTag("dialog")
-//                if(prev != null)
-//                    fragmentManager.remove(prev)
+                    .addToBackStack(null)
 
+                var prev = requireActivity().supportFragmentManager.findFragmentByTag("dialog")
+                if(prev != null)
+                    fragmentManager.remove(prev)
                 tabDialogFragment.show(fragmentManager,"dialog")
 
             }
         }
         return super.onOptionsItemSelected(item)
     }
-
-
 
     private fun setPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(
@@ -82,7 +86,7 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
                 RegisterActivity.PERMISSIONS_REQUEST_READ_CONTACTS
             )
         } else {
-            initFriends()
+            loadFriends()
         }
     }
 
@@ -93,30 +97,38 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
     ) {
         if (requestCode == RegisterActivity.PERMISSIONS_REQUEST_READ_CONTACTS) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                initFriends()
+                loadFriends()
             } else {
                 requireActivity().finish()
             }
         }
     }
 
-    private fun initFriends() {
-
+    @SuppressLint("CheckResult")
+    private fun loadFriends() {
         friend_recyclerview.adapter = friendAdapter
+        viewModel.getAnyUser()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                viewModel.loadUser(myUserId!!)
+                viewModel.loadUsers()
+                setObserver()
+            },{
+                viewModel.sync()
+                viewModel.loadUser(myUserId!!)
+                viewModel.loadUsers()
+                setObserver()
+            })
+    }
 
-        if(viewModel.isUserRepositoryEmpty())
-        {
-            viewModel.makeFirebaseFriendRelation()
-            viewModel.setUserDatabase()
-        }
-        viewModel.loadMyUser()
-        viewModel.loadUsers()
-
-
+    @SuppressLint("CheckResult")
+    private fun setObserver()
+    {
         disposable.add(viewModel.users.subscribe(friendAdapter::submitList))
-
-        viewModel.getMyUser().observe(viewLifecycleOwner, Observer { myUser ->
-            if (myUser != null) {
+        viewModel.myUser.observe(viewLifecycleOwner, Observer {myUser->
+            if(myUser!= null) {
+                Log.d("FriendFragment myuser", myUser.username)
                 friend_my_textview_username.text = myUser.username
                 Picasso.get().load(myUser.profileImageUrl)
                     .placeholder(R.drawable.person)
@@ -124,7 +136,6 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
             }
         })
     }
-
     override fun onStop() {
         super.onStop()
         disposable.clear()

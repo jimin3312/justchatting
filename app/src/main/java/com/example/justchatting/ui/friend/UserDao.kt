@@ -5,6 +5,9 @@ import androidx.paging.DataSource
 import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
 import com.example.justchatting.User
+import io.reactivex.Completable
+import io.reactivex.Observable
+import io.reactivex.Single
 
 @Dao
 interface UserDao {
@@ -14,9 +17,15 @@ interface UserDao {
     @Query("SELECT * FROM users_tb WHERE uid IN (:userId)")
     fun getUserById(userId: String): LiveData<User>
 
-    @Insert(onConflict = REPLACE)
-    fun insertUser(user: User)
-
     @Query("SELECT * FROM users_tb LIMIT 1")
-    fun getAnyUser() : LiveData<User>
+    fun getAnyUser() : Single<User>
+
+    @Insert(onConflict = REPLACE)
+    fun insertUser(user: User) :Completable
+
+    @Update
+    fun update(user : User) : Completable
+
+
+
 }
