@@ -9,9 +9,11 @@ import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat.checkSelfPermission
+import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.Observable
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.RecyclerView
 import com.example.justchatting.R
 import com.example.justchatting.User
 import com.example.justchatting.base.BaseFragment
@@ -45,8 +47,9 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
 
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
+        friend_recyclerview.adapter =friendAdapter
         setHasOptionsMenu(true)
-        setPermission()
+        loadFriends()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -76,47 +79,18 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun setPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(
-                this.requireContext(), Manifest.permission.READ_CONTACTS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissions(
-                arrayOf(Manifest.permission.READ_CONTACTS),
-                RegisterActivity.PERMISSIONS_REQUEST_READ_CONTACTS
-            )
-        } else {
-            loadFriends()
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        if (requestCode == RegisterActivity.PERMISSIONS_REQUEST_READ_CONTACTS) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                loadFriends()
-            } else {
-                requireActivity().finish()
-            }
-        }
-    }
-
     @SuppressLint("CheckResult")
     private fun loadFriends() {
-        friend_recyclerview.adapter = friendAdapter
         viewModel.getAnyUser()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                viewModel.loadUser(myUserId!!)
+                viewModel.loadMyUser(myUserId!!)
                 viewModel.loadUsers()
                 setObserver()
             },{
                 viewModel.sync()
-                viewModel.loadUser(myUserId!!)
+                viewModel.loadMyUser(myUserId!!)
                 viewModel.loadUsers()
                 setObserver()
             })
@@ -125,16 +99,23 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
     @SuppressLint("CheckResult")
     private fun setObserver()
     {
-        disposable.add(viewModel.users.subscribe(friendAdapter::submitList))
-        viewModel.myUser.observe(viewLifecycleOwner, Observer {myUser->
-            if(myUser!= null) {
-                Log.d("FriendFragment myuser", myUser.username)
-                friend_my_textview_username.text = myUser.username
-                Picasso.get().load(myUser.profileImageUrl)
-                    .placeholder(R.drawable.person)
-                    .into(friend_my_imageview_profile_image)
-            }
-        })
+        disposable.add(viewModel.users.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ pagedList->
+                friendAdapter.submitList(pagedList)
+            },{})
+        )
+        disposable.add(viewModel.myUser.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ myUser ->
+                if(myUser!= null) {
+                    Log.d("FriendFragment myuser", myUser.username)
+                    friend_my_textview_username.text = myUser.username
+                    Picasso.get().load(myUser.profileImageUrl)
+                        .placeholder(R.drawable.person)
+                        .into(friend_my_imageview_profile_image)
+                }
+            },{}))
     }
     override fun onStop() {
         super.onStop()

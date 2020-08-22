@@ -29,14 +29,14 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
     private val userRepository : FriendUserRepository by inject()
     private var myUserId = FirebaseAuth.getInstance().uid
 
-    lateinit var myUser: LiveData<User>
+    lateinit var myUser: Observable<User>
     lateinit var users : Observable<PagedList<User>>
 
     init {
         setListener()
     }
-    fun loadUser(userId : String){
-        myUser = userRepository.getMyUser(userId)
+    fun loadMyUser(myId : String){
+        myUser = userRepository.getMyUser(myId)
     }
     fun loadUsers() {
         users = userRepository.getUsers(myUserId!!).toObservable(pageSize = 30)
