@@ -7,12 +7,14 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.Observable
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.justchatting.R
 import com.example.justchatting.User
@@ -36,9 +38,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  */
 class FriendFragment : BaseFragment<FragmentFriendBinding>() {
     private val viewModel: FriendViewModel by viewModel()
-    private val friendAdapter = FriendAdapter()
+    private val friendAdapter : FriendAdapter = FriendAdapter()
     private val disposable = CompositeDisposable()
-    private var myUserId = FirebaseAuth.getInstance().uid
 
     override fun getLayoutId(): Int = R.layout.fragment_friend
 
@@ -47,9 +48,13 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
 
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
-        friend_recyclerview.adapter =friendAdapter
         setHasOptionsMenu(true)
-        loadFriends()
+        friend_recyclerview.run {
+            setHasFixedSize(true)
+            adapter = friendAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
+        setPermission()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -85,31 +90,29 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                viewModel.loadMyUser(myUserId!!)
-                viewModel.loadUsers()
+                Log.d("FriendFrag","data exist")
                 setObserver()
             },{
+                Log.d("FriendFrag","data doesn't exist")
                 viewModel.sync()
-                viewModel.loadMyUser(myUserId!!)
-                viewModel.loadUsers()
                 setObserver()
             })
+
     }
 
     @SuppressLint("CheckResult")
     private fun setObserver()
     {
-        disposable.add(viewModel.users.subscribeOn(Schedulers.io())
+        disposable.add(viewModel.getUsers().subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ pagedList->
                 friendAdapter.submitList(pagedList)
             },{})
         )
-        disposable.add(viewModel.myUser.subscribeOn(Schedulers.io())
+        disposable.add(viewModel.getMyUser().subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ myUser ->
                 if(myUser!= null) {
-                    Log.d("FriendFragment myuser", myUser.username)
                     friend_my_textview_username.text = myUser.username
                     Picasso.get().load(myUser.profileImageUrl)
                         .placeholder(R.drawable.person)
@@ -117,6 +120,35 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
                 }
             },{}))
     }
+
+    private fun setPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(
+                requireContext() , Manifest.permission.READ_CONTACTS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(
+                arrayOf(Manifest.permission.READ_CONTACTS),
+                RegisterActivity.PERMISSIONS_REQUEST_READ_CONTACTS
+            )
+        } else {
+            loadFriends()
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == RegisterActivity.PERMISSIONS_REQUEST_READ_CONTACTS) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                setPermission()
+            } else {
+                requireActivity().finish()
+            }
+        }
+    }
+
     override fun onStop() {
         super.onStop()
         disposable.clear()
