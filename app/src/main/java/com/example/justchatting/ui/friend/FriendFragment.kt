@@ -92,22 +92,34 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
     override fun messageFromTabDialog(selection : Int, input : String) {
         when(selection) {
              0-> {
+                 Log.d("FriendFragment","cancel to add friend")
                 val prev = childFragmentManager.findFragmentByTag("dialog")
                 if(prev != null) {
                     (prev as DialogFragment).dismiss()
                 }
             }
             1->{
-                if(viewModel.addFriendWithId(input))
-                    Log.d("FriendFragment","친구 추가 완료")
-                else
-                    Log.d("FriendFragment","실패")
+
+                Log.d("FriendFragment","add a friend with phoneNum : $input")
+                viewModel.addFriendWithPhoneNumber(input)
+//                viewModel.getIsAddFriend().subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe({
+//                        Log.d("FriendFragment","친구 추가 완료")
+//                    },{
+//                        Log.d("FriendFragment","실패")
+//                    })
             }
             2->{
-                if(viewModel.addFriendWithPhoneNumber(input))
-                    Log.d("FriendFragment","친구 추가 완료")
-                else
-                    Log.d("FriendFragment","실패")
+                Log.d("FriendFragment","add a friend with Id : $input")
+                viewModel.addFriendWithId(input)
+//                viewModel.getIsAddFriend().subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe({
+//                        Log.d("FriendFragment","친구 추가 완료")
+//                    },{
+//                        Log.d("FriendFragment","실패")
+//                    })
             }
         }
     }
