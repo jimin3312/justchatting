@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.justchatting.R
@@ -22,16 +23,19 @@ class AddFriendFragment(text : String) : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.dialog_fragment, container, false)
-        val textView = view.findViewById<TextView>(R.id.dialog_textview_detail)
+        val detailTextView = view.findViewById<TextView>(R.id.dialog_textview_detail)
         val addButton = view.findViewById<Button>(R.id.btn_add)
         val cancelButton = view.findViewById<Button>(R.id.btn_cancel)
-        textView.text = mText
+        val inputEditTextView = view.findViewById<EditText>(R.id.dialog_edittext_input)
+        detailTextView.text = mText
 
         addButton.setOnClickListener { view->
-            addFriendFragmentListener?.messageFromAddFriendFragment(true)
+            Log.d("AddFriendFragment","onclick add")
+            addFriendFragmentListener?.messageFromAddFriendFragment(true,inputEditTextView.text.toString())
         }
         cancelButton.setOnClickListener{view->
-            addFriendFragmentListener?.messageFromAddFriendFragment(false)
+            Log.d("AddFriendFragment","onclick cancel")
+            addFriendFragmentListener?.messageFromAddFriendFragment(false,"")
         }
 
         return view
@@ -49,7 +53,7 @@ class AddFriendFragment(text : String) : Fragment() {
         addFriendFragmentListener = null
     }
     interface OnAddFriendFragmentButtonListener{
-        fun messageFromAddFriendFragment(isAdd : Boolean)
+        fun messageFromAddFriendFragment(isAdd : Boolean, input : String)
     }
 
 }

@@ -24,6 +24,7 @@ class TabDialogFragment: DialogFragment() , AddFriendFragment.OnAddFriendFragmen
     lateinit var inputIdFragment : AddFriendFragment
     lateinit var inputPhoneFragment : AddFriendFragment
     private var mTabDialogFragmentListener: OnTabDialogFragmentListener? = null
+    var position = 1
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,9 +51,11 @@ class TabDialogFragment: DialogFragment() , AddFriendFragment.OnAddFriendFragmen
                 when(tab?.position)
                 {
                     0->{
+                        position = 1
                         childFragmentManager.beginTransaction().replace(R.id.dialog_fragment_container, inputIdFragment).commit()
                     }
                     1->{
+                        position = 2
                         childFragmentManager.beginTransaction().replace(R.id.dialog_fragment_container, inputPhoneFragment).commit()
                     }
                 }
@@ -85,11 +88,14 @@ class TabDialogFragment: DialogFragment() , AddFriendFragment.OnAddFriendFragmen
         mTabDialogFragmentListener = null
     }
     interface OnTabDialogFragmentListener {
-        fun messageFromTabDialog(isAdd : Boolean)
+        fun messageFromTabDialog(selection : Int, input : String)
     }
 
-    override fun messageFromAddFriendFragment(isAdd: Boolean) {
-        mTabDialogFragmentListener?.messageFromTabDialog(isAdd)
+    override fun messageFromAddFriendFragment(isAdd: Boolean, input : String) {
+        if(isAdd)
+            mTabDialogFragmentListener?.messageFromTabDialog(position, input)
+        else
+            mTabDialogFragmentListener?.messageFromTabDialog(0, input)
     }
 
 }

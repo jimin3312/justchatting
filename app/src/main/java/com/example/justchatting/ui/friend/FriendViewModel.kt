@@ -12,6 +12,7 @@ import androidx.paging.toObservable
 import com.example.justchatting.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.google.firebase.ktx.Firebase
 import io.reactivex.Completable
 import io.reactivex.Observable
 
@@ -158,14 +159,6 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
             }
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-//                if(snapshot.child("phoneNumber").exists() &&
-//                    snapshot.child("profileImageUrl").exists() &&
-//                    snapshot.child("uid").exists() &&
-//                    snapshot.child("username").exists())
-//                {
-//                    val user = snapshot.getValue(User::class.java) ?: return
-//                    insert(user)
-//                }
                 val user = snapshot.getValue(User::class.java) ?: return
                 insert(user)
             }
@@ -173,6 +166,68 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
             }
         })
     }
+
+    fun addFriendWithId(toId : String) : Boolean{
+        var isAdd = false
+        val toUserRef = FirebaseDatabase.getInstance().getReference("/users/$toId")
+        toUserRef.addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onCancelled(error: DatabaseError) {
+            }
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val toUser = snapshot.getValue(User::class.java) ?: return
+                val fromUserRef = FirebaseDatabase.getInstance().getReference("/users/$myUserId")
+                fromUserRef.addListenerForSingleValueEvent(object : ValueEventListener{
+                    override fun onCancelled(error: DatabaseError) {
+                    }
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val fromUser = snapshot.getValue(User::class.java) ?: return
+                        val fromUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$myUserId/${toUser.uid}")
+                        fromUserFriendRef.setValue(toUser).addOnCompleteListener {
+                            if(it.isSuccessful) {
+                                val toUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/${toUser.uid}/$myUserId")
+                                toUserFriendRef.setValue(fromUser).addOnCompleteListener {
+                                    if(it.isSuccessful)
+                                        isAdd = true
+                                }
+                            }
+                        }
+                    }
+                })
+            }
+        })
+        return isAdd
+    }
+    fun addFriendWithPhoneNumber(toPhoneNum : String) : Boolean{
+        var isAdd = false
+        val toUserRef = FirebaseDatabase.getInstance().getReference("/phone/$toPhoneNum")
+        toUserRef.addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onCancelled(error: DatabaseError) {
+            }
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val toUser = snapshot.getValue(User::class.java) ?: return
+                val fromUserRef = FirebaseDatabase.getInstance().getReference("/users/$myUserId")
+                fromUserRef.addListenerForSingleValueEvent(object : ValueEventListener{
+                    override fun onCancelled(error: DatabaseError) {
+                    }
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val fromUser = snapshot.getValue(User::class.java) ?: return
+                        val fromUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$myUserId/${toUser.uid}")
+                        fromUserFriendRef.setValue(toUser).addOnCompleteListener {
+                            if(it.isSuccessful) {
+                                val toUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/${toUser.uid}/$myUserId")
+                                toUserFriendRef.setValue(fromUser).addOnCompleteListener {
+                                    if(it.isSuccessful)
+                                        isAdd = true
+                                }
+                            }
+                        }
+                    }
+                })
+            }
+        })
+        return isAdd
+    }
+
     override fun onCleared() {
         super.onCleared()
         compositeDisposable.dispose()

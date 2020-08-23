@@ -89,16 +89,25 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
         return super.onOptionsItemSelected(item)
     }
 
-    override fun messageFromTabDialog(isAdd: Boolean) {
-        if(isAdd)
-        {
-            Log.d("FriendFragment", "add friend")
-        }else
-        {
-            Log.d("FriendFragment", "cancel to add friend")
-            var prev = childFragmentManager.findFragmentByTag("dialog")
-            if(prev != null) {
-                (prev as DialogFragment).dismiss()
+    override fun messageFromTabDialog(selection : Int, input : String) {
+        when(selection) {
+             0-> {
+                val prev = childFragmentManager.findFragmentByTag("dialog")
+                if(prev != null) {
+                    (prev as DialogFragment).dismiss()
+                }
+            }
+            1->{
+                if(viewModel.addFriendWithId(input))
+                    Log.d("FriendFragment","친구 추가 완료")
+                else
+                    Log.d("FriendFragment","실패")
+            }
+            2->{
+                if(viewModel.addFriendWithPhoneNumber(input))
+                    Log.d("FriendFragment","친구 추가 완료")
+                else
+                    Log.d("FriendFragment","실패")
             }
         }
     }
@@ -172,8 +181,4 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
         super.onStop()
         disposable.clear()
     }
-
-
-
-
 }
