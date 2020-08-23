@@ -1,12 +1,17 @@
 package com.example.justchatting
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.justchatting.databinding.ActivityMainBinding
+import com.example.justchatting.ui.friend.FriendAdapter
 import com.example.justchatting.ui.login.RegisterActivity
 import com.google.firebase.auth.FirebaseAuth
 
@@ -16,7 +21,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         verifyUserIsLoggedIn()
     }
     private fun verifyUserIsLoggedIn() {
@@ -24,10 +28,12 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, RegisterActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
-        } else {
+        } else
+        {
             binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
             val navController = findNavController(R.id.nav_host_fragment)
             binding.bottomNavigationView.setupWithNavController(navController)
         }
     }
+
 }

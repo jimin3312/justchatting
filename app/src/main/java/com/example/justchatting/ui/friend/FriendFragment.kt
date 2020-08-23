@@ -7,11 +7,15 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat.checkSelfPermission
+import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.Observable
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.justchatting.R
 import com.example.justchatting.User
 import com.example.justchatting.base.BaseFragment
@@ -34,9 +38,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  */
 class FriendFragment : BaseFragment<FragmentFriendBinding>() {
     private val viewModel: FriendViewModel by viewModel()
-    private val friendAdapter = FriendAdapter()
+    private val friendAdapter : FriendAdapter = FriendAdapter()
     private val disposable = CompositeDisposable()
-    private var myUserId = FirebaseAuth.getInstance().uid
 
     override fun getLayoutId(): Int = R.layout.fragment_friend
 
@@ -46,6 +49,11 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         setHasOptionsMenu(true)
+        friend_recyclerview.run {
+            setHasFixedSize(true)
+            adapter = friendAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
         setPermission()
     }
 
@@ -76,9 +84,46 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         return super.onOptionsItemSelected(item)
     }
 
+    @SuppressLint("CheckResult")
+    private fun loadFriends() {
+        viewModel.getAnyUser()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                Log.d("FriendFrag","data exist")
+                setObserver()
+            },{
+                Log.d("FriendFrag","data doesn't exist")
+                viewModel.sync()
+                setObserver()
+            })
+
+    }
+
+    @SuppressLint("CheckResult")
+    private fun setObserver()
+    {
+        disposable.add(viewModel.getUsers().subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ pagedList->
+                friendAdapter.submitList(pagedList)
+            },{})
+        )
+        disposable.add(viewModel.getMyUser().subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ myUser ->
+                if(myUser!= null) {
+                    friend_my_textview_username.text = myUser.username
+                    Picasso.get().load(myUser.profileImageUrl)
+                        .placeholder(R.drawable.person)
+                        .into(friend_my_imageview_profile_image)
+                }
+            },{}))
+    }
+
     private fun setPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(
-                this.requireContext(), Manifest.permission.READ_CONTACTS
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(
+                requireContext() , Manifest.permission.READ_CONTACTS
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             requestPermissions(
@@ -97,45 +142,13 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
     ) {
         if (requestCode == RegisterActivity.PERMISSIONS_REQUEST_READ_CONTACTS) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                loadFriends()
+                setPermission()
             } else {
                 requireActivity().finish()
             }
         }
     }
 
-    @SuppressLint("CheckResult")
-    private fun loadFriends() {
-        friend_recyclerview.adapter = friendAdapter
-        viewModel.getAnyUser()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                viewModel.loadUser(myUserId!!)
-                viewModel.loadUsers()
-                setObserver()
-            },{
-                viewModel.sync()
-                viewModel.loadUser(myUserId!!)
-                viewModel.loadUsers()
-                setObserver()
-            })
-    }
-
-    @SuppressLint("CheckResult")
-    private fun setObserver()
-    {
-        disposable.add(viewModel.users.subscribe(friendAdapter::submitList))
-        viewModel.myUser.observe(viewLifecycleOwner, Observer {myUser->
-            if(myUser!= null) {
-                Log.d("FriendFragment myuser", myUser.username)
-                friend_my_textview_username.text = myUser.username
-                Picasso.get().load(myUser.profileImageUrl)
-                    .placeholder(R.drawable.person)
-                    .into(friend_my_imageview_profile_image)
-            }
-        })
-    }
     override fun onStop() {
         super.onStop()
         disposable.clear()

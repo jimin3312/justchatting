@@ -14,8 +14,11 @@ interface UserDao {
     @Query("SELECT * FROM users_tb Where uid  NOT IN (:myId) ORDER BY user_name ASC")
     fun getAll(myId : String) : DataSource.Factory<Int, User>
 
-    @Query("SELECT * FROM users_tb WHERE uid IN (:userId)")
-    fun getUserById(userId: String): LiveData<User>
+    @Query("SELECT * FROM users_tb WHERE uid IN (:myId)")
+    fun getMyUser(myId: String): Observable<User>
+
+//    @Query("SELECT * FROM users_tb WHERE uid IN (:userId)")
+//    fun getUserById(userId: String): LiveData<User>
 
     @Query("SELECT * FROM users_tb LIMIT 1")
     fun getAnyUser() : Single<User>
