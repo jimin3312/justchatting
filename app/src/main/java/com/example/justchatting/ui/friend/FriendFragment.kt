@@ -9,24 +9,15 @@ import android.util.Log
 import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.core.content.ContextCompat.checkSelfPermission
-import androidx.databinding.BindingAdapter
-import androidx.databinding.DataBindingUtil
-import androidx.databinding.Observable
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.justchatting.R
-import com.example.justchatting.User
 import com.example.justchatting.base.BaseFragment
 import com.example.justchatting.databinding.FragmentFriendBinding
+import com.example.justchatting.ui.friend.dialog.AddFriendFragment
 import com.example.justchatting.ui.friend.dialog.TabDialogFragment
 
 import com.squareup.picasso.Picasso
 import com.example.justchatting.ui.login.RegisterActivity
-import com.google.firebase.auth.FirebaseAuth
-import io.reactivex.Completable
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -36,7 +27,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 /**
  * A simple [Fragment] subclass.
  */
-class FriendFragment : BaseFragment<FragmentFriendBinding>() {
+class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.OnTabDialogFragmentListener{
     private val viewModel: FriendViewModel by viewModel()
     private val friendAdapter : FriendAdapter = FriendAdapter()
     private val disposable = CompositeDisposable()
@@ -74,14 +65,22 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
                     .beginTransaction()
                     .addToBackStack(null)
 
-                var prev = requireActivity().supportFragmentManager.findFragmentByTag("dialog")
-                if(prev != null)
-                    fragmentManager.remove(prev)
                 tabDialogFragment.show(fragmentManager,"dialog")
-
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+    override fun messageFromTabDialog(isAdd: Boolean) {
+        if(isAdd)
+        {
+            Log.d("FriendFragment", "add friend")
+        }else
+        {
+            Log.d("FriendFragment", "cancel to add friend")
+            var prev = requireActivity().supportFragmentManager.findFragmentByTag("dialog")
+            if(prev != null)
+                requireActivity().supportFragmentManager.beginTransaction().remove(prev).commit()
+        }
     }
 
     @SuppressLint("CheckResult")
@@ -153,4 +152,8 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         super.onStop()
         disposable.clear()
     }
+
+
+
+
 }

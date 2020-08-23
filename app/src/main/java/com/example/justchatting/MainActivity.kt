@@ -11,7 +11,6 @@ import com.example.justchatting.ui.login.RegisterActivity
 import com.example.justchatting.ui.settings.SettingsFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
