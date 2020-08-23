@@ -162,8 +162,9 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
             }
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                if(snapshot.child("uid").exists() && snapshot.child("phoneNumber").exists()
-                    && snapshot.child("profileImageUrl").exists() && snapshot.child("username").exists()) {
+                if(snapshot.child("uid").exists() && snapshot.child("phoneNumber").exists() &&
+                    snapshot.child("profileImageUrl").exists() && snapshot.child("username").exists() &&
+                    snapshot.child("email").exists()) {
                     val user = snapshot.getValue(User::class.java) ?: return
                     insert(user)
                 }
@@ -173,8 +174,8 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
         })
     }
 
-    fun addFriendWithId(toId : String){
-        val toUserRef = FirebaseDatabase.getInstance().getReference("/users/$toId")
+    fun addFriendWithId(email : String){
+        val toUserRef = FirebaseDatabase.getInstance().getReference("/email/$email")
         toUserRef.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onCancelled(error: DatabaseError) {
             }

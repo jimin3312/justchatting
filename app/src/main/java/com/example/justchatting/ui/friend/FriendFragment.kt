@@ -24,6 +24,7 @@ import com.example.justchatting.ui.friend.dialog.TabDialogFragment
 
 import com.squareup.picasso.Picasso
 import com.example.justchatting.ui.login.RegisterActivity
+import com.google.firebase.auth.FirebaseAuth
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -88,16 +89,18 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
     }
     private fun isSuccessfulDialog(message: String, buttonName: String)
     {
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setMessage(message)
-            .setPositiveButton(buttonName) { dialog, which ->
-                dialog.dismiss()
-            }
-        val dialog = builder.create()
-        val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-        val positiveButtonLayoutParams = positiveButton.layoutParams as LinearLayout.LayoutParams
-        positiveButtonLayoutParams.gravity = Gravity.CENTER
-        builder.show()
+        val alertDialog = AlertDialog.Builder(requireContext()).create()
+        alertDialog.setMessage(message)
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, buttonName,DialogInterface.OnClickListener{ dialog, which ->
+            dialog.dismiss()
+        })
+        alertDialog.show()
+        val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        val layoutParams = positiveButton.layoutParams as LinearLayout.LayoutParams
+        layoutParams.weight = 1.0f
+        layoutParams.gravity = Gravity.CENTER
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).layoutParams = layoutParams
+
     }
     override fun messageFromTabDialog(selection : Int, input : String) {
         when(selection) {
@@ -108,6 +111,8 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
                 viewModel.addFriendWithPhoneNumber(input)
             }
             2->{
+                val re = Regex("[^A-Za-z0-9 ]")
+                val input = re.replace(input,"")
                 viewModel.addFriendWithId(input)
             }
         }

@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.justchatting.User
 import com.example.justchatting.repository.login.UserRepository
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -65,10 +64,12 @@ class LoginVIewModel(
             return
         }
 
+
+
         // loading event here
         val uploadImage: Completable = repository.uploadProfile(selectedPhotoUri)
         val signUpWithEmail: Completable = repository.signUpWithEmail(email!!, password!!)
-        val saveUserToDB: Completable = repository.saveUser(name!!, phoneNumber!!, selectedPhotoUri)
+        val saveUserToDB: Completable = repository.saveUser(name!!, phoneNumber!!, selectedPhotoUri, email!!)
 
         disposables.add(signUpWithEmail
             .andThen(uploadImage)

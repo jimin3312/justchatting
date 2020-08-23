@@ -37,8 +37,8 @@ class TabDialogFragment: DialogFragment() , AddFriendFragment.OnAddFriendFragmen
         tabLayout.addTab(tabLayout.newTab().setText("연락처로 추가"))
         tabLayout.addTab(tabLayout.newTab().setText("ID로 추가"))
 
-        inputIdFragment = AddFriendFragment("친구로 추가하기 위해 ID를 입력하세요.")
         inputPhoneFragment = AddFriendFragment("친구로 추가하기 위해 전화번호를 입력하세요.")
+        inputIdFragment = AddFriendFragment("친구로 추가하기 위해 ID를 입력하세요.")
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
             override fun onTabReselected(tab: TabLayout.Tab?) {
@@ -52,11 +52,11 @@ class TabDialogFragment: DialogFragment() , AddFriendFragment.OnAddFriendFragmen
                 {
                     0->{
                         position = 1
-                        childFragmentManager.beginTransaction().replace(R.id.dialog_fragment_container, inputIdFragment).commit()
+                        childFragmentManager.beginTransaction().replace(R.id.dialog_fragment_container, inputPhoneFragment).commit()
                     }
                     1->{
                         position = 2
-                        childFragmentManager.beginTransaction().replace(R.id.dialog_fragment_container, inputPhoneFragment).commit()
+                        childFragmentManager.beginTransaction().replace(R.id.dialog_fragment_container, inputIdFragment).commit()
                     }
                 }
             }
