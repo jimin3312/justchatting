@@ -28,11 +28,9 @@ class AddFriendFragment(text : String) : Fragment() {
         textView.text = mText
 
         addButton.setOnClickListener { view->
-            Log.d("AddFriendFragment","onclick add")
             addFriendFragmentListener?.messageFromAddFriendFragment(true)
         }
         cancelButton.setOnClickListener{view->
-            Log.d("AddFriendFragment","onclick cancel")
             addFriendFragmentListener?.messageFromAddFriendFragment(false)
         }
 

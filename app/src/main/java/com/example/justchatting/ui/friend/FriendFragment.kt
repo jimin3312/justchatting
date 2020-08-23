@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.justchatting.R
@@ -37,15 +39,27 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = this
-        setHasOptionsMenu(true)
+//        binding.viewModel = viewModel
+//        binding.lifecycleOwner = this
+//        setHasOptionsMenu(true)
         friend_recyclerview.apply {
             setHasFixedSize(true)
             adapter = friendAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
         setPermission()
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = DataBindingUtil.inflate(inflater, getLayoutId(), container, false)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
+        setHasOptionsMenu(true)
+        return binding.root
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -59,17 +73,22 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
                 viewModel.sync()
             }
             R.id.friend_add_friend_button -> {
-                var tabDialogFragment = TabDialogFragment()
-                var fragmentManager = requireActivity()
-                    .supportFragmentManager
-                    .beginTransaction()
-                    .addToBackStack(null)
+//                var tabDialogFragment = TabDialogFragment()
 
+                var fragmentManager = childFragmentManager
+
+                fragmentManager.beginTransaction()
+                    .addToBackStack(null)
+                    .commit()
+
+                val tabDialogFragment = TabDialogFragment()
                 tabDialogFragment.show(fragmentManager,"dialog")
+
             }
         }
         return super.onOptionsItemSelected(item)
     }
+
     override fun messageFromTabDialog(isAdd: Boolean) {
         if(isAdd)
         {
@@ -77,9 +96,10 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
         }else
         {
             Log.d("FriendFragment", "cancel to add friend")
-            var prev = requireActivity().supportFragmentManager.findFragmentByTag("dialog")
-            if(prev != null)
-                requireActivity().supportFragmentManager.beginTransaction().remove(prev).commit()
+            var prev = childFragmentManager.findFragmentByTag("dialog")
+            if(prev != null) {
+                (prev as DialogFragment).dismiss()
+            }
         }
     }
 

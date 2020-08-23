@@ -12,7 +12,9 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.fragment.app.DialogFragment
 import androidx.viewpager.widget.ViewPager
+import com.example.justchatting.MainActivity
 import com.example.justchatting.R
+import com.example.justchatting.ui.friend.FriendFragment
 import com.google.android.gms.dynamic.SupportFragmentWrapper
 import com.google.android.material.tabs.TabLayout
 
@@ -29,7 +31,7 @@ class TabDialogFragment: DialogFragment() , AddFriendFragment.OnAddFriendFragmen
         savedInstanceState: Bundle?
     ): View? {
 
-        val view = requireActivity().layoutInflater.inflate(R.layout.dialog_add_friend_layout, null)
+        val view = inflater.inflate(R.layout.dialog_add_friend_layout, null)
         tabLayout = view.findViewById(R.id.dialog_add_friend_tab)
         tabLayout.addTab(tabLayout.newTab().setText("연락처로 추가"))
         tabLayout.addTab(tabLayout.newTab().setText("ID로 추가"))
@@ -49,7 +51,6 @@ class TabDialogFragment: DialogFragment() , AddFriendFragment.OnAddFriendFragmen
                 {
                     0->{
                         childFragmentManager.beginTransaction().replace(R.id.dialog_fragment_container, inputIdFragment).commit()
-
                     }
                     1->{
                         childFragmentManager.beginTransaction().replace(R.id.dialog_fragment_container, inputPhoneFragment).commit()
@@ -62,12 +63,9 @@ class TabDialogFragment: DialogFragment() , AddFriendFragment.OnAddFriendFragmen
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
-        if(context is OnTabDialogFragmentListener)
-            mTabDialogFragmentListener = context as OnTabDialogFragmentListener
         if(parentFragment is OnTabDialogFragmentListener)
         {
-            mTabDialogFragmentListener = context as OnTabDialogFragmentListener
+            mTabDialogFragmentListener = parentFragment as OnTabDialogFragmentListener
         }
     }
 
@@ -91,9 +89,6 @@ class TabDialogFragment: DialogFragment() , AddFriendFragment.OnAddFriendFragmen
     }
 
     override fun messageFromAddFriendFragment(isAdd: Boolean) {
-        Log.d("TabDialogFragment", "TabDialog add : $isAdd")
-        if(mTabDialogFragmentListener == null)
-            Log.d("TabDialogFragment", "TabDialoglistener null")
         mTabDialogFragmentListener?.messageFromTabDialog(isAdd)
     }
 
