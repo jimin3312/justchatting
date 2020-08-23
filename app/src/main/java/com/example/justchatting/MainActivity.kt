@@ -32,10 +32,10 @@ class MainActivity : AppCompatActivity() {
             settingFragment = SettingsFragment()
 
             setListener()
-            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, friendFragment).commit()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, friendFragment).commit()
         }
     }
-
     private fun setListener() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNavigationView.setOnNavigationItemSelectedListener(object : BottomNavigationView.OnNavigationItemSelectedListener{

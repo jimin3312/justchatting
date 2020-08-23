@@ -2,15 +2,19 @@ package com.example.justchatting.ui.friend
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.LinearLayout
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.justchatting.R
 import com.example.justchatting.base.BaseFragment
@@ -39,27 +43,16 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        binding.viewModel = viewModel
-//        binding.lifecycleOwner = this
-//        setHasOptionsMenu(true)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
+        setHasOptionsMenu(true)
         friend_recyclerview.apply {
             setHasFixedSize(true)
             adapter = friendAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
         setPermission()
-    }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = DataBindingUtil.inflate(inflater, getLayoutId(), container, false)
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = this
-        setHasOptionsMenu(true)
-        return binding.root
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -73,8 +66,6 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
                 viewModel.sync()
             }
             R.id.friend_add_friend_button -> {
-//                var tabDialogFragment = TabDialogFragment()
-
                 var fragmentManager = childFragmentManager
 
                 fragmentManager.beginTransaction()
@@ -88,38 +79,36 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
         }
         return super.onOptionsItemSelected(item)
     }
-
+    private fun deleteAddFriendDialog()
+    {
+        val prev = childFragmentManager.findFragmentByTag("dialog")
+        if(prev != null) {
+            (prev as DialogFragment).dismiss()
+        }
+    }
+    private fun isSuccessfulDialog(message: String, buttonName: String)
+    {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setMessage(message)
+            .setPositiveButton(buttonName) { dialog, which ->
+                dialog.dismiss()
+            }
+        val dialog = builder.create()
+        val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        val positiveButtonLayoutParams = positiveButton.layoutParams as LinearLayout.LayoutParams
+        positiveButtonLayoutParams.gravity = Gravity.CENTER
+        builder.show()
+    }
     override fun messageFromTabDialog(selection : Int, input : String) {
         when(selection) {
-             0-> {
-                 Log.d("FriendFragment","cancel to add friend")
-                val prev = childFragmentManager.findFragmentByTag("dialog")
-                if(prev != null) {
-                    (prev as DialogFragment).dismiss()
-                }
+            0->{
+                deleteAddFriendDialog()
             }
             1->{
-
-                Log.d("FriendFragment","add a friend with phoneNum : $input")
                 viewModel.addFriendWithPhoneNumber(input)
-//                viewModel.getIsAddFriend().subscribeOn(Schedulers.io())
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribe({
-//                        Log.d("FriendFragment","친구 추가 완료")
-//                    },{
-//                        Log.d("FriendFragment","실패")
-//                    })
             }
             2->{
-                Log.d("FriendFragment","add a friend with Id : $input")
                 viewModel.addFriendWithId(input)
-//                viewModel.getIsAddFriend().subscribeOn(Schedulers.io())
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribe({
-//                        Log.d("FriendFragment","친구 추가 완료")
-//                    },{
-//                        Log.d("FriendFragment","실패")
-//                    })
             }
         }
     }
@@ -159,6 +148,16 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
                         .into(friend_my_imageview_profile_image)
                 }
             },{}))
+
+        viewModel.getIsAddFriend().observe(viewLifecycleOwner, Observer { isSuccessful->
+            if(isSuccessful) {
+                deleteAddFriendDialog()
+                isSuccessfulDialog("친구 추가 성공","확인")
+            } else {
+                deleteAddFriendDialog()
+                isSuccessfulDialog("친구 추가 실패","확인")
+            }
+        })
     }
 
     private fun setPermission() {
