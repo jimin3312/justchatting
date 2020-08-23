@@ -49,7 +49,7 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         setHasOptionsMenu(true)
-        friend_recyclerview.run {
+        friend_recyclerview.apply {
             setHasFixedSize(true)
             adapter = friendAdapter
             layoutManager = LinearLayoutManager(requireContext())
@@ -90,10 +90,10 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                Log.d("FriendFrag","data exist")
+                Log.d("FriendFragment","data exist")
                 setObserver()
             },{
-                Log.d("FriendFrag","data doesn't exist")
+                Log.d("FriendFragment","data doesn't exist")
                 viewModel.sync()
                 setObserver()
             })
