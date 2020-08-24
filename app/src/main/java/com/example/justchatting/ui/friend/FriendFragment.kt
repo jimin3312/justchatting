@@ -163,6 +163,9 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
                 isSuccessfulDialog("친구 추가 실패","확인")
             }
         })
+        viewModel.getIsContactsSyncFinished().observe(viewLifecycleOwner, Observer {
+            viewModel.setUsersDatabase()
+        })
     }
 
     private fun setPermission() {

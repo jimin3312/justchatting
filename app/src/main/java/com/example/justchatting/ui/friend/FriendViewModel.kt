@@ -34,10 +34,13 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
     private var users : Observable<PagedList<User>> = userRepository.getUsers(myUserId!!).toObservable(pageSize = 30)
 
     private var isAddFriend = MutableLiveData<Boolean>()
+    private var isContactsSyncFinished = MutableLiveData<Boolean>()
 
     init {
-        Log.d("FriendViewModel", "init")
         setListener()
+    }
+    fun getIsContactsSyncFinished() : MutableLiveData<Boolean>{
+        return isContactsSyncFinished
     }
     fun getIsAddFriend() : MutableLiveData<Boolean>{
         return isAddFriend
@@ -78,7 +81,8 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
 
                 var contactList = getContacts(getApplication())
                 contactList.add(myUser.phoneNumber)
-                contactList.forEach{ number->
+
+                contactList.forEachIndexed{ index, number->
                     val ref = FirebaseDatabase.getInstance().getReference("/phone/$number")
                     Log.d("REPO","number : $number")
                     ref.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -97,6 +101,9 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
                             }
                         }
                     })
+                    if(index == contactList.size-1) {
+                        isContactsSyncFinished.postValue(true)
+                    }
                 }
             }
         })
@@ -137,6 +144,8 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
 
     fun setUsersDatabase()
     {
+
+        Log.d("setUsersDatabase", "start")
         val ref = FirebaseDatabase.getInstance().getReference("/friends/$myUserId")
         ref.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onCancelled(error: DatabaseError) {
@@ -144,8 +153,12 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
             override fun onDataChange(snapshot: DataSnapshot) {
                 snapshot.children.forEach{ child->
                     val user = child.getValue(User::class.java)
-                    if(user != null)
+
+                    if(user != null) {
+
+                        Log.d("setUsersDatabase", user.username)
                         insert(user)
+                    }
                 }
             }
         })
