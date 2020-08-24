@@ -10,6 +10,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import io.reactivex.Completable
+import io.reactivex.Single
 import java.util.*
 
 class FirebaseSource {
@@ -21,39 +22,40 @@ class FirebaseSource {
 
     fun loginWithEmail(email: String, password: String): Completable = Completable.create{ emitter ->
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
-            if(!emitter.isDisposed){
-                if(it.isComplete)
+                if(it.isSuccessful)
                     emitter.onComplete()
                 else
                     emitter.onError(it.exception!!)
-            }
         }
     }
 
 
-    fun signUp(email: String, password: String): Completable = Completable.create{ emitter ->
+    fun signUp(email: String, password: String): Single<String> = Single.create{ emitter ->
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener{
                 if(!it.isSuccessful) return@addOnCompleteListener
-                emitter.onComplete()
+                emitter.onSuccess("")
             }
             .addOnFailureListener{
                 emitter.onError(it)
             }
     }
 
-    fun uploadProfile(uri: Uri?): Completable {
-        uri ?: return Completable.complete()
 
-        return Completable.create{emitter ->
+    fun uploadProfile(uri: Uri?): Single<String> {
+
+        return Single.create{emitter ->
+            if(uri == null)
+                emitter.onSuccess("")
+
             val filename = UUID.randomUUID().toString()
             val ref = FirebaseStorage.getInstance().getReference("/profileImages/$filename")
-            ref.putFile(uri)
+            ref.putFile(uri!!)
                 .addOnSuccessListener {
                     Log.d("Register", "Successfully uploaded image: ${it.metadata?.path}")
                     ref.downloadUrl.addOnSuccessListener {
                         Log.d("RegisterActivity", "File Location : $it")
-                        emitter.onComplete()
+                        emitter.onSuccess(it.toString())
                     }
                 }.addOnCanceledListener {
                     emitter.onError(Exception("upload is canceled"))
@@ -63,7 +65,7 @@ class FirebaseSource {
         }
     }
 
-    fun saveUser(name: String, phoneNumber: String, selectedPhotoUri: Uri?, email: String): Completable = Completable.create{emitter ->
+    fun saveUser(name: String, phoneNumber: String, firebaseImageResourcePath: String, email: String): Completable = Completable.create{emitter ->
         val uid = FirebaseAuth.getInstance().uid ?: ""
 
         val re = Regex("[^A-Za-z0-9 ]")
@@ -74,7 +76,7 @@ class FirebaseSource {
             uid,
             name,
             phoneNumber,
-            selectedPhotoUri.toString(),
+            firebaseImageResourcePath,
             email
         )
 
@@ -84,21 +86,6 @@ class FirebaseSource {
                 Log.d("RegisterActivity", "Finally we saved the user to Firebase database")
                 val phoneRef = FirebaseDatabase.getInstance().getReference("/phone/$phoneNumber")
                 phoneRef.setValue(user).addOnSuccessListener {
-//                    ref.addListenerForSingleValueEvent(object :ValueEventListener{
-//                        override fun onCancelled(error: DatabaseError) {
-//                        }
-//                        override fun onDataChange(snapshot: DataSnapshot) {
-//                            val user = snapshot.getValue(User::class.java)?:return
-//                            val match = "^\uAC00-\uD7A3xfe0-9a-zA-Z\\s".toRegex()
-//                            val emailNoSpecial = user.email.replace(match,"")
-//                            val emailRef = FirebaseDatabase.getInstance().getReference("/email/$emailNoSpecial")
-//                            emailRef.setValue(user).addOnSuccessListener {
-//                                emitter.onComplete()
-//                            }
-//                        }
-//                    })
-
-
                     val emailRef = FirebaseDatabase.getInstance().getReference("/email/$email")
                     emailRef.setValue(user).addOnSuccessListener {
                         emitter.onComplete()

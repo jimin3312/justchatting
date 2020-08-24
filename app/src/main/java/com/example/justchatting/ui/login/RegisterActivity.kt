@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.telephony.PhoneNumberFormattingTextWatcher
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.LayoutRes
 import com.example.justchatting.MainActivity
 import com.example.justchatting.R
@@ -50,6 +51,9 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
         })
+        viewModel.errorToastMessage.observe(this, Observer {
+            Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -61,15 +65,17 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
             viewModel.selectedPhotoUri = data.data
 
             val bitmap: Bitmap
-            bitmap = if(Build.VERSION.SDK_INT < 28) {
-                MediaStore.Images.Media.getBitmap(
-                    this.contentResolver,
-                    viewModel.selectedPhotoUri
-                )
-            } else {
-                val source = ImageDecoder.createSource(this.contentResolver, viewModel.selectedPhotoUri!!)
-                ImageDecoder.decodeBitmap(source)
-            }
+//            bitmap = if(Build.VERSION.SDK_INT < 28) {
+//                MediaStore.Images.Media.getBitmap(
+//                    this.contentResolver,
+//                    viewModel.selectedPhotoUri
+//                )
+//            } else {
+//                val source = ImageDecoder.createSource(this.contentResolver, viewModel.selectedPhotoUri!!)
+//                ImageDecoder.decodeBitmap(source)
+//            }
+
+            bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, viewModel.selectedPhotoUri)
 
 
             select_photo_imageview_register.setImageBitmap(bitmap)
