@@ -1,11 +1,13 @@
 package com.example.justchatting.ui.login
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.justchatting.repository.login.UserRepository
 import io.reactivex.Completable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -20,6 +22,7 @@ class LoginVIewModel(
     var name: String? = null
     var phoneNumber: String? = null
     var selectedPhotoUri: Uri? = null
+    var firebaseImageResourcePath : String? = null
 
     private val _successLogin = MutableLiveData<Boolean>()
     val successLogin: LiveData<Boolean>
@@ -33,10 +36,13 @@ class LoginVIewModel(
     val successSignUp: LiveData<Boolean>
         get() = _successSignUp
 
+    private val _errorToastMessage = MutableLiveData<String>()
+    val errorToastMessage : LiveData<String>
+        get() = _errorToastMessage
 
     fun login() {
         if (email.isNullOrEmpty() || password.isNullOrEmpty()) {
-            //failure event here
+            _errorToastMessage.value = "please enter your email and password"
             return
         }
 
@@ -48,7 +54,7 @@ class LoginVIewModel(
                 .subscribe({
                     _successLogin.value = true
                 }, {
-                    // error event here
+                    _errorToastMessage.value = "Authentication failed."
                 })
         )
     }
@@ -58,29 +64,32 @@ class LoginVIewModel(
     }
 
     fun signUp() {
-        if(email.isNullOrEmpty() || password.isNullOrEmpty() || phoneNumber.isNullOrEmpty())
+        if(name.isNullOrEmpty() || email.isNullOrEmpty() || password.isNullOrEmpty() || phoneNumber.isNullOrEmpty())
         {
-            //failure event here
+            _errorToastMessage.value = "please enter your username, email, password, phone number"
             return
         }
 
 
 
         // loading event here
-        val uploadImage: Completable = repository.uploadProfile(selectedPhotoUri)
-        val signUpWithEmail: Completable = repository.signUpWithEmail(email!!, password!!)
-        val saveUserToDB: Completable = repository.saveUser(name!!, phoneNumber!!, selectedPhotoUri, email!!)
+        val uploadImage: Single<String> = repository.uploadProfile(selectedPhotoUri)
+        val signUpWithEmail: Single<String> = repository.signUpWithEmail(email!!, password!!)
 
-        disposables.add(signUpWithEmail
-            .andThen(uploadImage)
-            .andThen(saveUserToDB)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                _successSignUp.value = true
-            },{
-                // error event here
-            }))
+        disposables.add(signUpWithEmail.subscribe({
+            Log.d("FirebaseSource", "signup")
+            disposables.add(uploadImage.subscribe({
+                Log.d("FirebaseSource", "imgae url : $it")
+                firebaseImageResourcePath = it
+
+                val saveUserToDB: Completable = repository.saveUser(name!!, phoneNumber!!, firebaseImageResourcePath!!, email!!)
+                disposables.add(saveUserToDB.subscribe({
+                    _successSignUp.value = true
+                },{}))
+            },{}))
+        },{
+            _errorToastMessage.value = it.message
+        }))
     }
 
 

@@ -16,9 +16,9 @@ class UserRepositoryImpl(
     override fun saveUser(
         name: String,
         phoneNumber: String,
-        selectedPhotoUri: Uri?,
+        firebaseImageResourcePath: String,
         email: String
-    ) = firebaseSource.saveUser(name, phoneNumber, selectedPhotoUri, email)
+    ) = firebaseSource.saveUser(name, phoneNumber, firebaseImageResourcePath, email)
 
     override fun logout() = firebaseSource.logout()
 }

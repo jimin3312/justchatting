@@ -2,6 +2,7 @@ package com.example.justchatting.ui.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.annotation.LayoutRes
 import androidx.lifecycle.Observer
 import com.example.justchatting.MainActivity
@@ -26,6 +27,9 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>()
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
+        })
+        viewModel.errorToastMessage.observe(this, Observer {
+            Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         })
 
         back_to_register_button_login.setOnClickListener{
