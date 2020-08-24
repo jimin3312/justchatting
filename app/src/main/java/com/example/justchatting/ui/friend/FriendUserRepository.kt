@@ -12,7 +12,6 @@ class FriendUserRepository(private val userDao: UserDao){
     fun getUsers(myId : String) : DataSource.Factory<Int, User>{
         return userDao.getAll(myId)
     }
-
     fun getMyUser(myId: String): Observable<User>{
         return userDao.getMyUser(myId)
     }

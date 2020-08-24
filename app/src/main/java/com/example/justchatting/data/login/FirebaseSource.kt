@@ -4,7 +4,10 @@ import android.net.Uri
 import android.util.Log
 import com.example.justchatting.User
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import io.reactivex.Completable
 import java.util.*
@@ -60,21 +63,46 @@ class FirebaseSource {
         }
     }
 
-    fun saveUser(name: String, phoneNumber: String, selectedPhotoUri: Uri?): Completable = Completable.create{emitter ->
+    fun saveUser(name: String, phoneNumber: String, selectedPhotoUri: Uri?, email: String): Completable = Completable.create{emitter ->
         val uid = FirebaseAuth.getInstance().uid ?: ""
+
+        val re = Regex("[^A-Za-z0-9 ]")
+        val email = re.replace(email,"")
+
         val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
         val user = User(
             uid,
             name,
             phoneNumber,
-            selectedPhotoUri.toString()
+            selectedPhotoUri.toString(),
+            email
         )
+
+
         ref.setValue(user)
             .addOnSuccessListener {
                 Log.d("RegisterActivity", "Finally we saved the user to Firebase database")
-                val ref = FirebaseDatabase.getInstance().getReference("/phone/$phoneNumber")
-                ref.setValue(user).addOnSuccessListener {
-                    emitter.onComplete()
+                val phoneRef = FirebaseDatabase.getInstance().getReference("/phone/$phoneNumber")
+                phoneRef.setValue(user).addOnSuccessListener {
+//                    ref.addListenerForSingleValueEvent(object :ValueEventListener{
+//                        override fun onCancelled(error: DatabaseError) {
+//                        }
+//                        override fun onDataChange(snapshot: DataSnapshot) {
+//                            val user = snapshot.getValue(User::class.java)?:return
+//                            val match = "^\uAC00-\uD7A3xfe0-9a-zA-Z\\s".toRegex()
+//                            val emailNoSpecial = user.email.replace(match,"")
+//                            val emailRef = FirebaseDatabase.getInstance().getReference("/email/$emailNoSpecial")
+//                            emailRef.setValue(user).addOnSuccessListener {
+//                                emitter.onComplete()
+//                            }
+//                        }
+//                    })
+
+
+                    val emailRef = FirebaseDatabase.getInstance().getReference("/email/$email")
+                    emailRef.setValue(user).addOnSuccessListener {
+                        emitter.onComplete()
+                    }
                 }
             }
             .addOnFailureListener{

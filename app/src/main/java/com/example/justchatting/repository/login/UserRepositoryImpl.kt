@@ -13,7 +13,12 @@ class UserRepositoryImpl(
 
     override fun uploadProfile(uri: Uri?) = firebaseSource.uploadProfile(uri)
 
-    override fun saveUser(name: String, phoneNumber: String, selectedPhotoUri: Uri?) = firebaseSource.saveUser(name, phoneNumber, selectedPhotoUri)
+    override fun saveUser(
+        name: String,
+        phoneNumber: String,
+        selectedPhotoUri: Uri?,
+        email: String
+    ) = firebaseSource.saveUser(name, phoneNumber, selectedPhotoUri, email)
 
     override fun logout() = firebaseSource.logout()
 }

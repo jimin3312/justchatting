@@ -11,7 +11,6 @@ import com.example.justchatting.ui.login.RegisterActivity
 import com.example.justchatting.ui.settings.SettingsFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,16 +21,21 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        verifyUserIsLoggedIn()
 
-        friendFragment = FriendFragment()
-        chattingFragment = ChattingFragment()
-        settingFragment = SettingsFragment()
+        if (FirebaseAuth.getInstance().uid == null) {
+            val intent = Intent(this, RegisterActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+        } else {
+            friendFragment = FriendFragment()
+            chattingFragment = ChattingFragment()
+            settingFragment = SettingsFragment()
 
-        setListener()
-        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, friendFragment).commit()
+            setListener()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, friendFragment).commit()
+        }
     }
-
     private fun setListener() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNavigationView.setOnNavigationItemSelectedListener(object : BottomNavigationView.OnNavigationItemSelectedListener{
@@ -55,12 +59,5 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun verifyUserIsLoggedIn() {
-        if (FirebaseAuth.getInstance().uid == null) {
-            val intent = Intent(this, RegisterActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivity(intent)
-        }
-    }
 
 }
