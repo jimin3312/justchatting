@@ -35,6 +35,10 @@ class LoginVIewModel(
     val successSignUp: LiveData<Boolean>
         get() = _successSignUp
 
+    private val _x = 1
+    val x : Int
+        get() = _x
+
     private val _errorToastMessage = MutableLiveData<String>()
     val errorToastMessage: LiveData<String>
         get() = _errorToastMessage

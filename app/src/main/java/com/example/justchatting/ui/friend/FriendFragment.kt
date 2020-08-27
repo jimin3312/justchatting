@@ -34,10 +34,9 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 /**
  * A simple [Fragment] subclass.
  */
-class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.OnTabDialogFragmentListener{
+class FriendFragment : BaseFragment<FragmentFriendBinding>(){
     private val viewModel: FriendViewModel by viewModel()
-    private val friendAdapter : FriendAdapter = FriendAdapter()
-    private val disposable = CompositeDisposable()
+    private lateinit var friendAdapter : FriendAdapter
 
     override fun getLayoutId(): Int = R.layout.fragment_friend
 
@@ -46,12 +45,6 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
 
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
-        setHasOptionsMenu(true)
-        friend_recyclerview.apply {
-            setHasFixedSize(true)
-            adapter = friendAdapter
-            layoutManager = LinearLayoutManager(requireContext())
-        }
         setPermission()
 
     }
@@ -73,13 +66,13 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
                     .addToBackStack(null)
                     .commit()
 
-                val tabDialogFragment = TabDialogFragment()
-                tabDialogFragment.show(fragmentManager,"dialog")
+//                val tabDialogFragment = TabDialogFragment()
+//                tabDialogFragment.show(fragmentManager,"dialog")
+
             }
         }
         return super.onOptionsItemSelected(item)
     }
-
     private fun deleteAddFriendDialog()
     {
         val prev = childFragmentManager.findFragmentByTag("dialog")
@@ -87,7 +80,6 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
             (prev as DialogFragment).dismiss()
         }
     }
-
     private fun isSuccessfulDialog(message: String, buttonName: String)
     {
         val alertDialog = AlertDialog.Builder(requireContext()).create()
@@ -101,75 +93,23 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
         layoutParams.weight = 1.0f
         layoutParams.gravity = Gravity.CENTER
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).layoutParams = layoutParams
-
     }
 
-    override fun messageFromTabDialog(selection : Int, input : String) {
-        when(selection) {
-            0->{
-                deleteAddFriendDialog()
-            }
-            1->{
-                viewModel.addFriendWithPhoneNumber(input)
-            }
-            2->{
-                val re = Regex("[^A-Za-z0-9 ]")
-                val input = re.replace(input,"")
-                viewModel.addFriendWithId(input)
-            }
-        }
-    }
-
-    @SuppressLint("CheckResult")
-    private fun loadFriends() {
-        viewModel.getAnyUser()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                Log.d("FriendFragment","data exist")
-                setObserver()
-            },{
-                Log.d("FriendFragment","data doesn't exist")
-                viewModel.sync()
-                setObserver()
-            })
-
-    }
-
-    @SuppressLint("CheckResult")
-    private fun setObserver()
-    {
-        disposable.add(viewModel.getUsers().subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ pagedList->
-                    friendAdapter.submitList(pagedList)
-                },{})
-        )
-        disposable.add(viewModel.getMyUser().subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ myUser ->
-                if(myUser!= null) {
-                    friend_my_textview_username.text = myUser.username
-                    Picasso.get().load(myUser.profileImageUrl)
-                        .placeholder(R.drawable.person)
-                        .into(friend_my_imageview_profile_image)
-                }
-            },{}))
-
-        viewModel.getIsAddFriend().observe(viewLifecycleOwner, Observer { isSuccessful->
-            if(isSuccessful) {
-                deleteAddFriendDialog()
-                isSuccessfulDialog("친구 추가 성공","확인")
-            } else {
-                deleteAddFriendDialog()
-                isSuccessfulDialog("친구 추가 실패","확인")
-            }
-        })
-
-        viewModel.getIsContactsSyncFinished().observe(viewLifecycleOwner, Observer {
-            viewModel.setUsersDatabase()
-        })
-    }
+//    override fun messageFromTabDialog(selection : Int, input : String) {
+//        when(selection) {
+//            0->{
+//                deleteAddFriendDialog()
+//            }
+//            1->{
+//                viewModel.addFriendWithPhoneNumber(input)
+//            }
+//            2->{
+//                val re = Regex("[^A-Za-z0-9 ]")
+//                val input = re.replace(input,"")
+//                viewModel.addFriendWithId(input)
+//            }
+//        }
+//    }
 
     private fun setPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(
@@ -181,10 +121,19 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
                 RegisterActivity.PERMISSIONS_REQUEST_READ_CONTACTS
             )
         } else {
-            loadFriends()
+            friendAdapter = FriendAdapter(viewModel.friendList.value!!)
+            setHasOptionsMenu(true)
+            friend_recyclerview.apply {
+                adapter = friendAdapter
+                setHasFixedSize(true)
+                layoutManager = LinearLayoutManager(requireContext())
+            }
+
+            viewModel.friendList.observe(viewLifecycleOwner, Observer {
+                friendAdapter.notifyDataSetChanged()
+            })
         }
     }
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -197,10 +146,5 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
                 requireActivity().finish()
             }
         }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        disposable.clear()
     }
 }
