@@ -9,8 +9,8 @@ import com.google.firebase.database.*
 class FriendRepository() {
 
     private var _friendMap : HashMap<String, User> = HashMap()
-        val friendMap : HashMap<String, User>
-            get()= _friendMap
+    val friendMap : HashMap<String, User>
+        get()= _friendMap
     fun getFriends(): MutableLiveData<ArrayList<User>> {
         val friends = MutableLiveData<ArrayList<User>>()
         friends.postValue(ArrayList(_friendMap.values))
