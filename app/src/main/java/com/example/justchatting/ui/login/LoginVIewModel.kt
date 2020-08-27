@@ -36,6 +36,10 @@ class LoginVIewModel(
     val successSignUp: LiveData<Boolean>
         get() = _successSignUp
 
+    private val _x = 1
+    val x : Int
+        get() = _x
+
     private val _errorToastMessage = MutableLiveData<String>()
     val errorToastMessage : LiveData<String>
         get() = _errorToastMessage
@@ -69,8 +73,6 @@ class LoginVIewModel(
             _errorToastMessage.value = "please enter your username, email, password, phone number"
             return
         }
-
-
 
         // loading event here
         val uploadImage: Single<String> = repository.uploadProfile(selectedPhotoUri)
