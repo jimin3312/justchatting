@@ -22,7 +22,7 @@ class FirebaseSource {
 
     fun loginWithEmail(email: String, password: String): Completable = Completable.create{ emitter ->
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
-                if(it.isSuccessful  )
+                if(it.isSuccessful)
                     emitter.onComplete()
                 else
                     emitter.onError(it.exception!!)
