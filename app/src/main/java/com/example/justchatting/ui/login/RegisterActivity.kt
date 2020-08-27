@@ -65,18 +65,15 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
             viewModel.selectedPhotoUri = data.data
 
             val bitmap: Bitmap
-//            bitmap = if(Build.VERSION.SDK_INT < 28) {
-//                MediaStore.Images.Media.getBitmap(
-//                    this.contentResolver,
-//                    viewModel.selectedPhotoUri
-//                )
-//            } else {
-//                val source = ImageDecoder.createSource(this.contentResolver, viewModel.selectedPhotoUri!!)
-//                ImageDecoder.decodeBitmap(source)
-//            }
-
-            bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, viewModel.selectedPhotoUri)
-
+            bitmap = if(Build.VERSION.SDK_INT < 28) {
+                MediaStore.Images.Media.getBitmap(
+                    this.contentResolver,
+                    viewModel.selectedPhotoUri
+                )
+            } else {
+                val source = ImageDecoder.createSource(this.contentResolver, viewModel.selectedPhotoUri!!)
+                ImageDecoder.decodeBitmap(source)
+            }
 
             select_photo_imageview_register.setImageBitmap(bitmap)
             select_photo_button_register.alpha = 0f
