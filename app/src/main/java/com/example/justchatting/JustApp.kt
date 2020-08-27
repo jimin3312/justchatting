@@ -11,7 +11,7 @@ class JustApp : Application() {
 
         startKoin {
             androidContext(this@JustApp)
-            modules(viewModelModule, databaseModule, loginModule )
+            modules(viewModelModule, databaseModule, loginModule, chattingRoomModule )
         }
     }
 }

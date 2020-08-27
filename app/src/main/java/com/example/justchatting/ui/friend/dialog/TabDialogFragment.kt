@@ -80,7 +80,7 @@ class TabDialogFragment: DialogFragment() , AddFriendFragment.OnAddFriendFragmen
     override fun onResume() {
         super.onResume()
         childFragmentManager.beginTransaction().replace(R.id.dialog_fragment_container, inputIdFragment)
-        dialog!!.getWindow()!!.setLayout(1000, 700);
+        dialog!!.getWindow()!!.setLayout(1000, 1000);
     }
 
     override fun onDetach() {

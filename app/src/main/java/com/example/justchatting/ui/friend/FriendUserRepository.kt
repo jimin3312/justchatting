@@ -22,4 +22,8 @@ class FriendUserRepository(private val userDao: UserDao){
     fun getAnyUser() : Single<User> {
         return userDao.getAnyUser()
     }
+
+    fun updateUser(user: User): Completable {
+        return userDao.update(user)
+    }
 }

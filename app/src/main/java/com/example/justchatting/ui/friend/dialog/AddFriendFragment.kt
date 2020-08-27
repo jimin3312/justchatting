@@ -12,7 +12,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.justchatting.R
 
-class AddFriendFragment(text : String) : Fragment() {
+class AddFriendFragment(text: String) : Fragment() {
 
     private var mText = text
     private var addFriendFragmentListener: OnAddFriendFragmentButtonListener? = null
@@ -29,13 +29,16 @@ class AddFriendFragment(text : String) : Fragment() {
         val inputEditTextView = view.findViewById<EditText>(R.id.dialog_edittext_input)
         detailTextView.text = mText
 
-        addButton.setOnClickListener { view->
-            Log.d("AddFriendFragment","onclick add")
-            addFriendFragmentListener?.messageFromAddFriendFragment(true,inputEditTextView.text.toString())
+        addButton.setOnClickListener { view ->
+            Log.d("AddFriendFragment", "onclick add")
+            addFriendFragmentListener?.messageFromAddFriendFragment(
+                true,
+                inputEditTextView.text.toString()
+            )
         }
-        cancelButton.setOnClickListener{view->
-            Log.d("AddFriendFragment","onclick cancel")
-            addFriendFragmentListener?.messageFromAddFriendFragment(false,"")
+        cancelButton.setOnClickListener { view ->
+            Log.d("AddFriendFragment", "onclick cancel")
+            addFriendFragmentListener?.messageFromAddFriendFragment(false, "")
         }
 
         return view
@@ -43,7 +46,7 @@ class AddFriendFragment(text : String) : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        if(parentFragment is OnAddFriendFragmentButtonListener){
+        if (parentFragment is OnAddFriendFragmentButtonListener) {
             addFriendFragmentListener = parentFragment as OnAddFriendFragmentButtonListener
         }
     }
@@ -52,8 +55,9 @@ class AddFriendFragment(text : String) : Fragment() {
         super.onDetach()
         addFriendFragmentListener = null
     }
-    interface OnAddFriendFragmentButtonListener{
-        fun messageFromAddFriendFragment(isAdd : Boolean, input : String)
+
+    interface OnAddFriendFragmentButtonListener {
+        fun messageFromAddFriendFragment(isAdd: Boolean, input: String)
     }
 
 }

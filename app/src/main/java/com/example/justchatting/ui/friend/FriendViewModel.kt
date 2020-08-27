@@ -24,14 +24,15 @@ import io.reactivex.schedulers.Schedulers
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
-class FriendViewModel(application: Application) : AndroidViewModel(application), KoinComponent{
+class FriendViewModel(application: Application) : AndroidViewModel(application), KoinComponent {
 
-    private val compositeDisposable : CompositeDisposable = CompositeDisposable()
-    private val userRepository : FriendUserRepository by inject()
+    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
+    private val userRepository: FriendUserRepository by inject()
     private var myUserId = FirebaseAuth.getInstance().uid
 
     private var myUser: Observable<User> = userRepository.getMyUser(myUserId!!)
-    private var users : Observable<PagedList<User>> = userRepository.getUsers(myUserId!!).toObservable(pageSize = 30)
+    private var users: Observable<PagedList<User>> =
+        userRepository.getUsers(myUserId!!).toObservable(pageSize = 30)
 
     private var isAddFriend = MutableLiveData<Boolean>()
     private var isContactsSyncFinished = MutableLiveData<Boolean>()
@@ -39,52 +40,71 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
     init {
         setListener()
     }
-    fun getIsContactsSyncFinished() : MutableLiveData<Boolean>{
+
+    fun getIsContactsSyncFinished(): MutableLiveData<Boolean> {
         return isContactsSyncFinished
     }
-    fun getIsAddFriend() : MutableLiveData<Boolean>{
+
+    fun getIsAddFriend(): MutableLiveData<Boolean> {
         return isAddFriend
     }
-    fun getMyUser() : Observable<User>{
+
+    fun getMyUser(): Observable<User> {
         return myUser
     }
-    fun getUsers() : Observable<PagedList<User>>{
+
+    fun getUsers(): Observable<PagedList<User>> {
         return users
     }
 
-    fun getAnyUser() : Single<User> {
+    fun getAnyUser(): Single<User> {
         return userRepository.getAnyUser()
     }
 
-    fun insert(user : User) {
-        compositeDisposable.add(userRepository.insertUser(user)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                Log.d("insert", "success")
-            },{
-                Log.d("insert", "fail")
-            })
+    fun insert(user: User) {
+        compositeDisposable.add(
+            userRepository.insertUser(user)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    Log.d("insert", "success")
+                }, {
+                    Log.d("insert", "fail")
+                })
         )
     }
 
-    fun sync(){
+    fun update(user: User) {
+        compositeDisposable.add(
+            userRepository.updateUser(user)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    Log.d("update", "success")
+                }, {
+                    Log.d("update", "fail")
+                })
+        )
+    }
+
+    fun sync() {
         Log.d("FriendViewModel", "Sync start")
         val myUserRef = FirebaseDatabase.getInstance().getReference("/users/$myUserId")
 
         myUserRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
             }
+
             override fun onDataChange(snapshot: DataSnapshot) {
-                val myUser = snapshot.getValue(User::class.java)?: return
+                val myUser = snapshot.getValue(User::class.java) ?: return
                 Log.d("FriendViewModel:", "my username: ${myUser.username}")
 
                 var contactList = getContacts(getApplication())
                 contactList.add(myUser.phoneNumber)
 
-                contactList.forEachIndexed{ index, number->
+                contactList.forEachIndexed { index, number ->
                     val ref = FirebaseDatabase.getInstance().getReference("/phone/$number")
-                    Log.d("REPO","number : $number")
+                    Log.d("REPO", "number : $number")
                     ref.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onCancelled(error: DatabaseError) {}
                         override fun onDataChange(snapshot: DataSnapshot) {
@@ -92,16 +112,18 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
                             Log.d("FriendViewModel uid", user.uid)
                             Log.d("FriendViewModel", user.username)
 
-                            val fromRef = FirebaseDatabase.getInstance().getReference("/friends/${myUserId}/${user.uid}")
+                            val fromRef = FirebaseDatabase.getInstance()
+                                .getReference("/friends/${myUserId}/${user.uid}")
                             fromRef.setValue(user)
 
-                            if(user.uid != myUserId) {
-                                val toRef = FirebaseDatabase.getInstance().getReference("/friends/${user.uid}/$myUserId")
+                            if (user.uid != myUserId) {
+                                val toRef = FirebaseDatabase.getInstance()
+                                    .getReference("/friends/${user.uid}/$myUserId")
                                 toRef.setValue(myUser)
                             }
                         }
                     })
-                    if(index == contactList.size-1) {
+                    if (index == contactList.size - 1) {
                         isContactsSyncFinished.postValue(true)
                     }
                 }
@@ -116,7 +138,8 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
         if ((cur?.count ?: 0) > 0) {
             while (cur != null && cur.moveToNext()) {
                 val id: String = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID))
-                val name: String = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
+                val name: String =
+                    cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
                 if (cur.getInt(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
                     val pCur: Cursor? = cr.query(
                         ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
@@ -126,11 +149,12 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
                         null
                     )
                     while (pCur!!.moveToNext()) {
-                        val temp : String = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
-                        var phoneNo : String = ""
+                        val temp: String =
+                            pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                        var phoneNo: String = ""
                         temp.forEach {
-                            if(it.isDigit())
-                                phoneNo+=it
+                            if (it.isDigit())
+                                phoneNo += it
                         }
                         contactList.add(phoneNo)
                     }
@@ -142,19 +166,19 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
         return contactList
     }
 
-    fun setUsersDatabase()
-    {
+    fun setUsersDatabase() {
 
         Log.d("setUsersDatabase", "start")
         val ref = FirebaseDatabase.getInstance().getReference("/friends/$myUserId")
-        ref.addListenerForSingleValueEvent(object : ValueEventListener{
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
             }
+
             override fun onDataChange(snapshot: DataSnapshot) {
-                snapshot.children.forEach{ child->
+                snapshot.children.forEach { child ->
                     val user = child.getValue(User::class.java)
 
-                    if(user != null) {
+                    if (user != null) {
 
                         Log.d("setUsersDatabase", user.username)
                         insert(user)
@@ -163,57 +187,81 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
             }
         })
     }
-    private fun setListener()
-    {
+
+    private fun setListener() {
         val ref = FirebaseDatabase.getInstance().getReference("/friends/$myUserId")
+
         ref.addChildEventListener(object : ChildEventListener {
             override fun onCancelled(error: DatabaseError) {
             }
+
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
 
             }
+
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                if (snapshot.child("uid").exists() && snapshot.child("phoneNumber").exists() &&
+                    snapshot.child("profileImageUrl").exists() && snapshot.child("username")
+                        .exists() &&
+                    snapshot.child("email").exists()
+                ) {
+                    val user = snapshot.getValue(User::class.java) ?: return
+                    update(user)
+                }
             }
+
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                if(snapshot.child("uid").exists() && snapshot.child("phoneNumber").exists() &&
-                    snapshot.child("profileImageUrl").exists() && snapshot.child("username").exists() &&
-                    snapshot.child("email").exists()) {
+                if (snapshot.child("uid").exists() && snapshot.child("phoneNumber").exists() &&
+                    snapshot.child("profileImageUrl").exists() && snapshot.child("username")
+                        .exists() &&
+                    snapshot.child("email").exists()
+                ) {
                     val user = snapshot.getValue(User::class.java) ?: return
                     insert(user)
                 }
             }
+
             override fun onChildRemoved(snapshot: DataSnapshot) {
             }
         })
     }
 
-    fun addFriendWithId(email : String){
+    fun addFriendWithId(email: String) {
         val toUserRef = FirebaseDatabase.getInstance().getReference("/email/$email")
-        toUserRef.addListenerForSingleValueEvent(object : ValueEventListener{
+
+        toUserRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
             }
+
             override fun onDataChange(snapshot: DataSnapshot) {
                 val toUser = snapshot.getValue(User::class.java)
-                if(toUser==null) {
+                if (toUser == null) {
                     isAddFriend.postValue(false)
                     return
                 }
+
                 val fromUserRef = FirebaseDatabase.getInstance().getReference("/users/$myUserId")
-                fromUserRef.addListenerForSingleValueEvent(object : ValueEventListener{
+
+                fromUserRef.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onCancelled(error: DatabaseError) {
                     }
+
                     override fun onDataChange(snapshot: DataSnapshot) {
                         val fromUser = snapshot.getValue(User::class.java)
-                        if(fromUser==null) {
+                        if (fromUser == null) {
                             isAddFriend.postValue(false)
                             return
                         }
-                        val fromUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$myUserId/${toUser.uid}")
+
+                        val fromUserFriendRef = FirebaseDatabase.getInstance()
+                            .getReference("/friends/$myUserId/${toUser.uid}")
+
                         fromUserFriendRef.setValue(toUser).addOnCompleteListener {
-                            if(it.isSuccessful) {
-                                val toUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/${toUser.uid}/$myUserId")
+                            if (it.isSuccessful) {
+                                val toUserFriendRef = FirebaseDatabase.getInstance()
+                                    .getReference("/friends/${toUser.uid}/$myUserId")
                                 toUserFriendRef.setValue(fromUser).addOnCompleteListener {
-                                    if(it.isSuccessful) {
+                                    if (it.isSuccessful) {
                                         Log.d("FriendViewModel", "add")
                                         isAddFriend.postValue(true)
                                     }
@@ -225,35 +273,40 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
             }
         })
     }
-    fun addFriendWithPhoneNumber(toPhoneNum : String){
+
+    fun addFriendWithPhoneNumber(toPhoneNum: String) {
         Log.d("PhoneNumber : ", toPhoneNum)
         val toUserRef = FirebaseDatabase.getInstance().getReference("/phone/$toPhoneNum")
-        toUserRef.addListenerForSingleValueEvent(object : ValueEventListener{
+        toUserRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
             }
+
             override fun onDataChange(snapshot: DataSnapshot) {
                 val toUser = snapshot.getValue(User::class.java)
-                if(toUser==null) {
+                if (toUser == null) {
                     isAddFriend.postValue(false)
                     return
                 }
                 val fromUserRef = FirebaseDatabase.getInstance().getReference("/users/$myUserId")
-                fromUserRef.addListenerForSingleValueEvent(object : ValueEventListener{
+                fromUserRef.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onCancelled(error: DatabaseError) {
                     }
+
                     override fun onDataChange(snapshot: DataSnapshot) {
                         val fromUser = snapshot.getValue(User::class.java)
-                        if(fromUser==null) {
+                        if (fromUser == null) {
                             isAddFriend.postValue(false)
                             return
                         }
-                        val fromUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$myUserId/${toUser.uid}")
+                        val fromUserFriendRef = FirebaseDatabase.getInstance()
+                            .getReference("/friends/$myUserId/${toUser.uid}")
                         fromUserFriendRef.setValue(toUser).addOnCompleteListener {
-                            if(it.isSuccessful) {
-                                val toUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/${toUser.uid}/$myUserId")
+                            if (it.isSuccessful) {
+                                val toUserFriendRef = FirebaseDatabase.getInstance()
+                                    .getReference("/friends/${toUser.uid}/$myUserId")
                                 toUserFriendRef.setValue(fromUser).addOnCompleteListener {
-                                    if(it.isSuccessful) {
-                                        Log.d("FriendViewModel","add")
+                                    if (it.isSuccessful) {
+                                        Log.d("FriendViewModel", "add")
                                         isAddFriend.postValue(true)
                                     }
                                 }

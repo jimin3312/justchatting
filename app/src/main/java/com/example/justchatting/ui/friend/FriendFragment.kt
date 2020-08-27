@@ -75,11 +75,11 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
 
                 val tabDialogFragment = TabDialogFragment()
                 tabDialogFragment.show(fragmentManager,"dialog")
-
             }
         }
         return super.onOptionsItemSelected(item)
     }
+
     private fun deleteAddFriendDialog()
     {
         val prev = childFragmentManager.findFragmentByTag("dialog")
@@ -87,6 +87,7 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
             (prev as DialogFragment).dismiss()
         }
     }
+
     private fun isSuccessfulDialog(message: String, buttonName: String)
     {
         val alertDialog = AlertDialog.Builder(requireContext()).create()
@@ -102,6 +103,7 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).layoutParams = layoutParams
 
     }
+
     override fun messageFromTabDialog(selection : Int, input : String) {
         when(selection) {
             0->{
@@ -138,10 +140,10 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
     private fun setObserver()
     {
         disposable.add(viewModel.getUsers().subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ pagedList->
-                friendAdapter.submitList(pagedList)
-            },{})
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ pagedList->
+                    friendAdapter.submitList(pagedList)
+                },{})
         )
         disposable.add(viewModel.getMyUser().subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -163,6 +165,7 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(), TabDialogFragment.
                 isSuccessfulDialog("친구 추가 실패","확인")
             }
         })
+
         viewModel.getIsContactsSyncFinished().observe(viewLifecycleOwner, Observer {
             viewModel.setUsersDatabase()
         })

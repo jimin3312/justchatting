@@ -1,6 +1,5 @@
 package com.example.justchatting.ui.friend
 
-import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
@@ -28,7 +27,4 @@ interface UserDao {
 
     @Update
     fun update(user : User) : Completable
-
-
-
 }

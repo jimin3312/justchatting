@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.fragment_container, friendFragment).commit()
         }
     }
+
     private fun setListener() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNavigationView.setOnNavigationItemSelectedListener(object : BottomNavigationView.OnNavigationItemSelectedListener{
@@ -58,6 +59,4 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
-
-
 }
