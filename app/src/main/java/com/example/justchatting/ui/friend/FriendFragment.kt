@@ -25,6 +25,7 @@ import com.example.justchatting.ui.friend.dialog.TabDialogFragment
 import com.squareup.picasso.Picasso
 import com.example.justchatting.ui.login.RegisterActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -34,7 +35,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 /**
  * A simple [Fragment] subclass.
  */
-class FriendFragment : BaseFragment<FragmentFriendBinding>(){
+class FriendFragment : BaseFragment<FragmentFriendBinding>() {
     private val viewModel: FriendViewModel by viewModel()
     private lateinit var friendAdapter : FriendAdapter
 
@@ -45,10 +46,40 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(){
 
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
-        setPermission()
+        setHasOptionsMenu(true)
+
+        friendAdapter = FriendAdapter()
+
+        friend_recyclerview.apply {
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = friendAdapter
+        }
+        viewModel.sync()
+//        viewModel.friendRepository.isFinished.observe(viewLifecycleOwner, Observer {
+//            Log.d("sync finished","--------------")
+//            viewModel.friendRepository.loadFriends()
+//        })
+//        viewModel.friendRepository.isFinished2.observe(viewLifecycleOwner, Observer {
+//            Log.d("sync finished2","--------------")
+//            viewModel.loadMyUser()
+//            viewModel.loadUsers()
+//        })
+
+
+        viewModel.getMyUsers().observe(viewLifecycleOwner, Observer {
+            friend_my_textview_username.text = it.username
+            if (it.profileImageUrl!!.isEmpty())
+                friend_my_imageview_profile_image.setImageResource(R.drawable.person)
+            else
+                Picasso.get().load(it!!.profileImageUrl).into(friend_my_imageview_profile_image)
+        })
+
+        viewModel.getUsers().observe(viewLifecycleOwner, Observer {
+            friendAdapter.setUsers(it)
+        })
 
     }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.friend_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -95,6 +126,7 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(){
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).layoutParams = layoutParams
     }
 
+
 //    override fun messageFromTabDialog(selection : Int, input : String) {
 //        when(selection) {
 //            0->{
@@ -111,40 +143,5 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>(){
 //        }
 //    }
 
-    private fun setPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(
-                requireContext() , Manifest.permission.READ_CONTACTS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissions(
-                arrayOf(Manifest.permission.READ_CONTACTS),
-                RegisterActivity.PERMISSIONS_REQUEST_READ_CONTACTS
-            )
-        } else {
-            friendAdapter = FriendAdapter(viewModel.friendList.value!!)
-            setHasOptionsMenu(true)
-            friend_recyclerview.apply {
-                adapter = friendAdapter
-                setHasFixedSize(true)
-                layoutManager = LinearLayoutManager(requireContext())
-            }
 
-            viewModel.friendList.observe(viewLifecycleOwner, Observer {
-                friendAdapter.notifyDataSetChanged()
-            })
-        }
-    }
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        if (requestCode == RegisterActivity.PERMISSIONS_REQUEST_READ_CONTACTS) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                setPermission()
-            } else {
-                requireActivity().finish()
-            }
-        }
-    }
 }

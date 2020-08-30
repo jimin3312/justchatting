@@ -20,16 +20,10 @@ class FirebaseSource {
 
     fun logout() = auth.signOut()
 
-<<<<<<< HEAD
-    fun loginWithEmail(email: String, password: String): Completable = Completable.create{ emitter ->
-        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
-                if(it.isSuccessful  )
-=======
     fun loginWithEmail(email: String, password: String): Completable =
         Completable.create { emitter ->
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
                 if (it.isSuccessful)
->>>>>>> 9c52d2eb984d7e7eea5ca4a363b2e5127f87ce0c
                     emitter.onComplete()
                 else
                     emitter.onError(it.exception!!)
@@ -89,20 +83,19 @@ class FirebaseSource {
 
             val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
             val user = User(
-                uid,
-                name,
-                phoneNumber,
-                firebaseImageResourcePath,
-                email
+                username = name,
+                phoneNumber = phoneNumber,
+                profileImageUrl = firebaseImageResourcePath,
+                email = email
             )
 
             ref.setValue(user)
                 .addOnSuccessListener {
                     val phoneRef =
                         FirebaseDatabase.getInstance().getReference("/phone/$phoneNumber")
-                    phoneRef.setValue(user).addOnSuccessListener {
+                    phoneRef.setValue(uid).addOnSuccessListener {
                         val emailRef = FirebaseDatabase.getInstance().getReference("/email/$email")
-                        emailRef.setValue(user).addOnSuccessListener {
+                        emailRef.setValue(uid).addOnSuccessListener {
                             emitter.onSuccess(true)
                         }
                     }
