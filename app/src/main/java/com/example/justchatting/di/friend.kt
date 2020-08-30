@@ -1,9 +1,6 @@
 package com.example.justchatting.di
 
-import com.example.justchatting.ui.friend.FriendRepository
-import com.example.justchatting.ui.friend.dialog.AddFriendFragment
-import com.example.justchatting.ui.friend.dialog.TabDialogFragment
-import org.koin.android.ext.koin.androidApplication
+import com.example.justchatting.repository.friend.FriendRepository
 import org.koin.dsl.module
 
 val friendModule = module {

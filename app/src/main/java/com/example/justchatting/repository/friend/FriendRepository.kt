@@ -1,4 +1,4 @@
-package com.example.justchatting.ui.friend
+package com.example.justchatting.repository.friend
 
 import android.app.Application
 import android.database.Cursor

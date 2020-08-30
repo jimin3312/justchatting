@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.justchatting.User
+import com.example.justchatting.repository.friend.FriendRepository
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 

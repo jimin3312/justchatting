@@ -1,7 +1,6 @@
 package com.example.justchatting.di
 
 import com.example.justchatting.ui.chatting.ChattingViewModel
-import com.example.justchatting.ui.friend.FriendRepository
 import com.example.justchatting.ui.friend.FriendViewModel
 import com.example.justchatting.ui.login.LoginVIewModel
 import com.example.justchatting.ui.settings.SettingsViewModel
