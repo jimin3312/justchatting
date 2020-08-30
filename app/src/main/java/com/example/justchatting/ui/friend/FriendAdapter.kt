@@ -13,22 +13,31 @@ import com.example.justchatting.R
 import com.example.justchatting.User
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlinx.android.synthetic.main.fragment_friend.*
 import kotlinx.android.synthetic.main.fragment_friend_item.view.*
+import org.koin.ext.getScopeId
 
-class FriendAdapter(private val friendList : ArrayList<User>) : RecyclerView.Adapter<FriendAdapter.UserViewHolder>()
+class FriendAdapter : RecyclerView.Adapter<FriendAdapter.UserViewHolder>()
 {
-
+    private var mFriendList: ArrayList<User>? = null
+    fun setUsers(friendList: ArrayList<User>)
+    {
+        mFriendList = friendList
+        notifyDataSetChanged()
+    }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.fragment_friend_item,parent,false)
         return UserViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-        holder.bind(friendList[position])
+        holder.bind(mFriendList?.get(position))
     }
 
     override fun getItemCount(): Int {
-        return friendList.size
+        if(mFriendList == null)
+            return 0
+        return mFriendList!!.size
     }
 
     inner class UserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
@@ -41,9 +50,10 @@ class FriendAdapter(private val friendList : ArrayList<User>) : RecyclerView.Ada
         {
             this.user = user
             username.text = user?.username
-            Picasso.get().load(user?.profileImageUrl)
-                .placeholder(R.drawable.person)
-                .into(profileImg)
+            if(user!!.profileImageUrl!!.isEmpty())
+                profileImg.setImageResource(R.drawable.person)
+            else
+                Picasso.get().load(user.profileImageUrl).placeholder(R.drawable.person).into(profileImg)
         }
     }
 
