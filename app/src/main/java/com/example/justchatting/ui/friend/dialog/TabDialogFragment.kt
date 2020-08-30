@@ -63,7 +63,7 @@ class TabDialogFragment: DialogFragment(){
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        childFragmentManager.beginTransaction().replace(R.id.dialog_fragment_container, inputIdFragment).commit()
+        childFragmentManager.beginTransaction().replace(R.id.dialog_fragment_container, inputPhoneFragment).commit()
     }
 
     override fun onResume() {

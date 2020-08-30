@@ -36,9 +36,11 @@ class AddFriendFragment(tabPosition : Int, text: String) : DialogFragment() {
             Log.d("AddFriendFragment", "onclick add")
             when(mtabPosition) {
                 TabPosition.PHONE.value ->{
+                    Log.d("AddFriendFragment", "phone")
                     viewModel.addFriendWithPhoneNumber(inputEditTextView.text.toString())
                 }
                 TabPosition.ID.value -> {
+                    Log.d("AddFriendFragment", "id")
                     val re = Regex("[^A-Za-z0-9 ]")
                     val input = re.replace(inputEditTextView.text.toString(),"")
                     viewModel.addFriendWithId(input)
@@ -60,7 +62,7 @@ class AddFriendFragment(tabPosition : Int, text: String) : DialogFragment() {
         }
     }
     enum class TabPosition(val value : Int){
-        PHONE(0),
-        ID(1)
+        PHONE(1),
+        ID(2)
     }
 }

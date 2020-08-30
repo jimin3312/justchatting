@@ -15,34 +15,15 @@ class FriendRepository {
         val TAG = "FriendRepository"
     }
 
-    private var friendMap : HashMap<String, User> = HashMap()
+    var friendMap : HashMap<String, User> = HashMap()
+    private var _users : MutableLiveData<ArrayList<User>> = MutableLiveData(ArrayList())
+    val users : LiveData<ArrayList<User>>
+        get() = _users
 
-    private var _friendUsers : MutableLiveData<ArrayList<User>> = MutableLiveData(ArrayList())
-    val friendUsers : LiveData<ArrayList<User>>
-        get() = _friendUsers
+    private var myUser : MutableLiveData<User> = MutableLiveData()
 
-    private var _myUser : MutableLiveData<User> = MutableLiveData()
-    val myUser : LiveData<User>
-        get() = _myUser
+    var addFriend : MutableLiveData<Int> = MutableLiveData()
 
-    private var _addFriend : MutableLiveData<Boolean> = MutableLiveData()
-    val addFriend : LiveData<Boolean>
-        get() = _addFriend
-
-    fun loadMyUser()
-    {
-        val uid = FirebaseAuth.getInstance().uid
-        val myRef = FirebaseDatabase.getInstance().getReference("/users/$uid")
-        myRef.addListenerForSingleValueEvent(object : ValueEventListener{
-            override fun onCancelled(error: DatabaseError) {
-            }
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val my = snapshot.getValue(User::class.java) ?: return
-                _myUser.postValue(my)
-            }
-        })
-    }
 
     fun loadFriends() {
         val uid = FirebaseAuth.getInstance().uid
@@ -70,9 +51,16 @@ class FriendRepository {
                         })
                     }
                 }
-                _friendUsers.postValue(ArrayList(friendMap.values))
+
+                _users.postValue(getUsersArrayList())
             }
         })
+    }
+    fun getUsersArrayList(): ArrayList<User> {
+        val arrayList = ArrayList(friendMap.values)
+        arrayList.sortWith(compareBy{it.username})
+        arrayList.add(0, myUser.value)
+        return arrayList
     }
 
     fun makeFriendRelationships(application: Application){
@@ -146,55 +134,70 @@ class FriendRepository {
         return contactList
     }
 
-    fun addFriendWithId(email : String){
+    fun addFriendWithEmail(email : String){
+        if(email.isEmpty())
+            return
+        Log.d(TAG, "add friend with phone $email")
         val uid = FirebaseAuth.getInstance().uid
         val friendEmailRef = FirebaseDatabase.getInstance().getReference("/email/$email")
         friendEmailRef.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onCancelled(error: DatabaseError) {
             }
             override fun onDataChange(snapshot: DataSnapshot) {
-                val isEmailExist = snapshot.getValue(Boolean::class.java)
-                if(isEmailExist == null){
-                    _addFriend.postValue(false)
+                val friendId = snapshot.getValue(String()::class.java)
+                if(friendId == null){
+                    Log.d(TAG,"failed to add")
+                    addFriend.postValue(-1)
                     return
                 }
-                if(isEmailExist) {
-                    val friendId = snapshot.key
-                    val fromUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$uid/$friendId")
-                    fromUserFriendRef.setValue(true)
-                    val toUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$friendId/$uid")
-                    toUserFriendRef.setValue(true)
-                    _addFriend.postValue(true)
-                }
+                val fromUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$uid/$friendId")
+                fromUserFriendRef.setValue(true)
+                val toUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$friendId/$uid")
+                toUserFriendRef.setValue(true)
+                addFriend.postValue(1)
             }
         })
     }
     fun addFriendWithPhoneNumber(phoneNum : String){
+        Log.d(TAG, "add friend with phone $phoneNum")
+        if(phoneNum.isEmpty())
+            return
+
         val uid = FirebaseAuth.getInstance().uid
         val friendPhoneRef = FirebaseDatabase.getInstance().getReference("/phone/$phoneNum")
         friendPhoneRef.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onCancelled(error: DatabaseError) {
             }
             override fun onDataChange(snapshot: DataSnapshot) {
-                val isPhoneNumExist = snapshot.getValue(Boolean::class.java)
-                if(isPhoneNumExist == null){
-                    _addFriend.postValue(false)
+                val friendId = snapshot.getValue(String()::class.java)
+                if(friendId == null){
+                    Log.d(TAG,"failed to add")
+                    addFriend.postValue(-1)
                     return
                 }
-                if(isPhoneNumExist) {
-                    val friendId = snapshot.key
-                    val fromUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$uid/$friendId")
-                    fromUserFriendRef.setValue(true)
-                    val toUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$friendId/$uid")
-                    toUserFriendRef.setValue(true)
-                    _addFriend.postValue(true)
-                }
+                val fromUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$uid/$friendId")
+                fromUserFriendRef.setValue(true)
+                val toUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$friendId/$uid")
+                toUserFriendRef.setValue(true)
+                addFriend.postValue(1)
             }
         })
     }
     fun setListener()
     {
+
         val uid = FirebaseAuth.getInstance().uid
+        val myRef = FirebaseDatabase.getInstance().getReference("/users/$uid")
+        myRef.addValueEventListener(object : ValueEventListener{
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val my = snapshot.getValue(User::class.java) ?: return
+                myUser.postValue(my)
+            }
+        })
+
         val ref = FirebaseDatabase.getInstance().getReference("/friends/$uid")
         ref.addChildEventListener(object : ChildEventListener {
             override fun onCancelled(error: DatabaseError) {
@@ -219,7 +222,7 @@ class FriendRepository {
                             val user = snapshot.getValue(User::class.java)?:return
                             Log.d(TAG, "onChildAdded ${user.username}")
                             friendMap[friendId] = user
-                            _friendUsers.postValue(ArrayList(friendMap.values))
+                            _users.postValue(getUsersArrayList())
                         }
                     })
                 }
@@ -228,6 +231,4 @@ class FriendRepository {
             }
         })
     }
-
-
 }

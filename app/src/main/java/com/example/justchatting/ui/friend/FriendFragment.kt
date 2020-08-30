@@ -42,22 +42,21 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         }
         viewModel.sync()
 
-        viewModel.getMyUsers().observe(viewLifecycleOwner, Observer {
-            friend_my_textview_username.text = it.username
-            if (it.profileImageUrl!!.isEmpty())
-                friend_my_imageview_profile_image.setImageResource(R.drawable.person)
-            else
-                Picasso.get().load(it!!.profileImageUrl).into(friend_my_imageview_profile_image)
-        })
-
         viewModel.getUsers().observe(viewLifecycleOwner, Observer {
             friendAdapter.setUsers(it)
+            friendAdapter.notifyDataSetChanged()
         })
         viewModel.getAddFriend().observe(viewLifecycleOwner, Observer {friendAddSuccess->
-            if(friendAddSuccess)
-                resultDialog("친구추가 성공", "확인")
-            else
-                resultDialog("친구추가 실패", "확인")
+            when (friendAddSuccess) {
+                1 -> {
+                    resultDialog("친구추가 성공", "확인")
+                    viewModel.getAddFriend().postValue(0)
+                }
+                -1 -> {
+                    resultDialog("친구추가 실패", "확인")
+                    viewModel.getAddFriend().postValue(0)
+                }
+            }
         })
     }
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
