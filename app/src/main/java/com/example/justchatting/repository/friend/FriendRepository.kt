@@ -1,7 +1,6 @@
-package com.example.justchatting.ui.friend
+package com.example.justchatting.repository.friend
 
 import android.app.Application
-import android.content.Context
 import android.database.Cursor
 import android.provider.ContactsContract
 import android.util.Log
@@ -10,39 +9,21 @@ import androidx.lifecycle.MutableLiveData
 import com.example.justchatting.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 
-class FriendRepository(): KoinComponent {
+class FriendRepository {
     companion object{
         val TAG = "FriendRepository"
     }
 
-    private var _friendMap : HashMap<String, User> = HashMap()
-    val friendMap : HashMap<String, User>
-        get() = _friendMap
+    var friendMap : HashMap<String, User> = HashMap()
+    private var _users : MutableLiveData<ArrayList<User>> = MutableLiveData(ArrayList())
+    val users : LiveData<ArrayList<User>>
+        get() = _users
 
-    var friendUsers : MutableLiveData<ArrayList<User>> = MutableLiveData(ArrayList())
-    var myUser : MutableLiveData<User> = MutableLiveData()
-    var isFinished : MutableLiveData<Boolean> = MutableLiveData()
-    var isFinished2 : MutableLiveData<Boolean> = MutableLiveData()
+    private var myUser : MutableLiveData<User> = MutableLiveData()
 
-    fun loadMyUser()
-    {
-        val uid = FirebaseAuth.getInstance().uid
-        val myRef = FirebaseDatabase.getInstance().getReference("/users/$uid")
-        myRef.addListenerForSingleValueEvent(object : ValueEventListener{
-            override fun onCancelled(error: DatabaseError) {
-            }
+    var addFriend : MutableLiveData<Int> = MutableLiveData()
 
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val my = snapshot.getValue(User::class.java) ?: return
-                myUser.postValue(my)
-            }
-        })
-    }
 
     fun loadFriends() {
         val uid = FirebaseAuth.getInstance().uid
@@ -65,16 +46,21 @@ class FriendRepository(): KoinComponent {
                             override fun onDataChange(snapshot: DataSnapshot) {
                                 val user = snapshot.getValue(User::class.java)?: return
                                 Log.d(TAG,"user : ${user.username}")
-                                _friendMap[friendId!!] = user
+                                friendMap[friendId!!] = user
                             }
                         })
                     }
                 }
-                friendUsers.postValue(ArrayList(_friendMap.values))
-                Log.d("friendList", ArrayList(_friendMap.values).toString())
-                isFinished2.postValue(true)
+
+                _users.postValue(getUsersArrayList())
             }
         })
+    }
+    fun getUsersArrayList(): ArrayList<User> {
+        val arrayList = ArrayList(friendMap.values)
+        arrayList.sortWith(compareBy{it.username})
+        arrayList.add(0, myUser.value)
+        return arrayList
     }
 
     fun makeFriendRelationships(application: Application){
@@ -112,7 +98,6 @@ class FriendRepository(): KoinComponent {
                         }
                     })
                 }
-                isFinished.postValue(true)
             }
         })
     }
@@ -149,39 +134,70 @@ class FriendRepository(): KoinComponent {
         return contactList
     }
 
-    fun addFriendWithId(email : String){
+    fun addFriendWithEmail(email : String){
+        if(email.isEmpty())
+            return
+        Log.d(TAG, "add friend with phone $email")
         val uid = FirebaseAuth.getInstance().uid
         val friendEmailRef = FirebaseDatabase.getInstance().getReference("/email/$email")
         friendEmailRef.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onCancelled(error: DatabaseError) {
             }
             override fun onDataChange(snapshot: DataSnapshot) {
-                val friendId = snapshot.key ?: return
+                val friendId = snapshot.getValue(String()::class.java)
+                if(friendId == null){
+                    Log.d(TAG,"failed to add")
+                    addFriend.postValue(-1)
+                    return
+                }
                 val fromUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$uid/$friendId")
                 fromUserFriendRef.setValue(true)
                 val toUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$friendId/$uid")
                 toUserFriendRef.setValue(true)
+                addFriend.postValue(1)
             }
         })
     }
     fun addFriendWithPhoneNumber(phoneNum : String){
+        Log.d(TAG, "add friend with phone $phoneNum")
+        if(phoneNum.isEmpty())
+            return
+
         val uid = FirebaseAuth.getInstance().uid
         val friendPhoneRef = FirebaseDatabase.getInstance().getReference("/phone/$phoneNum")
         friendPhoneRef.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onCancelled(error: DatabaseError) {
             }
             override fun onDataChange(snapshot: DataSnapshot) {
-                val friendId = snapshot.key ?: return
+                val friendId = snapshot.getValue(String()::class.java)
+                if(friendId == null){
+                    Log.d(TAG,"failed to add")
+                    addFriend.postValue(-1)
+                    return
+                }
                 val fromUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$uid/$friendId")
                 fromUserFriendRef.setValue(true)
                 val toUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$friendId/$uid")
                 toUserFriendRef.setValue(true)
+                addFriend.postValue(1)
             }
         })
     }
     fun setListener()
     {
+
         val uid = FirebaseAuth.getInstance().uid
+        val myRef = FirebaseDatabase.getInstance().getReference("/users/$uid")
+        myRef.addValueEventListener(object : ValueEventListener{
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val my = snapshot.getValue(User::class.java) ?: return
+                myUser.postValue(my)
+            }
+        })
+
         val ref = FirebaseDatabase.getInstance().getReference("/friends/$uid")
         ref.addChildEventListener(object : ChildEventListener {
             override fun onCancelled(error: DatabaseError) {
@@ -193,8 +209,8 @@ class FriendRepository(): KoinComponent {
             }
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
 
-                val isFriend = snapshot.getValue(Boolean::class.java) ?: return
-                if(isFriend)
+                val friend = snapshot.getValue(Boolean::class.java) ?: return
+                if(friend)
                 {
                     val friendId = snapshot.key?: return
                     val ref = FirebaseDatabase.getInstance().getReference("/users/$friendId")
@@ -205,9 +221,8 @@ class FriendRepository(): KoinComponent {
                         override fun onDataChange(snapshot: DataSnapshot) {
                             val user = snapshot.getValue(User::class.java)?:return
                             Log.d(TAG, "onChildAdded ${user.username}")
-                            _friendMap[friendId] = user
-                            friendUsers.postValue(ArrayList(_friendMap.values))
-                            isFinished2.postValue(true)
+                            friendMap[friendId] = user
+                            _users.postValue(getUsersArrayList())
                         }
                     })
                 }
@@ -216,6 +231,4 @@ class FriendRepository(): KoinComponent {
             }
         })
     }
-
-
 }
