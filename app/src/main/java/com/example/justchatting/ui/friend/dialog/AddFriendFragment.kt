@@ -9,14 +9,17 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.example.justchatting.R
+import com.example.justchatting.ui.friend.FriendViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class AddFriendFragment(text: String) : Fragment() {
+class AddFriendFragment(tabPosition : Int, text: String) : DialogFragment() {
 
+    private val viewModel: FriendViewModel by viewModel()
     private var mText = text
-    private var addFriendFragmentListener: OnAddFriendFragmentButtonListener? = null
-
+    private var mtabPosition = tabPosition
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -29,35 +32,35 @@ class AddFriendFragment(text: String) : Fragment() {
         val inputEditTextView = view.findViewById<EditText>(R.id.dialog_edittext_input)
         detailTextView.text = mText
 
-        addButton.setOnClickListener { view ->
+        addButton.setOnClickListener { _ ->
             Log.d("AddFriendFragment", "onclick add")
-            addFriendFragmentListener?.messageFromAddFriendFragment(
-                true,
-                inputEditTextView.text.toString()
-            )
+            when(mtabPosition) {
+                TabPosition.PHONE.value ->{
+                    viewModel.addFriendWithPhoneNumber(inputEditTextView.text.toString())
+                }
+                TabPosition.ID.value -> {
+                    val re = Regex("[^A-Za-z0-9 ]")
+                    val input = re.replace(inputEditTextView.text.toString(),"")
+                    viewModel.addFriendWithId(input)
+                }
+            }
         }
-        cancelButton.setOnClickListener { view ->
+        cancelButton.setOnClickListener { _ ->
             Log.d("AddFriendFragment", "onclick cancel")
-            addFriendFragmentListener?.messageFromAddFriendFragment(false, "")
+            deleteAddFriendDialog()
         }
 
         return view
     }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (parentFragment is OnAddFriendFragmentButtonListener) {
-            addFriendFragmentListener = parentFragment as OnAddFriendFragmentButtonListener
+    private fun deleteAddFriendDialog()
+    {
+        val fragment = requireParentFragment().parentFragmentManager.findFragmentByTag("dialog")
+        if(fragment != null) {
+            (fragment as DialogFragment).dismiss()
         }
     }
-
-    override fun onDetach() {
-        super.onDetach()
-        addFriendFragmentListener = null
+    enum class TabPosition(val value : Int){
+        PHONE(0),
+        ID(1)
     }
-
-    interface OnAddFriendFragmentButtonListener {
-        fun messageFromAddFriendFragment(isAdd: Boolean, input: String)
-    }
-
 }

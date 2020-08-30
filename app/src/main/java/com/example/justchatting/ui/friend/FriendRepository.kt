@@ -1,7 +1,6 @@
 package com.example.justchatting.ui.friend
 
 import android.app.Application
-import android.content.Context
 import android.database.Cursor
 import android.provider.ContactsContract
 import android.util.Log
@@ -10,24 +9,25 @@ import androidx.lifecycle.MutableLiveData
 import com.example.justchatting.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 
-class FriendRepository(): KoinComponent {
+class FriendRepository {
     companion object{
         val TAG = "FriendRepository"
     }
 
-    private var _friendMap : HashMap<String, User> = HashMap()
-    val friendMap : HashMap<String, User>
-        get() = _friendMap
+    private var friendMap : HashMap<String, User> = HashMap()
 
-    var friendUsers : MutableLiveData<ArrayList<User>> = MutableLiveData(ArrayList())
-    var myUser : MutableLiveData<User> = MutableLiveData()
-    var isFinished : MutableLiveData<Boolean> = MutableLiveData()
-    var isFinished2 : MutableLiveData<Boolean> = MutableLiveData()
+    private var _friendUsers : MutableLiveData<ArrayList<User>> = MutableLiveData(ArrayList())
+    val friendUsers : LiveData<ArrayList<User>>
+        get() = _friendUsers
+
+    private var _myUser : MutableLiveData<User> = MutableLiveData()
+    val myUser : LiveData<User>
+        get() = _myUser
+
+    private var _addFriend : MutableLiveData<Boolean> = MutableLiveData()
+    val addFriend : LiveData<Boolean>
+        get() = _addFriend
 
     fun loadMyUser()
     {
@@ -39,7 +39,7 @@ class FriendRepository(): KoinComponent {
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 val my = snapshot.getValue(User::class.java) ?: return
-                myUser.postValue(my)
+                _myUser.postValue(my)
             }
         })
     }
@@ -65,14 +65,12 @@ class FriendRepository(): KoinComponent {
                             override fun onDataChange(snapshot: DataSnapshot) {
                                 val user = snapshot.getValue(User::class.java)?: return
                                 Log.d(TAG,"user : ${user.username}")
-                                _friendMap[friendId!!] = user
+                                friendMap[friendId!!] = user
                             }
                         })
                     }
                 }
-                friendUsers.postValue(ArrayList(_friendMap.values))
-                Log.d("friendList", ArrayList(_friendMap.values).toString())
-                isFinished2.postValue(true)
+                _friendUsers.postValue(ArrayList(friendMap.values))
             }
         })
     }
@@ -112,7 +110,6 @@ class FriendRepository(): KoinComponent {
                         }
                     })
                 }
-                isFinished.postValue(true)
             }
         })
     }
@@ -156,11 +153,19 @@ class FriendRepository(): KoinComponent {
             override fun onCancelled(error: DatabaseError) {
             }
             override fun onDataChange(snapshot: DataSnapshot) {
-                val friendId = snapshot.key ?: return
-                val fromUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$uid/$friendId")
-                fromUserFriendRef.setValue(true)
-                val toUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$friendId/$uid")
-                toUserFriendRef.setValue(true)
+                val isEmailExist = snapshot.getValue(Boolean::class.java)
+                if(isEmailExist == null){
+                    _addFriend.postValue(false)
+                    return
+                }
+                if(isEmailExist) {
+                    val friendId = snapshot.key
+                    val fromUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$uid/$friendId")
+                    fromUserFriendRef.setValue(true)
+                    val toUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$friendId/$uid")
+                    toUserFriendRef.setValue(true)
+                    _addFriend.postValue(true)
+                }
             }
         })
     }
@@ -171,11 +176,19 @@ class FriendRepository(): KoinComponent {
             override fun onCancelled(error: DatabaseError) {
             }
             override fun onDataChange(snapshot: DataSnapshot) {
-                val friendId = snapshot.key ?: return
-                val fromUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$uid/$friendId")
-                fromUserFriendRef.setValue(true)
-                val toUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$friendId/$uid")
-                toUserFriendRef.setValue(true)
+                val isPhoneNumExist = snapshot.getValue(Boolean::class.java)
+                if(isPhoneNumExist == null){
+                    _addFriend.postValue(false)
+                    return
+                }
+                if(isPhoneNumExist) {
+                    val friendId = snapshot.key
+                    val fromUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$uid/$friendId")
+                    fromUserFriendRef.setValue(true)
+                    val toUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$friendId/$uid")
+                    toUserFriendRef.setValue(true)
+                    _addFriend.postValue(true)
+                }
             }
         })
     }
@@ -193,8 +206,8 @@ class FriendRepository(): KoinComponent {
             }
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
 
-                val isFriend = snapshot.getValue(Boolean::class.java) ?: return
-                if(isFriend)
+                val friend = snapshot.getValue(Boolean::class.java) ?: return
+                if(friend)
                 {
                     val friendId = snapshot.key?: return
                     val ref = FirebaseDatabase.getInstance().getReference("/users/$friendId")
@@ -205,9 +218,8 @@ class FriendRepository(): KoinComponent {
                         override fun onDataChange(snapshot: DataSnapshot) {
                             val user = snapshot.getValue(User::class.java)?:return
                             Log.d(TAG, "onChildAdded ${user.username}")
-                            _friendMap[friendId] = user
-                            friendUsers.postValue(ArrayList(_friendMap.values))
-                            isFinished2.postValue(true)
+                            friendMap[friendId] = user
+                            _friendUsers.postValue(ArrayList(friendMap.values))
                         }
                     })
                 }
