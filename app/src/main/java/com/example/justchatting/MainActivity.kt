@@ -8,7 +8,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import com.example.justchatting.databinding.ActivityMainBinding
 import com.example.justchatting.ui.chatting.ChattingFragment
 import com.example.justchatting.ui.friend.FriendFragment
 import com.example.justchatting.ui.login.RegisterActivity
@@ -22,10 +24,10 @@ class MainActivity : AppCompatActivity() {
     lateinit var friendFragment : Fragment
     lateinit var chattingFragment : Fragment
     lateinit var settingFragment : Fragment
-
+    lateinit var binding : ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         if (FirebaseAuth.getInstance().uid == null) {
             val intent = Intent(this, RegisterActivity::class.java)
