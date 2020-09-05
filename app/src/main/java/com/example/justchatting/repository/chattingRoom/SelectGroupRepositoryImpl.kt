@@ -20,6 +20,7 @@ class SelectGroupRepositoryImpl : SelectGroupRepository {
         val uid = FirebaseAuth.getInstance().uid
         val friendsRef = FirebaseDatabase.getInstance().getReference("/friends/$uid")
         val friendList = ArrayList<User>()
+        var x : Long = 0
         friendsRef.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onCancelled(error: DatabaseError) {
             }
@@ -36,6 +37,9 @@ class SelectGroupRepositoryImpl : SelectGroupRepository {
                                 val user = snapshot.getValue(User::class.java)?: return
                                 Log.d("ChattingRoomRepo", "username : ${user.username}")
                                 friendList.add(user)
+                                friendList.sortBy { data->
+                                    data.username
+                                }
                                 _friends.postValue(friendList)
                             }
                         })
