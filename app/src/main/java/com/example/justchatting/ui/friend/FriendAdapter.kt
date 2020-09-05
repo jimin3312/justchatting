@@ -4,18 +4,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.paging.PagedListAdapter
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.justchatting.R
 import com.example.justchatting.User
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
-import kotlinx.android.synthetic.main.fragment_friend.*
-import kotlinx.android.synthetic.main.fragment_friend_item.view.*
-import org.koin.ext.getScopeId
 
 class FriendAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
 {
@@ -36,16 +29,6 @@ class FriendAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
             VIEW_TYPE_USERS
     }
 
-//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
-//        if(viewType == VIEW_TYPE_MY)
-//        val view = LayoutInflater.from(parent.context).inflate(R.layout.fragment_friend_item,parent,false)
-//        return UserViewHolder(view)
-//    }
-//
-//    override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-//        holder.bind(mFriendList?.get(position))
-//    }
-
     override fun getItemCount(): Int {
         if(mFriendList == null)
             return 0
@@ -53,10 +36,10 @@ class FriendAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if(viewType == VIEW_TYPE_MY) {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.fragment_friend_my_item, parent,false)
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.friend_my_item, parent,false)
             MyViewHolder(view)
         } else{
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.fragment_friend_item, parent, false)
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.friend_item, parent, false)
             UserViewHolder(view)
         }
     }

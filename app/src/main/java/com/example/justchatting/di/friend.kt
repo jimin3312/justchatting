@@ -5,6 +5,4 @@ import org.koin.dsl.module
 
 val friendModule = module {
     single { FriendRepository() }
-//    factory { TabDialogFragment() }
-//    factory { AddFriendFragment(get(),get()) }
 }

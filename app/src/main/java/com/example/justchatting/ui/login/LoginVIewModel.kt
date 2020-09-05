@@ -72,8 +72,6 @@ class LoginVIewModel(
             return
         }
 
-        // loading event here
-
         val uploadImage: Single<String> = repository.uploadProfile(selectedPhotoUri)
         val signUpWithEmail: Completable = repository.signUpWithEmail(email!!, password!!)
 
