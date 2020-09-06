@@ -83,6 +83,7 @@ class FirebaseSource {
 
             val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
             val user = User(
+                uid = uid,
                 username = name,
                 phoneNumber = phoneNumber,
                 profileImageUrl = firebaseImageResourcePath,

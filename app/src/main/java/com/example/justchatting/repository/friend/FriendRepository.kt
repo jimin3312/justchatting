@@ -38,14 +38,12 @@ class FriendRepository {
                     if(data)
                     {
                         val friendId = dataSnapshot.key
-                        Log.d(TAG,"friendId : ${friendId}")
                         val friendUserRef =  FirebaseDatabase.getInstance().getReference("/users/$friendId")
                         friendUserRef.addListenerForSingleValueEvent(object : ValueEventListener{
                             override fun onCancelled(error: DatabaseError) {
                             }
                             override fun onDataChange(snapshot: DataSnapshot) {
                                 val user = snapshot.getValue(User::class.java)?: return
-                                Log.d(TAG,"user : ${user.username}")
                                 friendMap[friendId!!] = user
                             }
                         })
@@ -64,7 +62,6 @@ class FriendRepository {
     }
 
     fun makeFriendRelationships(application: Application){
-        Log.d(TAG, "Sync start")
         var uid = FirebaseAuth.getInstance().uid
         val myUserRef = FirebaseDatabase.getInstance().getReference("/users/$uid")
 
@@ -73,7 +70,6 @@ class FriendRepository {
             }
             override fun onDataChange(snapshot: DataSnapshot) {
                 val myUser = snapshot.getValue(User::class.java)?: return
-                Log.d(TAG, "my username: ${myUser.username}")
 
                 val contactList = getContacts(application)
                 contactList.forEachIndexed { _, number ->
@@ -82,10 +78,6 @@ class FriendRepository {
                     ref.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onCancelled(error: DatabaseError) {}
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            Log.d(
-                                TAG,
-                                "makeFriendRelation : ${snapshot.getValue(String::class.java)}"
-                            )
                             val friendId = snapshot.getValue(String::class.java) ?: return
                             val fromRef = FirebaseDatabase.getInstance()
                                 .getReference("/friends/${uid}/${friendId}")
@@ -137,7 +129,6 @@ class FriendRepository {
     fun addFriendWithEmail(email : String){
         if(email.isEmpty())
             return
-        Log.d(TAG, "add friend with phone $email")
         val uid = FirebaseAuth.getInstance().uid
         val friendEmailRef = FirebaseDatabase.getInstance().getReference("/email/$email")
         friendEmailRef.addListenerForSingleValueEvent(object : ValueEventListener{
@@ -146,7 +137,6 @@ class FriendRepository {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val friendId = snapshot.getValue(String()::class.java)
                 if(friendId == null){
-                    Log.d(TAG,"failed to add")
                     addFriend.postValue(-1)
                     return
                 }
@@ -159,7 +149,6 @@ class FriendRepository {
         })
     }
     fun addFriendWithPhoneNumber(phoneNum : String){
-        Log.d(TAG, "add friend with phone $phoneNum")
         if(phoneNum.isEmpty())
             return
 
@@ -171,7 +160,6 @@ class FriendRepository {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val friendId = snapshot.getValue(String()::class.java)
                 if(friendId == null){
-                    Log.d(TAG,"failed to add")
                     addFriend.postValue(-1)
                     return
                 }
@@ -185,7 +173,6 @@ class FriendRepository {
     }
     fun setListener()
     {
-
         val uid = FirebaseAuth.getInstance().uid
         val myRef = FirebaseDatabase.getInstance().getReference("/users/$uid")
         myRef.addValueEventListener(object : ValueEventListener{
@@ -220,7 +207,6 @@ class FriendRepository {
 
                         override fun onDataChange(snapshot: DataSnapshot) {
                             val user = snapshot.getValue(User::class.java)?:return
-                            Log.d(TAG, "onChildAdded ${user.username}")
                             friendMap[friendId] = user
                             _users.postValue(getUsersArrayList())
                         }
