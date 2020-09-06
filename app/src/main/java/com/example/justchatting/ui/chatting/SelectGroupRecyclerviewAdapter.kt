@@ -6,6 +6,8 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.justchatting.R
 import com.example.justchatting.User
@@ -15,6 +17,10 @@ import de.hdodenhof.circleimageview.CircleImageView
 class SelectGroupRecyclerviewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var mFriendList : ArrayList<User>? = null
 
+    private var _checkedCnt = MutableLiveData<Int>()
+    val checkedCnt : LiveData<Int>
+        get()=_checkedCnt
+    var checkedArrayList = ArrayList<String>()
     fun setFriendList(friendList : ArrayList<User>){
         mFriendList = friendList
     }
@@ -39,6 +45,7 @@ class SelectGroupRecyclerviewAdapter : RecyclerView.Adapter<RecyclerView.ViewHol
         val profileImage =  itemView.findViewById<CircleImageView>(R.id.select_imageview_profile_image)
         val checkBox = itemView.findViewById<CheckBox>(R.id.select_group_checkbox)
         val layout: ConstraintLayout = itemView.findViewById(R.id.select_fried_item)
+
         fun bind(user : User?){
             if(user == null)
                 return
@@ -52,7 +59,19 @@ class SelectGroupRecyclerviewAdapter : RecyclerView.Adapter<RecyclerView.ViewHol
             }
 
             layout.setOnClickListener{
-                checkBox.isChecked = !checkBox.isChecked
+                if(checkBox.isChecked) {
+                    checkBox.isChecked = false
+                    val it = checkedArrayList.iterator()
+                    while(it.hasNext()){
+                        if(it.next() == user.uid){
+                            it.remove()
+                        }
+                    }
+                } else {
+                    checkBox.isChecked = true
+                    checkedArrayList.add(user.uid)
+                }
+                _checkedCnt.postValue(checkedArrayList.size)
             }
         }
     }

@@ -36,6 +36,9 @@ class SelectGroupRepositoryImpl : SelectGroupRepository {
                                 val user = snapshot.getValue(User::class.java)?: return
                                 Log.d("ChattingRoomRepo", "username : ${user.username}")
                                 friendList.add(user)
+                                friendList.sortBy { data->
+                                    data.username
+                                }
                                 _friends.postValue(friendList)
                             }
                         })
