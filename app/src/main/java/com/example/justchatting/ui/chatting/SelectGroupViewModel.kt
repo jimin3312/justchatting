@@ -3,8 +3,8 @@ package com.example.justchatting.ui.chatting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.example.justchatting.User
-import com.example.justchatting.repository.chattingRoom.SelectGroupRepository
-import com.example.justchatting.repository.chattingRoom.SelectGroupRepositoryImpl
+import com.example.justchatting.repository.chatting.SelectGroupRepository
+import com.example.justchatting.repository.chatting.SelectGroupRepositoryImpl
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 

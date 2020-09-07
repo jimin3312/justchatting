@@ -1,4 +1,4 @@
-package com.example.justchatting.repository.chattingRoom
+package com.example.justchatting.repository.chatting
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -10,7 +10,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
-class SelectGroupRepositoryImpl : SelectGroupRepository {
+class SelectGroupRepositoryImpl :
+    SelectGroupRepository {
 
     private val _friends : MutableLiveData<ArrayList<User>> = MutableLiveData()
     val friends : LiveData<ArrayList<User>>

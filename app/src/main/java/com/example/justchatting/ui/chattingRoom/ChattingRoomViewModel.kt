@@ -8,4 +8,5 @@ import org.koin.core.inject
 class ChattingRoomViewModel : ViewModel(), KoinComponent{
     val chattingRoomRepository : ChattingRoomRepository by inject()
 
+
 }
