@@ -1,10 +1,11 @@
 package com.example.justchatting
 
-class ChatMessageImage (
-    override val type : Int =0,
+data class ChatMessageModel(
+    val type : String = "",
     val id : String ="",
     val fromId: String = "",
     val profileImageUrl:String ="",
     val imageUri: String = "",
+    val text : String = "",
     val timeStamp : Long = 0
-)   : ChatMessage(type)
+)

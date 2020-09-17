@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class User(
+data class UserModel(
     val uid : String ="",
     val username : String ="",
     val phoneNumber: String= "",

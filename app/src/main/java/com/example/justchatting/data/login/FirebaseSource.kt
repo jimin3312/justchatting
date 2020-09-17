@@ -2,12 +2,9 @@ package com.example.justchatting.data.login
 
 import android.net.Uri
 import android.util.Log
-import com.example.justchatting.User
+import com.example.justchatting.UserModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -82,7 +79,7 @@ class FirebaseSource {
             val email = re.replace(email, "")
 
             val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
-            val user = User(
+            val user = UserModel(
                 uid = uid,
                 username = name,
                 phoneNumber = phoneNumber,
@@ -92,11 +89,13 @@ class FirebaseSource {
 
             ref.setValue(user)
                 .addOnSuccessListener {
-                    val phoneRef =
-                        FirebaseDatabase.getInstance().getReference("/phone/$phoneNumber")
+                    val phoneRef = FirebaseDatabase.getInstance().getReference("/phone/$phoneNumber")
                     phoneRef.setValue(uid).addOnSuccessListener {
+
+
                         val emailRef = FirebaseDatabase.getInstance().getReference("/email/$email")
                         emailRef.setValue(uid).addOnSuccessListener {
+                            
                             emitter.onSuccess(true)
                         }
                     }

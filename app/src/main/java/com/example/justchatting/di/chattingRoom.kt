@@ -7,5 +7,5 @@ import com.example.justchatting.repository.chattingRoom.ChattingRoomRepositoryIm
 import org.koin.dsl.module
 
 val chattingRoomModule = module {
-    single<ChattingRoomRepository> {ChattingRoomRepositoryImpl()}
+    factory<ChattingRoomRepository> {ChattingRoomRepositoryImpl()}
 }
