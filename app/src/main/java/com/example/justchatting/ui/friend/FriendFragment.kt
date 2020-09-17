@@ -1,7 +1,9 @@
 package com.example.justchatting.ui.friend
 
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
@@ -12,6 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.justchatting.R
 import com.example.justchatting.base.BaseFragment
 import com.example.justchatting.databinding.FragmentFriendBinding
+import com.example.justchatting.ui.chatting.SelectGroupActivity
+import com.example.justchatting.ui.chattingRoom.ChattingRoomActivity
 import com.example.justchatting.ui.friend.dialog.TabDialogFragment
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_friend.*
@@ -43,6 +47,7 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         viewModel.sync()
 
         viewModel.getUsers().observe(viewLifecycleOwner, Observer {
+            Log.d("Friend", it.toString())
             friendAdapter.setUsers(it)
             friendAdapter.notifyDataSetChanged()
         })
@@ -56,6 +61,22 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
                     resultDialog("친구추가 실패", "확인")
                     viewModel.getAddFriend().postValue(0)
                 }
+            }
+        })
+
+        friendAdapter.itemClick.observe(viewLifecycleOwner, Observer {
+            if(it == true)
+                viewModel.loadGroupId(friendAdapter.groupMembers)
+        })
+        viewModel.getGroupId().observe(viewLifecycleOwner, Observer {groupId->
+            if(groupId != "-1") {
+                Log.d("FriendFragment", "groupID : $groupId")
+                val intent = Intent(requireContext(), ChattingRoomActivity::class.java)
+                intent.putExtra("groupId", groupId)
+                intent.putExtra("groupMembersMap", friendAdapter.groupMembers)
+                startActivity(intent)
+                friendAdapter.itemClick.postValue(false)
+                viewModel.getGroupId().postValue("-1")
             }
         })
     }

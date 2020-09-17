@@ -6,7 +6,8 @@ import android.provider.ContactsContract
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.justchatting.User
+import com.example.justchatting.UserModel
+import com.example.justchatting.repository.chatting.SelectGroupRepositoryImpl
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
@@ -15,15 +16,12 @@ class FriendRepository {
         val TAG = "FriendRepository"
     }
 
-    var friendMap : HashMap<String, User> = HashMap()
-    private var _users : MutableLiveData<ArrayList<User>> = MutableLiveData(ArrayList())
-    val users : LiveData<ArrayList<User>>
+    var friendMap : HashMap<String, UserModel> = HashMap()
+    private var _users : MutableLiveData<ArrayList<UserModel>> = MutableLiveData(ArrayList())
+    val users : LiveData<ArrayList<UserModel>>
         get() = _users
-
-    private var myUser : MutableLiveData<User> = MutableLiveData()
-
+    private var myUserModel : MutableLiveData<UserModel> = MutableLiveData()
     var addFriend : MutableLiveData<Int> = MutableLiveData()
-
 
     fun loadFriends() {
         val uid = FirebaseAuth.getInstance().uid
@@ -43,7 +41,7 @@ class FriendRepository {
                             override fun onCancelled(error: DatabaseError) {
                             }
                             override fun onDataChange(snapshot: DataSnapshot) {
-                                val user = snapshot.getValue(User::class.java)?: return
+                                val user = snapshot.getValue(UserModel::class.java)?: return
                                 friendMap[friendId!!] = user
                             }
                         })
@@ -54,10 +52,10 @@ class FriendRepository {
             }
         })
     }
-    fun getUsersArrayList(): ArrayList<User> {
+    fun getUsersArrayList(): ArrayList<UserModel> {
         val arrayList = ArrayList(friendMap.values)
         arrayList.sortWith(compareBy{it.username})
-        arrayList.add(0, myUser.value)
+        arrayList.add(0, myUserModel.value)
         return arrayList
     }
 
@@ -69,7 +67,7 @@ class FriendRepository {
             override fun onCancelled(error: DatabaseError) {
             }
             override fun onDataChange(snapshot: DataSnapshot) {
-                val myUser = snapshot.getValue(User::class.java)?: return
+                val myUser = snapshot.getValue(UserModel::class.java)?: return
 
                 val contactList = getContacts(application)
                 contactList.forEachIndexed { _, number ->
@@ -180,8 +178,8 @@ class FriendRepository {
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
-                val my = snapshot.getValue(User::class.java) ?: return
-                myUser.postValue(my)
+                val my = snapshot.getValue(UserModel::class.java) ?: return
+                myUserModel.postValue(my)
             }
         })
 
@@ -206,7 +204,7 @@ class FriendRepository {
                         }
 
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            val user = snapshot.getValue(User::class.java)?:return
+                            val user = snapshot.getValue(UserModel::class.java)?:return
                             friendMap[friendId] = user
                             _users.postValue(getUsersArrayList())
                         }
@@ -217,4 +215,6 @@ class FriendRepository {
             }
         })
     }
+
+
 }

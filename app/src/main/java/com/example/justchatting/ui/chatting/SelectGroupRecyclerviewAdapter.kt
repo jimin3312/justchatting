@@ -10,18 +10,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.justchatting.R
-import com.example.justchatting.User
+import com.example.justchatting.UserModel
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 
 class SelectGroupRecyclerviewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var mFriendList : ArrayList<User>? = null
+    private var mFriendList : ArrayList<UserModel>? = null
 
     private var _checkedCnt = MutableLiveData<Int>()
     val checkedCnt : LiveData<Int>
         get()=_checkedCnt
-    var checkedArrayList = ArrayList<String>()
-    fun setFriendList(friendList : ArrayList<User>){
+
+    var groupMembers = HashMap<String, Boolean>()
+
+    fun setFriendList(friendList : ArrayList<UserModel>){
         mFriendList = friendList
     }
 
@@ -40,38 +42,33 @@ class SelectGroupRecyclerviewAdapter : RecyclerView.Adapter<RecyclerView.ViewHol
         (holder as FriendViewHolder).bind(mFriendList!![position])
     }
     inner class FriendViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
-        var user : User? = null
+        var userModel : UserModel? = null
         val username = itemView.findViewById<TextView>(R.id.select_textview_username)
         val profileImage =  itemView.findViewById<CircleImageView>(R.id.select_imageview_profile_image)
         val checkBox = itemView.findViewById<CheckBox>(R.id.select_group_checkbox)
         val layout: ConstraintLayout = itemView.findViewById(R.id.select_fried_item)
 
-        fun bind(user : User?){
-            if(user == null)
+        fun bind(userModel : UserModel?){
+            if(userModel == null)
                 return
 
-            this.user=user
-            username.text = user.username
-            if(user.profileImageUrl!!.isEmpty()){
+            this.userModel=userModel
+            username.text = userModel.username
+            if(userModel.profileImageUrl!!.isEmpty()){
                 profileImage.setImageResource(R.drawable.person)
             } else{
-                Picasso.get().load(user.profileImageUrl).placeholder(R.drawable.person).into(profileImage)
+                Picasso.get().load(userModel.profileImageUrl).placeholder(R.drawable.person).into(profileImage)
             }
 
             layout.setOnClickListener{
                 if(checkBox.isChecked) {
                     checkBox.isChecked = false
-                    val it = checkedArrayList.iterator()
-                    while(it.hasNext()){
-                        if(it.next() == user.uid){
-                            it.remove()
-                        }
-                    }
+                    groupMembers.remove(userModel.uid)
                 } else {
                     checkBox.isChecked = true
-                    checkedArrayList.add(user.uid)
+                    groupMembers[userModel.uid] = true
                 }
-                _checkedCnt.postValue(checkedArrayList.size)
+                _checkedCnt.postValue(groupMembers.size)
             }
         }
     }
