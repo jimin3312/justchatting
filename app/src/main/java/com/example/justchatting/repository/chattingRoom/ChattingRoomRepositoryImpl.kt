@@ -31,9 +31,6 @@ class ChattingRoomRepositoryImpl : ChattingRoomRepository {
     override fun loadGroupNameList(groupMembersMap: HashMap<String, Boolean> ){
         val uid = FirebaseAuth.getInstance().uid
 
-        if(groupMembersMap.size==2) {
-            groupMembersMap.remove(uid)
-        }
         val arrayList: ArrayList<String> = ArrayList(groupMembersMap.keys)
         groupMembersMap[uid!!] = true
         arrayList.sortBy { it }
@@ -92,24 +89,7 @@ class ChattingRoomRepositoryImpl : ChattingRoomRepository {
                 chatLogArrayList.add(chatMessage)
                 _chatLogs.postValue(chatLogArrayList)
 
-                val memberRef = FirebaseDatabase.getInstance().getReference("/members/$groupId")
-                memberRef.addListenerForSingleValueEvent(object :ValueEventListener{
-                    override fun onCancelled(error: DatabaseError) {
 
-                    }
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        val membersIdMap = snapshot.getValue(object : get<HashMap<String, Boolean>>() {})
-                        Log.d(TAG,"membersIdMap : $membersIdMap")
-
-                        var chattingModel : ChattingModel
-                        chattingModel = if(chatMessage.type=="text")
-                            ChattingModel(groupNameList , membersIdMap!!, chatMessage.text,chatMessage.timeStamp, groupId)
-                        else
-                            ChattingModel(groupNameList, membersIdMap!!, "사진",chatMessage.timeStamp, groupId)
-                        val chatRoomRef = FirebaseDatabase.getInstance().getReference("/chatrooms/$groupId")
-                        chatRoomRef.setValue(chattingModel)
-                    }
-                })
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
@@ -142,6 +122,25 @@ class ChattingRoomRepositoryImpl : ChattingRoomRepository {
                 var messageRef : DatabaseReference = FirebaseDatabase.getInstance().getReference("/messages/$groupId").push()
                 val chatMessage = ChatMessageModel("text",messageRef.key.toString(),uid!!,user.profileImageUrl!!,"",text,  System.currentTimeMillis())
                 messageRef.setValue(chatMessage)
+
+                val memberRef = FirebaseDatabase.getInstance().getReference("/members/$groupId")
+                memberRef.addListenerForSingleValueEvent(object :ValueEventListener{
+                    override fun onCancelled(error: DatabaseError) {
+
+                    }
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val membersIdMap = snapshot.getValue(object : get<HashMap<String, Boolean>>() {})
+                        Log.d(TAG,"membersIdMap : $membersIdMap")
+
+                        var chattingModel : ChattingModel
+                        chattingModel = if(chatMessage.type=="text")
+                            ChattingModel(groupNameList , membersIdMap!!, chatMessage.text,chatMessage.timeStamp, groupId)
+                        else
+                            ChattingModel(groupNameList, membersIdMap!!, "사진",chatMessage.timeStamp, groupId)
+                        val chatRoomRef = FirebaseDatabase.getInstance().getReference("/chatrooms/$groupId")
+                        chatRoomRef.setValue(chattingModel)
+                    }
+                })
             }
         })
     }

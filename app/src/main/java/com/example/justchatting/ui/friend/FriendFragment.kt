@@ -44,6 +44,7 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = friendAdapter
         }
+
         viewModel.sync()
 
         viewModel.getUsers().observe(viewLifecycleOwner, Observer {
@@ -51,6 +52,9 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
             friendAdapter.setUsers(it)
             friendAdapter.notifyDataSetChanged()
         })
+
+
+
         viewModel.getAddFriend().observe(viewLifecycleOwner, Observer {friendAddSuccess->
             when (friendAddSuccess) {
                 1 -> {

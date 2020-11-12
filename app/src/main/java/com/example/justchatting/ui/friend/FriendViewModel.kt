@@ -15,28 +15,23 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
     private val friendRepository : FriendRepository by inject()
     private val friendChattingRepository : FriendChattingRepository by inject()
     init {
-        Log.d("FriedViewModel", "init")
         friendRepository.setListener()
     }
     fun getUsers() : LiveData<ArrayList<UserModel>> {
-        return friendRepository.users
+        return friendRepository.getUsers()
     }
     fun getAddFriend() : MutableLiveData<Int>{
-        return friendRepository.addFriend
+        return friendRepository.getAddFriend()
     }
     fun sync() {
-        Log.d("FriedViewModel","sync ${friendRepository.friendMap.size}")
-        if(friendRepository.friendMap.size==0) {
+        if(friendRepository.getUsers().value!!.isEmpty()) {
             friendRepository.makeFriendRelationships(getApplication())
-            friendRepository.loadFriends()
         }
     }
     fun addFriendWithPhoneNumber(input: String) {
-        Log.d("FriedViewModel", input)
         friendRepository.addFriendWithPhoneNumber(input)
     }
     fun addFriendWithId(input: String) {
-        Log.d("FriedViewModel", input)
         friendRepository.addFriendWithEmail(input)
     }
     fun getGroupId() : MutableLiveData<String>{

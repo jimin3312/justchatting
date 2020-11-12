@@ -12,7 +12,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
-class LoginVIewModel(
+class LoginViewModel(
     private val repository: UserRepository
 ) : ViewModel() {
 
@@ -21,7 +21,7 @@ class LoginVIewModel(
     var password: String? = null
     var name: String? = null
     var phoneNumber: String? = null
-    var selectedPhotoUri: Uri? = null
+    var selectedPhotoUri : Uri? = null
 
     private val _successLogin = MutableLiveData<Boolean>()
     val successLogin: LiveData<Boolean>
@@ -35,9 +35,6 @@ class LoginVIewModel(
     val successSignUp: LiveData<Boolean>
         get() = _successSignUp
 
-    private val _x = 1
-    val x : Int
-        get() = _x
 
     private val _errorToastMessage = MutableLiveData<String>()
     val errorToastMessage: LiveData<String>

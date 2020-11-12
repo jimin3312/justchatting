@@ -6,7 +6,7 @@
 
         <variable
             name="viewModel"
-            type="com.example.justchatting.ui.login.LoginVIewModel" />
+            type="com.example.justchatting.ui.login.LoginViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
