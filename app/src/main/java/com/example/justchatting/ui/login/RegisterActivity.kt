@@ -7,7 +7,6 @@ import android.graphics.ImageDecoder
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.telephony.PhoneNumberFormattingTextWatcher
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.LayoutRes
@@ -25,9 +24,7 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
     companion object{
         const val PERMISSIONS_REQUEST_READ_CONTACTS = 1000
     }
-
-    private lateinit var auth: FirebaseAuth
-    val viewModel: LoginVIewModel by viewModel()
+    val viewModel: LoginViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,8 +33,7 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
         binding.lifecycleOwner = this
 
         aleady_have_account_textview_register.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+            finish()
         }
 
         viewModel.selectingPhoto.observe(this, Observer {

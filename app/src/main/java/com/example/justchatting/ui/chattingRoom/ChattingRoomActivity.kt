@@ -31,6 +31,7 @@ class ChattingRoomActivity : AppCompatActivity() {
 
         groupId = intent.getStringExtra("groupId")
         groupMembersMap = intent.getSerializableExtra("groupMembersMap") as HashMap<String, Boolean>
+
         viewModel.loadGroupNameList(groupMembersMap)
 
         Log.d(TAG,"groupID : ${groupId}")
@@ -46,7 +47,6 @@ class ChattingRoomActivity : AppCompatActivity() {
         if(groupId != ""){
             Log.d(TAG, "fetch $groupId")
             viewModel.setListener(groupId!!)
-//            viewModel.fetchChatLog(groupId!!)
         }
 
         viewModel.getChatLogs().observe(this, Observer {
@@ -54,6 +54,7 @@ class ChattingRoomActivity : AppCompatActivity() {
             chattingRoomAdapter.notifyDataSetChanged()
             chatting_room_recyclerview.scrollToPosition(it.size-1)
         })
+
         viewModel.getNewGroupId().observe(this, Observer {newId->
             Log.d(TAG, "new group id : $newId")
             groupId = newId

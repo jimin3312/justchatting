@@ -10,7 +10,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import java.util.*
 
-class FirebaseSource {
+class AuthFirebaseSource {
     private val auth: FirebaseAuth by lazy {
         FirebaseAuth.getInstance()
     }

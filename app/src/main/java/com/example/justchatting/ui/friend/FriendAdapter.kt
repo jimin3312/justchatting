@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.justchatting.R
@@ -17,8 +16,8 @@ import de.hdodenhof.circleimageview.CircleImageView
 class FriendAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
 {
     companion object{
-        const val VIEW_TYPE_MY = 0
-        const val VIEW_TYPE_USERS = 1
+        const val VIEW_TYPE_ME = 0
+        const val VIEW_TYPE_FRIENDS = 1
     }
     private var uid = FirebaseAuth.getInstance().uid
     private var mFriendList: ArrayList<UserModel>? = null
@@ -32,9 +31,9 @@ class FriendAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
 
     override fun getItemViewType(position: Int): Int {
         return if(position==0)
-            VIEW_TYPE_MY
+            VIEW_TYPE_ME
         else
-            VIEW_TYPE_USERS
+            VIEW_TYPE_FRIENDS
     }
 
     override fun getItemCount(): Int {
@@ -43,7 +42,7 @@ class FriendAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
         return mFriendList!!.size
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return if(viewType == VIEW_TYPE_MY) {
+        return if(viewType == VIEW_TYPE_ME) {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.friend_my_item, parent,false)
             MyViewHolder(view)
         } else{

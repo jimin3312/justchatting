@@ -59,6 +59,7 @@ class ChattingRecyclerViewAdapter :RecyclerView.Adapter<RecyclerView.ViewHolder>
             }catch (e: Exception){}
 
             var title : String =""
+
             if(chattingModel.membersNameList.size>0) {
                 for (i in 0 until chattingModel.membersNameList.size - 1) {
                     title += chattingModel.membersNameList[i] + ", "
