@@ -21,7 +21,7 @@ class SelectGroupRecyclerviewAdapter : RecyclerView.Adapter<RecyclerView.ViewHol
     val checkedCnt : LiveData<Int>
         get()=_checkedCnt
 
-    var groupMembers = HashMap<String, Boolean>()
+    var groupMembers = HashMap<String, UserModel>()
 
     fun setFriendList(friendList : ArrayList<UserModel>){
         mFriendList = friendList
@@ -66,7 +66,7 @@ class SelectGroupRecyclerviewAdapter : RecyclerView.Adapter<RecyclerView.ViewHol
                     groupMembers.remove(userModel.uid)
                 } else {
                     checkBox.isChecked = true
-                    groupMembers[userModel.uid] = true
+                    groupMembers[userModel.uid] = userModel
                 }
                 _checkedCnt.postValue(groupMembers.size)
             }

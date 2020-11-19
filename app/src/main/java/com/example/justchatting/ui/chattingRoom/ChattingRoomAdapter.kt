@@ -3,7 +3,7 @@ package com.example.justchatting.ui.chattingRoom
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.justchatting.ChatMessageModel
+import com.example.justchatting.Message
 import com.example.justchatting.R
 import com.example.justchatting.ui.chattingRoom.view_holder.ChatFromViewHolder
 import com.example.justchatting.ui.chattingRoom.view_holder.ChatToViewHolder
@@ -15,14 +15,14 @@ class ChattingRoomAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
         val CHAT_FROM  = 0
         val CHAT_TO = 1
     }
-    private var chatMessageModels : ArrayList<ChatMessageModel>? = null
+    private var messages : ArrayList<Message>? = null
     private var uid = FirebaseAuth.getInstance().uid
-    fun setChattingLog(chattingLog : ArrayList<ChatMessageModel>){
-        this.chatMessageModels = chattingLog
+    fun setChattingLog(chattingLog : ArrayList<Message>){
+        this.messages = chattingLog
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if(chatMessageModels!![position].fromId == uid ){
+        return if(messages!![position].fromId == uid ){
             CHAT_FROM
         } else{
             CHAT_TO
@@ -44,18 +44,18 @@ class ChattingRoomAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
     }
 
     override fun getItemCount(): Int {
-        if(chatMessageModels == null)
+        if(messages == null)
             return 0
-        return chatMessageModels!!.size
+        return messages!!.size
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when(holder){
             is ChatFromViewHolder->{
-                holder.bind(chatMessageModels!![position])
+                holder.bind(messages!![position])
             }
             is ChatToViewHolder->{
-                holder.bind(chatMessageModels!![position])
+                holder.bind(messages!![position])
             }
         }
     }

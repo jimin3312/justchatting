@@ -14,12 +14,22 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
 
     private val friendRepository : FriendRepository by inject()
     private val friendChattingRepository : FriendChattingRepository by inject()
-    init {
+
+    fun loadFriends(){
+        friendRepository.loadFriends()
+    }
+    fun setListener(){
         friendRepository.setListener()
     }
+
+
     fun getUsers() : LiveData<ArrayList<UserModel>> {
         return friendRepository.getUsers()
     }
+    fun getMyInfo() : LiveData<UserModel>{
+        return friendRepository.getMyInfo()
+    }
+
     fun getAddFriend() : MutableLiveData<Int>{
         return friendRepository.getAddFriend()
     }
@@ -39,5 +49,9 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
     }
     fun loadGroupId(groupMembers: HashMap<String,Boolean>) {
         friendChattingRepository.loadGroupId(groupMembers)
+    }
+
+    fun loadMyInfo() {
+        friendRepository.loadMyInfo()
     }
 }

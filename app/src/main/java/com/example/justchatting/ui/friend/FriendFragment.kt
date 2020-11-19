@@ -45,6 +45,8 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
             adapter = friendAdapter
         }
 
+        viewModel.loadMyInfo()
+        viewModel.loadFriends()
         viewModel.sync()
 
         viewModel.getUsers().observe(viewLifecycleOwner, Observer {
@@ -53,19 +55,25 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
             friendAdapter.notifyDataSetChanged()
         })
 
-
-
         viewModel.getAddFriend().observe(viewLifecycleOwner, Observer {friendAddSuccess->
+
+
             when (friendAddSuccess) {
                 1 -> {
                     resultDialog("친구추가 성공", "확인")
                     viewModel.getAddFriend().postValue(0)
+                    deleteAddFriendDialog()
                 }
                 -1 -> {
                     resultDialog("친구추가 실패", "확인")
                     viewModel.getAddFriend().postValue(0)
                 }
+                -2 -> {
+                    resultDialog("이미 있는 친구입니다.", "확인")
+                    viewModel.getAddFriend().postValue(0)
+                }
             }
+
         })
 
         friendAdapter.itemClick.observe(viewLifecycleOwner, Observer {
@@ -120,5 +128,12 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         layoutParams.weight = 1.0f
         layoutParams.gravity = Gravity.CENTER
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).layoutParams = layoutParams
+    }
+    private fun deleteAddFriendDialog()
+    {
+        val fragment = childFragmentManager.findFragmentByTag("dialog")
+        if(fragment != null) {
+            (fragment as DialogFragment).dismiss()
+        }
     }
 }

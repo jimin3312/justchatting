@@ -1,6 +1,6 @@
 package com.example.justchatting
 
-data class ChatMessageModel(
+data class Message(
     val type : String = "",
     val id : String ="",
     val fromId: String = "",
