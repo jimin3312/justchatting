@@ -1,24 +1,24 @@
 package com.example.justchatting.repository.login
 
 import android.net.Uri
-import com.example.justchatting.data.login.FirebaseSource
+import com.example.justchatting.data.login.AuthFirebaseSource
 
 class UserRepositoryImpl(
-    private val firebaseSource: FirebaseSource
+    private val authFirebaseSource: AuthFirebaseSource
 ) : UserRepository {
 
-    override fun loginWithEmail(email: String, password: String) = firebaseSource.loginWithEmail(email, password)
+    override fun loginWithEmail(email: String, password: String) = authFirebaseSource.loginWithEmail(email, password)
 
-    override fun signUpWithEmail(email: String, password: String) = firebaseSource.signUp(email, password)
+    override fun signUpWithEmail(email: String, password: String) = authFirebaseSource.signUp(email, password)
 
-    override fun uploadProfile(uri: Uri?) = firebaseSource.uploadProfile(uri)
+    override fun uploadProfile(uri: Uri?) = authFirebaseSource.uploadProfile(uri)
 
     override fun saveUser(
         name: String,
         phoneNumber: String,
         firebaseImageResourcePath: String,
         email: String
-    ) = firebaseSource.saveUser(name, phoneNumber, firebaseImageResourcePath, email)
+    ) = authFirebaseSource.saveUser(name, phoneNumber, firebaseImageResourcePath, email)
 
-    override fun logout() = firebaseSource.logout()
+    override fun logout() = authFirebaseSource.logout()
 }

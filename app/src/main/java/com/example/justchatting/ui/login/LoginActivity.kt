@@ -9,13 +9,12 @@ import com.example.justchatting.MainActivity
 import com.example.justchatting.R
 import com.example.justchatting.base.BaseActivity
 import com.example.justchatting.databinding.ActivityLoginBinding
-import com.example.justchatting.ui.login.LoginVIewModel
 import kotlinx.android.synthetic.main.activity_login.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LoginActivity : BaseActivity<ActivityLoginBinding>()
 {
-    val viewModel: LoginVIewModel by viewModel()
+    val viewModel: LoginViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,12 +26,14 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>()
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
         })
+
         viewModel.errorToastMessage.observe(this, Observer {
             Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         })
 
         back_to_register_button_login.setOnClickListener{
-            finish()
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
         }
     }
 

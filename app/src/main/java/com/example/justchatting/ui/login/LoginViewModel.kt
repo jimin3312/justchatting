@@ -12,7 +12,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
-class LoginVIewModel(
+class LoginViewModel(
     private val repository: UserRepository
 ) : ViewModel() {
 
@@ -21,8 +21,7 @@ class LoginVIewModel(
     var password: String? = null
     var name: String? = null
     var phoneNumber: String? = null
-    var selectedPhotoUri: Uri? = null
-    var firebaseImageResourcePath : String? = null
+    var selectedPhotoUri : Uri? = null
 
     private val _successLogin = MutableLiveData<Boolean>()
     val successLogin: LiveData<Boolean>
@@ -36,12 +35,9 @@ class LoginVIewModel(
     val successSignUp: LiveData<Boolean>
         get() = _successSignUp
 
-    private val _x = 1
-    val x : Int
-        get() = _x
 
     private val _errorToastMessage = MutableLiveData<String>()
-    val errorToastMessage : LiveData<String>
+    val errorToastMessage: LiveData<String>
         get() = _errorToastMessage
 
     fun login() {
@@ -68,30 +64,27 @@ class LoginVIewModel(
     }
 
     fun signUp() {
-        if(name.isNullOrEmpty() || email.isNullOrEmpty() || password.isNullOrEmpty() || phoneNumber.isNullOrEmpty())
-        {
+        if (name.isNullOrEmpty() || email.isNullOrEmpty() || password.isNullOrEmpty() || phoneNumber.isNullOrEmpty()) {
             _errorToastMessage.value = "please enter your username, email, password, phone number"
             return
         }
 
-        // loading event here
         val uploadImage: Single<String> = repository.uploadProfile(selectedPhotoUri)
-        val signUpWithEmail: Single<String> = repository.signUpWithEmail(email!!, password!!)
+        val signUpWithEmail: Completable = repository.signUpWithEmail(email!!, password!!)
 
-        disposables.add(signUpWithEmail.subscribe({
-            Log.d("FirebaseSource", "signup")
-            disposables.add(uploadImage.subscribe({
-                Log.d("FirebaseSource", "imgae url : $it")
-                firebaseImageResourcePath = it
-
-                val saveUserToDB: Completable = repository.saveUser(name!!, phoneNumber!!, firebaseImageResourcePath!!, email!!)
-                disposables.add(saveUserToDB.subscribe({
-                    _successSignUp.value = true
-                },{}))
-            },{}))
-        },{
-            _errorToastMessage.value = it.message
-        }))
+        disposables.add(signUpWithEmail
+            .andThen(uploadImage
+                .flatMap { imagePath ->
+                    repository.saveUser(name!!, phoneNumber!!, imagePath, email!!)
+                })
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                _successSignUp.value = true
+            }, {
+                _errorToastMessage.value = it.message
+            })
+        )
     }
 
 

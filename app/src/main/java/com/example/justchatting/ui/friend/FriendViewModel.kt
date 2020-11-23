@@ -1,79 +1,49 @@
 package com.example.justchatting.ui.friend
 
 import android.app.Application
-import android.database.Cursor
-import android.provider.ContactsContract
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.example.justchatting.User
-import com.google.firebase.database.*
-
+import android.util.Log
+import androidx.lifecycle.*
+import com.example.justchatting.UserModel
+import com.example.justchatting.repository.chatting.SelectGroupRepositoryImpl
+import com.example.justchatting.repository.friend.FriendChattingRepository
+import com.example.justchatting.repository.friend.FriendRepository
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
 class FriendViewModel(application: Application) : AndroidViewModel(application), KoinComponent{
 
     private val friendRepository : FriendRepository by inject()
+    private val friendChattingRepository : FriendChattingRepository by inject()
 
-    private var _friendList : MutableLiveData<ArrayList<User>>
-    val friendList : LiveData<ArrayList<User>>
-        get() = _friendList
-
-    init {
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
+    fun setListener(){
         friendRepository.setListener()
-
-        if(friendRepository.friendMap.size == 0) {
-            friendRepository.makeFriendRelationships(getContacts(getApplication()))
-            friendRepository.loadFriends()
-            _friendList = friendRepository.getFriends()
-        } else
-            _friendList = friendRepository.getFriends()
+    }
+    fun getUsers() : LiveData<ArrayList<UserModel>> {
+        return friendRepository.getUsers()
     }
 
-    fun sync()
-    {
-        friendRepository.makeFriendRelationships(getContacts(getApplication()))
-        friendRepository.loadFriends()
-        _friendList = friendRepository.getFriends()
+    fun getAddFriend() : MutableLiveData<Int>{
+        return friendRepository.getAddFriend()
     }
-
-    private fun getContacts(application: Application): ArrayList<String> {
-        val contactList = ArrayList<String>()
-        val cr = application.contentResolver
-        val cur: Cursor? = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null)
-        if ((cur?.count ?: 0) > 0) {
-            while (cur != null && cur.moveToNext()) {
-                val id: String = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID))
-                val name: String = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
-                if (cur.getInt(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
-                    val pCur: Cursor? = cr.query(
-                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                        null,
-                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                        arrayOf(id),
-                        null
-                    )
-                    while (pCur!!.moveToNext()) {
-                        val temp : String = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
-                        var phoneNo : String = ""
-                        temp.forEach {
-                            if(it.isDigit())
-                                phoneNo+=it
-                        }
-                        contactList.add(phoneNo)
-                    }
-                    pCur.close()
-                }
-            }
+    fun sync() {
+        if(friendRepository.getUsers().value!!.isEmpty()) {
+            friendRepository.makeFriendRelationships(getApplication())
         }
-        cur?.close()
-        return contactList
+    }
+    fun addFriendWithPhoneNumber(input: String) {
+        friendRepository.addFriendWithPhoneNumber(input)
+    }
+    fun addFriendWithId(input: String) {
+        friendRepository.addFriendWithEmail(input)
+    }
+    fun getGroupId() : MutableLiveData<String>{
+        return  friendChattingRepository.groupId
+    }
+    fun loadGroupId(groupMembers: HashMap<String,Boolean>) {
+        friendChattingRepository.loadGroupId(groupMembers)
     }
 
-
-
-
-
+    fun loadMyInfo() {
+        friendRepository.loadMyInfo()
+    }
 }
