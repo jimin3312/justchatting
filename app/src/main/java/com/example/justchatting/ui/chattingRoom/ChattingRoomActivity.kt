@@ -7,8 +7,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.justchatting.R
+import com.example.justchatting.UserModel
 import com.example.justchatting.databinding.ActivityChattingRoomBinding
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_chatting_room.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -19,7 +19,7 @@ class ChattingRoomActivity : AppCompatActivity() {
 
     private val viewModel : ChattingRoomViewModel by viewModel()
     private var groupId : String? = null
-    private lateinit var groupMembersMap : HashMap<String, Boolean>
+    private lateinit var groupMembers : HashMap<String, UserModel>
     private lateinit var chattingRoomAdapter: ChattingRoomAdapter
     private lateinit var binding : ActivityChattingRoomBinding
 
@@ -27,15 +27,13 @@ class ChattingRoomActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_chatting_room)
 
-        val myId = FirebaseAuth.getInstance().uid
-
         groupId = intent.getStringExtra("groupId")
-        groupMembersMap = intent.getSerializableExtra("groupMembersMap") as HashMap<String, Boolean>
+        if(groupId ==""){
+            groupMembers = intent.getSerializableExtra("groupMembers") as HashMap<String, UserModel>
+        }
 
-        viewModel.loadGroupNameList(groupMembersMap)
+//        viewModel.loadGroupNameList(groupMembers)
 
-        Log.d(TAG,"groupID : ${groupId}")
-        Log.d(TAG, "groupMembers : $groupMembersMap")
         chattingRoomAdapter = ChattingRoomAdapter()
 
         chatting_room_recyclerview.apply {
@@ -63,11 +61,10 @@ class ChattingRoomActivity : AppCompatActivity() {
             chatting_room_edittext_input.setText("")
         })
 
-
         chatting_room_button_send.setOnClickListener {
             if(chatting_room_edittext_input.text.isNotEmpty()){
                 if(groupId==""){
-                    viewModel.makeRelationship(groupMembersMap)
+                    viewModel.createGroupId(groupMembers)
                 } else{
                     viewModel.sendText(chatting_room_edittext_input.text.toString(), groupId!!)
                     chatting_room_edittext_input.setText("")

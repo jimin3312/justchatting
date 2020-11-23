@@ -23,14 +23,18 @@ class ContactsDAO {
             override fun onDataChange(snapshot: DataSnapshot) {
 
                 val contactList = getContacts(application)
-                contactList.forEachIndexed { _, number ->
+                contactList.forEach { number ->
+
                     val ref = FirebaseDatabase.getInstance().getReference("/phone/$number")
                     Log.d(FriendRepository.TAG, "number : $number")
+
                     ref.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onCancelled(error: DatabaseError) {}
                         override fun onDataChange(snapshot: DataSnapshot) {
                             val friendId = snapshot.getValue(String::class.java) ?: return
+
                             val fromRef = FirebaseDatabase.getInstance().getReference("/friends/${uid}/${friendId}")
+
                             fromRef.setValue(true)
                             if (uid != friendId) {
                                 val toRef = FirebaseDatabase.getInstance().getReference("/friends/${friendId}/$uid")

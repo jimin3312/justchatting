@@ -29,7 +29,6 @@ class SelectGroupActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_select_group)
 
-        Log.d(TAG,"oncreate")
         selectGroupRecyclerviewAdapter = SelectGroupRecyclerviewAdapter()
         select_group_recyclerview.apply {
             setHasFixedSize(true)
@@ -52,7 +51,7 @@ class SelectGroupActivity : AppCompatActivity() {
             Log.d(TAG,"groupID : $groupId")
             val intent = Intent(this, ChattingRoomActivity::class.java)
             intent.putExtra("groupId", groupId)
-            intent.putExtra("groupMembersMap", selectGroupRecyclerviewAdapter.groupMembers)
+            intent.putExtra("groupMembers", selectGroupRecyclerviewAdapter.groupMembers)
             startActivity(intent)
         })
 
@@ -68,7 +67,6 @@ class SelectGroupActivity : AppCompatActivity() {
         when(item.itemId){
             R.id.select_confirm->{
                 val uid = FirebaseAuth.getInstance().uid
-                selectGroupRecyclerviewAdapter.groupMembers[uid!!]=true
                 viewModel.loadGroupId(selectGroupRecyclerviewAdapter.groupMembers)
             }
         }

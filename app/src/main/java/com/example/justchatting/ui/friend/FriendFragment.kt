@@ -30,6 +30,7 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
 
     override fun getLayoutId(): Int = R.layout.fragment_friend
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -46,6 +47,9 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         }
 
         viewModel.sync()
+        viewModel.loadMyInfo()
+        viewModel.setListener()
+//        viewModel.loadFriends()
 
         viewModel.getUsers().observe(viewLifecycleOwner, Observer {
             Log.d("Friend", it.toString())
@@ -53,19 +57,23 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
             friendAdapter.notifyDataSetChanged()
         })
 
-
-
         viewModel.getAddFriend().observe(viewLifecycleOwner, Observer {friendAddSuccess->
             when (friendAddSuccess) {
                 1 -> {
                     resultDialog("친구추가 성공", "확인")
                     viewModel.getAddFriend().postValue(0)
+                    deleteAddFriendDialog()
                 }
                 -1 -> {
                     resultDialog("친구추가 실패", "확인")
                     viewModel.getAddFriend().postValue(0)
                 }
+                -2 -> {
+                    resultDialog("이미 있는 친구입니다.", "확인")
+                    viewModel.getAddFriend().postValue(0)
+                }
             }
+
         })
 
         friendAdapter.itemClick.observe(viewLifecycleOwner, Observer {
@@ -77,7 +85,8 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
                 Log.d("FriendFragment", "groupID : $groupId")
                 val intent = Intent(requireContext(), ChattingRoomActivity::class.java)
                 intent.putExtra("groupId", groupId)
-                intent.putExtra("groupMembersMap", friendAdapter.groupMembers)
+                Log.d("FriendFragment", "groupMembers : ${friendAdapter.groupMembers.toString()}")
+                intent.putExtra("groupMembers", friendAdapter.groupMembers)
                 startActivity(intent)
                 friendAdapter.itemClick.postValue(false)
                 viewModel.getGroupId().postValue("-1")
@@ -120,5 +129,12 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         layoutParams.weight = 1.0f
         layoutParams.gravity = Gravity.CENTER
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).layoutParams = layoutParams
+    }
+    private fun deleteAddFriendDialog()
+    {
+        val fragment = childFragmentManager.findFragmentByTag("dialog")
+        if(fragment != null) {
+            (fragment as DialogFragment).dismiss()
+        }
     }
 }

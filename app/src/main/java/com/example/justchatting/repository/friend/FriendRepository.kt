@@ -6,11 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import com.example.justchatting.UserModel
 import com.example.justchatting.data.friend.ContactsDAO
 import com.example.justchatting.data.friend.FriendFirebaseSource
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 
 class FriendRepository(private val contactsDAO: ContactsDAO, private val friendFirebaseSource: FriendFirebaseSource) {
     companion object{
@@ -19,6 +14,10 @@ class FriendRepository(private val contactsDAO: ContactsDAO, private val friendF
     fun getUsers(): LiveData<ArrayList<UserModel>> {
         return friendFirebaseSource.users
     }
+//    fun getMyInfo() : LiveData<UserModel>{
+//        return friendFirebaseSource.myInfo
+//    }
+
     fun makeFriendRelationships(application: Application) = contactsDAO.makeFriendRelationships(application)
 
     fun addFriendWithEmail(email : String){
@@ -32,6 +31,10 @@ class FriendRepository(private val contactsDAO: ContactsDAO, private val friendF
     }
     fun getAddFriend(): MutableLiveData<Int> {
         return friendFirebaseSource.addFriend
+    }
+
+    fun loadMyInfo() {
+        friendFirebaseSource.loadMyInfo()
     }
 
 }

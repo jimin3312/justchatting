@@ -16,13 +16,13 @@ class SelectGroupViewModel : ViewModel() ,KoinComponent{
     }
 
     fun getFriends(): LiveData<ArrayList<UserModel>> {
-        return (selectGroupRepository as SelectGroupRepositoryImpl).friends
+        return selectGroupRepository.getFriends()
     }
 
-    fun loadGroupId(groupMembers : HashMap<String,Boolean>){
+    fun loadGroupId(groupMembers : HashMap<String, UserModel>){
         selectGroupRepository.loadGroupId(groupMembers)
     }
     fun getGroupId() : LiveData<String>{
-        return (selectGroupRepository as SelectGroupRepositoryImpl).groupId
+        return selectGroupRepository.getGroupId()
     }
 }

@@ -2,8 +2,6 @@ package com.example.justchatting.ui.chatting
 
 
 import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
-import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -41,9 +39,10 @@ class ChattingFragment : BaseFragment<FragmentChattingBinding>() {
             setHasFixedSize(true)
             adapter = chattingRecyclerviewAdapter
         }
+
         chatting_recyclerview.addItemDecoration(DividerItemDecoration(requireContext(),LinearLayoutManager.VERTICAL))
 
-        viewModel.loadChattingRooms()
+        viewModel.setListener()
 
         viewModel.getChattingRooms().observe(viewLifecycleOwner, Observer {
             Log.d(TAG,"chatting Rooms : ${it}")
