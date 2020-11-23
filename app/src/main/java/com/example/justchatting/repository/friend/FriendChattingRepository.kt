@@ -23,7 +23,6 @@ class FriendChattingRepository {
             }
             override fun onDataChange(snapshot: DataSnapshot) {
                 snapshot.children.forEach { userChatRoomId->
-                    Log.d(SelectGroupRepositoryImpl.TAG, "chatRoomId : ${userChatRoomId.key}")
                     val chatRoomMembersRef = FirebaseDatabase.getInstance().getReference("/members/${userChatRoomId.key}")
                     chatRoomMembersRef.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onCancelled(error: DatabaseError) {
@@ -31,13 +30,10 @@ class FriendChattingRepository {
                         }
                         override fun onDataChange(snapshot: DataSnapshot) {
 
-                            Log.d(SelectGroupRepositoryImpl.TAG, snapshot.childrenCount.toString())
-                            Log.d(SelectGroupRepositoryImpl.TAG, groupMembers.size.toString())
                             if( find || snapshot.childrenCount != groupMembers.size.toLong()){
                                 return
                             }
                             snapshot.children.forEach { dataSnapshot ->
-                                Log.d(SelectGroupRepositoryImpl.TAG,dataSnapshot.key)
                                 if(!groupMembers.containsKey(dataSnapshot.key)){
                                     return
                                 }

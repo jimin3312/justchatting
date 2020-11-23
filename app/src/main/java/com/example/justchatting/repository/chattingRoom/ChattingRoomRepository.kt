@@ -11,6 +11,6 @@ interface ChattingRoomRepository {
     fun sendText(text: String, groupId: String)
     fun setListener(groupId: String)
     fun createGroupId(groupMembersMap: HashMap<String, UserModel>)
-    fun loadGroupNameList(groupMembersMap: HashMap<String, UserModel>)
+//    fun loadGroupNameList(groupMembersMap: HashMap<String, UserModel>)
 //    fun fetchChatLog(groupId : String)
 }

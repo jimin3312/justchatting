@@ -3,7 +3,7 @@ package com.example.justchatting.data.chatting
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.justchatting.LatestMessage
+import com.example.justchatting.ChattingRoom
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
@@ -11,10 +11,10 @@ class ChattingFirebaseSource {
     companion object{
         val TAG = "ChattingRepository"
     }
-    private var chattingRoomMap = HashMap<String, LatestMessage>()
+    private var chattingRoomMap = HashMap<String, ChattingRoom>()
 
-    private var _chattingRooms : MutableLiveData<ArrayList<LatestMessage>> = MutableLiveData()
-    val chattingRooms : LiveData<ArrayList<LatestMessage>>
+    private var _chattingRooms : MutableLiveData<ArrayList<ChattingRoom>> = MutableLiveData()
+    val chattingRooms : LiveData<ArrayList<ChattingRoom>>
         get() =  _chattingRooms
 
 //    fun loadChatRooms() {
@@ -79,10 +79,20 @@ class ChattingFirebaseSource {
                     override fun onCancelled(error: DatabaseError) {
                     }
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        val chattingRoom = snapshot.getValue(LatestMessage::class.java) ?: return
+                        val chattingRoom = snapshot.getValue(ChattingRoom::class.java) ?: return
                         Log.d(TAG, "onChiledAdded, ${chattingRoom.lastMessage}")
-                        chattingRoomMap[groupId!!] = chattingRoom
-                        _chattingRooms.postValue(getChattingArrayList())
+
+                        val userGroupNameRef = FirebaseDatabase.getInstance().getReference("/user_groups/$uid/$groupId")
+                        userGroupNameRef.addListenerForSingleValueEvent(object :ValueEventListener{
+                            override fun onCancelled(error: DatabaseError) {
+                            }
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                val groupName = snapshot.getValue(String::class.java)?: return
+                                chattingRoom.groupName = groupName
+                                chattingRoomMap[groupId!!] = chattingRoom
+                                _chattingRooms.postValue(getChattingArrayList())
+                            }
+                        })
                     }
                 })
             }
@@ -91,9 +101,9 @@ class ChattingFirebaseSource {
         })
     }
 
-    private fun getChattingArrayList(): ArrayList<LatestMessage> {
+    private fun getChattingArrayList(): ArrayList<ChattingRoom> {
         val arrayList = ArrayList(chattingRoomMap.values)
-        arrayList.sortedBy { it.timeStamp }
+        arrayList.sortByDescending { it.timeStamp }
         return arrayList
     }
 

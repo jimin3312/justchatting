@@ -24,7 +24,7 @@ class ChattingRoomViewModel : ViewModel(), KoinComponent{
         chattingRoomRepository.setListener(groupId)
     }
     fun loadGroupNameList(groupMembersMap: HashMap<String, UserModel>){
-        chattingRoomRepository.loadGroupNameList(groupMembersMap)
+//        chattingRoomRepository.loadGroupNameList(groupMembersMap)
     }
 
     fun createGroupId(groupMembersMap: HashMap<String, UserModel>) {

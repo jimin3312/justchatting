@@ -6,19 +6,18 @@ import com.example.justchatting.data.chatting.SelectGroupFirebaseSource
 import com.example.justchatting.data.friend.FriendFirebaseSource
 
 class SelectGroupRepositoryImpl(
-    private val friendFirebaseSource: FriendFirebaseSource,
     private val selectGroupFirebaseSource: SelectGroupFirebaseSource
 ) : SelectGroupRepository {
 
     override fun loadFriends() {
-        friendFirebaseSource.loadFriends()
+        selectGroupFirebaseSource.loadFriends()
     }
-    override fun loadGroupId(groupMembers: HashMap<String, Boolean>) {
+    override fun loadGroupId(groupMembers: HashMap<String, UserModel>) {
         selectGroupFirebaseSource.loadGroupId(groupMembers)
     }
 
     override fun getFriends(): LiveData<ArrayList<UserModel>> {
-        return friendFirebaseSource.users
+        return selectGroupFirebaseSource.users
     }
     override fun getGroupId(): LiveData<String> {
         return selectGroupFirebaseSource.groupId

@@ -19,7 +19,7 @@ class SelectGroupViewModel : ViewModel() ,KoinComponent{
         return selectGroupRepository.getFriends()
     }
 
-    fun loadGroupId(groupMembers : HashMap<String,Boolean>){
+    fun loadGroupId(groupMembers : HashMap<String, UserModel>){
         selectGroupRepository.loadGroupId(groupMembers)
     }
     fun getGroupId() : LiveData<String>{

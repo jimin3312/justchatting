@@ -67,7 +67,6 @@ class SelectGroupActivity : AppCompatActivity() {
         when(item.itemId){
             R.id.select_confirm->{
                 val uid = FirebaseAuth.getInstance().uid
-                selectGroupRecyclerviewAdapter.groupMembers[uid!!]=true
                 viewModel.loadGroupId(selectGroupRecyclerviewAdapter.groupMembers)
             }
         }

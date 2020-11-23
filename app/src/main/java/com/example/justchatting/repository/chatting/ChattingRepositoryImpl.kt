@@ -1,7 +1,7 @@
 package com.example.justchatting.repository.chatting
 
 import androidx.lifecycle.LiveData
-import com.example.justchatting.LatestMessage
+import com.example.justchatting.ChattingRoom
 import com.example.justchatting.data.chatting.ChattingFirebaseSource
 
 class ChattingRepositoryImpl(private val chattingFirebaseSource: ChattingFirebaseSource) : ChattingRepository{
@@ -9,7 +9,7 @@ class ChattingRepositoryImpl(private val chattingFirebaseSource: ChattingFirebas
     override fun setListener() {
         chattingFirebaseSource.setListener()
     }
-    override fun getChattingRooms(): LiveData<ArrayList<LatestMessage>> {
+    override fun getChattingRooms(): LiveData<ArrayList<ChattingRoom>> {
         return chattingFirebaseSource.chattingRooms
     }
 

@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.justchatting.Message
-import com.example.justchatting.LatestMessage
+import com.example.justchatting.ChattingRoom
 import com.example.justchatting.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -122,6 +122,7 @@ class ChattingRoomFirebaseSource {
             if(stringBuilder.length>=19)
                 break
         }
+        stringBuilder.deleteCharAt(stringBuilder.length-1)
 
         return stringBuilder.toString()
     }
@@ -148,33 +149,24 @@ class ChattingRoomFirebaseSource {
                 )
                 messageRef.setValue(chatMessage)
 
-                val memberRef = FirebaseDatabase.getInstance().getReference("/members/$groupId")
-                memberRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onCancelled(error: DatabaseError) {
-                    }
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        val membersIdMap = snapshot.getValue(object : GenericTypeIndicator<HashMap<String, Boolean>>() {})
-                        Log.d(TAG, "membersIdMap : $membersIdMap")
-                        //jerry tom
-                        // 마지막채팅 ,  timestamp
-                        var latestMessage: LatestMessage
-                        latestMessage = if (chatMessage.type == "text")
-                            LatestMessage(
-                                chatMessage.text,
-                                chatMessage.timeStamp,
-                                groupId
-                            )
-                        else
-                            LatestMessage(
-                                "사진",
-                                chatMessage.timeStamp,
-                                groupId
-                            )
-                        val chatRoomRef =
-                            FirebaseDatabase.getInstance().getReference("/chatrooms/$groupId")
-                        chatRoomRef.setValue(latestMessage)
-                    }
-                })
+                var chattingRoom: ChattingRoom
+                chattingRoom = if (chatMessage.type == "text")
+                    ChattingRoom(
+                        chatMessage.text,
+                        chatMessage.timeStamp,
+                        groupId
+                    )
+                else
+                    ChattingRoom(
+                        "사진",
+                        chatMessage.timeStamp,
+                        groupId
+                    )
+
+                val chatRoomRef =
+                    FirebaseDatabase.getInstance().getReference("/chatrooms/$groupId")
+                chatRoomRef.setValue(chattingRoom)
+
             }
         })
     }

@@ -14,9 +14,9 @@ class FriendRepository(private val contactsDAO: ContactsDAO, private val friendF
     fun getUsers(): LiveData<ArrayList<UserModel>> {
         return friendFirebaseSource.users
     }
-    fun getMyInfo() : LiveData<UserModel>{
-        return friendFirebaseSource.myInfo
-    }
+//    fun getMyInfo() : LiveData<UserModel>{
+//        return friendFirebaseSource.myInfo
+//    }
 
     fun makeFriendRelationships(application: Application) = contactsDAO.makeFriendRelationships(application)
 
@@ -26,11 +26,6 @@ class FriendRepository(private val contactsDAO: ContactsDAO, private val friendF
     fun addFriendWithPhoneNumber(phoneNum : String){
         friendFirebaseSource.addFriendWithPhoneNumber(phoneNum)
     }
-    fun loadFriends(){
-        friendFirebaseSource.loadFriends()
-    }
-
-
     fun setListener() {
         friendFirebaseSource.setListener()
     }

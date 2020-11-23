@@ -7,7 +7,7 @@
     android:layout_height="80dp">
 
     <TextView
-        android:id="@+id/chatting_members"
+        android:id="@+id/chatting_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -17,14 +17,14 @@
         tools:text="그룹멤버 이름" />
 
     <TextView
-        android:id="@+id/chatting_last_message"
+        android:id="@+id/chatting_contents"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/chatting_timestamp"
-        app:layout_constraintStart_toStartOf="@+id/chatting_members"
-        app:layout_constraintTop_toBottomOf="@+id/chatting_members"
+        app:layout_constraintStart_toStartOf="@+id/chatting_title"
+        app:layout_constraintTop_toBottomOf="@+id/chatting_title"
         tools:text="마지막 메세지" />
 
     <TextView

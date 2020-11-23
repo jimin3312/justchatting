@@ -8,20 +8,26 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class FriendFirebaseSource {
 
-    private var friends : ArrayList<UserModel> = ArrayList(mutableListOf(UserModel()))
-
+    private var friendsMap : HashMap<String, UserModel> = HashMap()
+    
     private var _users : MutableLiveData<ArrayList<UserModel>> = MutableLiveData(ArrayList())
     val users : LiveData<ArrayList<UserModel>>
         get() = _users
 
-    private var _myInfo : MutableLiveData<UserModel> = MutableLiveData()
-    val myInfo : LiveData<UserModel>
-        get() = _myInfo
+    private lateinit var myInfo : UserModel
 
     var addFriend : MutableLiveData<Int> = MutableLiveData()
+
+    private fun mapToList() : ArrayList<UserModel>{
+        val arrayList = ArrayList(friendsMap.values)
+        arrayList.sortBy { it.username }
+        arrayList.add(0, myInfo)
+        return arrayList
+    }
 
     fun addFriendWithEmail(email : String){
         if(email.isEmpty())
@@ -38,8 +44,8 @@ class FriendFirebaseSource {
                     return
                 }
 
-                friends.forEach{
-                    if(it.uid == friendId){
+                friendsMap.forEach{
+                    if(it.key == friendId){
                         addFriend.postValue(-2)
                         return
                     }
@@ -49,47 +55,6 @@ class FriendFirebaseSource {
                 val toUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$friendId/$uid")
                 toUserFriendRef.setValue(true)
                 addFriend.postValue(1)
-            }
-        })
-    }
-
-
-
-    fun loadFriends() {
-        val uid = FirebaseAuth.getInstance().uid
-        friends.removeAll{ it.uid != uid }
-
-        val ref = FirebaseDatabase.getInstance().getReference("/friends/$uid")
-        ref.addListenerForSingleValueEvent(object : ValueEventListener{
-            override fun onCancelled(error: DatabaseError) {
-            }
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-                var childCnt = snapshot.childrenCount.toInt()
-                snapshot.children.forEach{dataSnapshot ->
-                    val data = dataSnapshot.getValue(Boolean::class.java)?: return
-                    if(data)
-                    {
-                        val friendId = dataSnapshot.key
-                        val friendUserRef =  FirebaseDatabase.getInstance().getReference("/users/$friendId")
-                        friendUserRef.addListenerForSingleValueEvent(object : ValueEventListener{
-                            override fun onCancelled(error: DatabaseError) {
-                            }
-                            override fun onDataChange(snapshot: DataSnapshot) {
-                                val user = snapshot.getValue(UserModel::class.java)?: return
-                                friends.add(user)
-
-                                if(childCnt +1 == friends.size){
-                                    friends.subList(1,friends.size).sortWith(Comparator { o1, o2 ->
-                                        o1.username.compareTo(o2.username)
-                                    })
-                                    _users.postValue(friends)
-                                }
-                            }
-                        })
-                    }
-                }
-
             }
         })
     }
@@ -119,6 +84,8 @@ class FriendFirebaseSource {
         })
     }
 
+
+
     fun setListener()
     {
         val uid = FirebaseAuth.getInstance().uid
@@ -130,7 +97,6 @@ class FriendFirebaseSource {
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
             }
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-
             }
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
 
@@ -144,12 +110,8 @@ class FriendFirebaseSource {
 
                         override fun onDataChange(snapshot: DataSnapshot) {
                             val user = snapshot.getValue(UserModel::class.java)?:return
-
-                            friends.add(user)
-                            friends.subList(1,friends.size).sortWith(Comparator { o1, o2 ->
-                                o1.username.compareTo(o2.username)
-                            })
-                            _users.postValue(friends)
+                            friendsMap[user.uid] = user
+                            _users.postValue(mapToList())
                         }
                     })
                 }
@@ -168,13 +130,8 @@ class FriendFirebaseSource {
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 val my = snapshot.getValue(UserModel::class.java) ?: return
-
-                if(friends.size==0){
-                    friends.add(my)
-                } else {
-                    friends.set(0,my)
-                }
-
+                myInfo = my
+                _users.postValue(mapToList())
             }
         })
     }

@@ -30,6 +30,7 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
 
     override fun getLayoutId(): Int = R.layout.fragment_friend
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -45,9 +46,10 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
             adapter = friendAdapter
         }
 
-        viewModel.loadMyInfo()
-        viewModel.loadFriends()
         viewModel.sync()
+        viewModel.loadMyInfo()
+        viewModel.setListener()
+//        viewModel.loadFriends()
 
         viewModel.getUsers().observe(viewLifecycleOwner, Observer {
             Log.d("Friend", it.toString())
@@ -56,8 +58,6 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         })
 
         viewModel.getAddFriend().observe(viewLifecycleOwner, Observer {friendAddSuccess->
-
-
             when (friendAddSuccess) {
                 1 -> {
                     resultDialog("친구추가 성공", "확인")
@@ -85,7 +85,8 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
                 Log.d("FriendFragment", "groupID : $groupId")
                 val intent = Intent(requireContext(), ChattingRoomActivity::class.java)
                 intent.putExtra("groupId", groupId)
-                intent.putExtra("groupMembersMap", friendAdapter.groupMembers)
+                Log.d("FriendFragment", "groupMembers : ${friendAdapter.groupMembers.toString()}")
+                intent.putExtra("groupMembers", friendAdapter.groupMembers)
                 startActivity(intent)
                 friendAdapter.itemClick.postValue(false)
                 viewModel.getGroupId().postValue("-1")

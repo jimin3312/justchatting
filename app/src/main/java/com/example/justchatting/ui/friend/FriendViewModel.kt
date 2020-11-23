@@ -15,19 +15,11 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
     private val friendRepository : FriendRepository by inject()
     private val friendChattingRepository : FriendChattingRepository by inject()
 
-    fun loadFriends(){
-        friendRepository.loadFriends()
-    }
     fun setListener(){
         friendRepository.setListener()
     }
-
-
     fun getUsers() : LiveData<ArrayList<UserModel>> {
         return friendRepository.getUsers()
-    }
-    fun getMyInfo() : LiveData<UserModel>{
-        return friendRepository.getMyInfo()
     }
 
     fun getAddFriend() : MutableLiveData<Int>{

@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
-import com.example.justchatting.LatestMessage
+import com.example.justchatting.ChattingRoom
 import com.example.justchatting.R
 import com.example.justchatting.ui.chattingRoom.ChattingRoomActivity
 import java.lang.Exception
@@ -17,9 +17,9 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class ChattingRecyclerViewAdapter :RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var mChattingList : ArrayList<LatestMessage>? = null
+    private var mChattingList : ArrayList<ChattingRoom>? = null
 
-    fun setChattingList(arrayList: ArrayList<LatestMessage>){
+    fun setChattingList(arrayList: ArrayList<ChattingRoom>){
         this.mChattingList = arrayList
     }
 
@@ -40,35 +40,26 @@ class ChattingRecyclerViewAdapter :RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     inner class ChattingViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
-        val members = itemView.findViewById<TextView>(R.id.chatting_members)
-        val lastMessage = itemView.findViewById<TextView>(R.id.chatting_last_message)
+        val title = itemView.findViewById<TextView>(R.id.chatting_title)
+        val contents = itemView.findViewById<TextView>(R.id.chatting_contents)
         val timeStamp  = itemView.findViewById<TextView>(R.id.chatting_timestamp)
         val constraintLayout = itemView.findViewById<ConstraintLayout>(R.id.chatting_constraint_layout)
 
-        var chattingModel : LatestMessage? = null
+        var chattingModel : ChattingRoom? = null
 
         @SuppressLint("SimpleDateFormat")
-        fun bind(latestMessage: LatestMessage){
-            this.chattingModel = latestMessage
-            this.lastMessage.text = latestMessage.lastMessage
+        fun bind(chattingRoom: ChattingRoom){
+            this.chattingModel = chattingRoom
+            this.contents.text = chattingRoom.lastMessage
             try {
                 val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                timeStamp.text = simpleDateFormat.format(Date(latestMessage.timeStamp)).toString()
+                timeStamp.text = simpleDateFormat.format(Date(chattingRoom.timeStamp)).toString()
             }catch (e: Exception){}
 
-            var title : String =""
-
-            if(latestMessage.membersNameList.size>0) {
-                for (i in 0 until latestMessage.membersNameList.size - 1) {
-                    title += latestMessage.membersNameList[i] + ", "
-                }
-                title += latestMessage.membersNameList[latestMessage.membersNameList.size - 1]
-            }
-            members.text = title
+            title.text = chattingRoom.groupName
             constraintLayout.setOnClickListener {
                 val intent = Intent(itemView.context, ChattingRoomActivity::class.java)
-                intent.putExtra("groupId", latestMessage.groupId)
-                intent.putExtra("groupMembersMap", latestMessage.membersIdMap)
+                intent.putExtra("groupId", chattingRoom.groupId)
                 itemView.context.startActivity(intent)
             }
         }

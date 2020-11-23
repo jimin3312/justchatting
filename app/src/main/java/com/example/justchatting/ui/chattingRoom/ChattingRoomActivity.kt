@@ -28,9 +28,11 @@ class ChattingRoomActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_chatting_room)
 
         groupId = intent.getStringExtra("groupId")
-        groupMembers = intent.getSerializableExtra("groupMembers") as HashMap<String, UserModel>
+        if(groupId ==""){
+            groupMembers = intent.getSerializableExtra("groupMembers") as HashMap<String, UserModel>
+        }
 
-        viewModel.loadGroupNameList(groupMembers)
+//        viewModel.loadGroupNameList(groupMembers)
 
         chattingRoomAdapter = ChattingRoomAdapter()
 

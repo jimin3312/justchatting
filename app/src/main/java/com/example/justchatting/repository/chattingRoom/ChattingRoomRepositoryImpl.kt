@@ -5,8 +5,6 @@ import com.example.justchatting.Message
 import com.example.justchatting.UserModel
 import com.example.justchatting.data.chattingRoom.ChattingRoomFirebaseSource
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
-
 
 class ChattingRoomRepositoryImpl(private val chattingRoomFirebaseSource: ChattingRoomFirebaseSource) :
     ChattingRoomRepository {
@@ -20,9 +18,9 @@ class ChattingRoomRepositoryImpl(private val chattingRoomFirebaseSource: Chattin
     override fun getNewGroupId(): LiveData<String> {
         return chattingRoomFirebaseSource.newGroupId
     }
-    override fun loadGroupNameList(groupMembersMap: HashMap<String, UserModel>) {
-        chattingRoomFirebaseSource.loadGroupNameList(groupMembersMap)
-    }
+//    override fun loadGroupNameList(groupMembersMap: HashMap<String, UserModel>) {
+//        chattingRoomFirebaseSource.loadGroupNameList(groupMembersMap)
+//    }
 
 //    override fun fetchChatLog(groupId: String) {
 //        chattingRoomFirebaseSource.fetchChatLog(groupId)
@@ -35,6 +33,7 @@ class ChattingRoomRepositoryImpl(private val chattingRoomFirebaseSource: Chattin
     override fun createGroupId(groupMembersMap: HashMap<String, UserModel>) {
         chattingRoomFirebaseSource.createGroupId(groupMembersMap)
     }
+
 
     override fun sendText(text: String, groupId: String) {
         chattingRoomFirebaseSource.sendText(text, groupId)

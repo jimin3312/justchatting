@@ -11,6 +11,6 @@ import org.koin.dsl.module
 val chattingModule = module{
     factory { SelectGroupFirebaseSource() }
     factory { ChattingFirebaseSource() }
-    factory<SelectGroupRepository> { SelectGroupRepositoryImpl(get(),get()) }
+    factory<SelectGroupRepository> { SelectGroupRepositoryImpl(get()) }
     single<ChattingRepository>{ChattingRepositoryImpl(get())}
 }
