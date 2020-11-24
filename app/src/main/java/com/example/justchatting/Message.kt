@@ -7,5 +7,6 @@ data class Message(
     val profileImageUrl:String ="",
     val imageUri: String = "",
     val text : String = "",
-    val timeStamp : Long = 0
+    val timeStamp : Long = 0,
+    val name : String = ""
 )
