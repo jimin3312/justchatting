@@ -145,7 +145,8 @@ class ChattingRoomFirebaseSource {
                     user.profileImageUrl!!,
                     "",
                     text,
-                    System.currentTimeMillis()
+                    System.currentTimeMillis(),
+                    user.username
                 )
                 messageRef.setValue(chatMessage)
 
