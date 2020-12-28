@@ -1,4 +1,4 @@
-package com.example.justchatting.data.login
+package com.example.justchatting.data.Auth
 
 import android.net.Uri
 import android.util.Log
@@ -40,21 +40,16 @@ class AuthFirebaseSource {
             }
     }
 
-
     fun uploadProfile(uri: Uri?): Single<String> {
-
         return Single.create { emitter ->
             if (uri == null) {
                 emitter.onSuccess("")
-            }
-            else{
+            } else {
                 val filename = UUID.randomUUID().toString()
                 val ref = FirebaseStorage.getInstance().getReference("/profileImages/$filename")
                 ref.putFile(uri)
                     .addOnSuccessListener {
-                        Log.d("Register", "Successfully uploaded image: ${it.metadata?.path}")
                         ref.downloadUrl.addOnSuccessListener {
-                            Log.d("RegisterActivity", "File Location : $it")
                             emitter.onSuccess(it.toString())
                         }
                     }.addOnCanceledListener {
@@ -73,7 +68,7 @@ class AuthFirebaseSource {
         email: String
     ): Single<Boolean> =
         Single.create { emitter ->
-            val uid = FirebaseAuth.getInstance().uid ?: ""
+            val uid = FirebaseAuth.getInstance().uid!!
 
             val re = Regex("[^A-Za-z0-9 ]")
             val email = re.replace(email, "")
@@ -89,13 +84,13 @@ class AuthFirebaseSource {
 
             ref.setValue(user)
                 .addOnSuccessListener {
-                    val phoneRef = FirebaseDatabase.getInstance().getReference("/phone/$phoneNumber")
+                    val phoneRef =
+                        FirebaseDatabase.getInstance().getReference("/phone/$phoneNumber")
+
                     phoneRef.setValue(uid).addOnSuccessListener {
-
-
                         val emailRef = FirebaseDatabase.getInstance().getReference("/email/$email")
                         emailRef.setValue(uid).addOnSuccessListener {
-                            
+
                             emitter.onSuccess(true)
                         }
                     }
@@ -103,6 +98,5 @@ class AuthFirebaseSource {
                 .addOnFailureListener {
                     emitter.onError(it)
                 }
-
         }
 }

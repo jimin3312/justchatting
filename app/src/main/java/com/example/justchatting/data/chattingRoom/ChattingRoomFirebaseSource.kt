@@ -87,8 +87,6 @@ class ChattingRoomFirebaseSource {
 
                 logArrayList.add(chatMessage)
                 _chatLogs.postValue(logArrayList)
-
-
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
@@ -167,7 +165,6 @@ class ChattingRoomFirebaseSource {
                 val chatRoomRef =
                     FirebaseDatabase.getInstance().getReference("/chatrooms/$groupId")
                 chatRoomRef.setValue(chattingRoom)
-
             }
         })
     }

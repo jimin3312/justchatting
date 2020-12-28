@@ -41,6 +41,7 @@ class FriendAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
             return 0
         return mFriendList!!.size
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if(viewType == VIEW_TYPE_ME) {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.friend_my_item, parent,false)

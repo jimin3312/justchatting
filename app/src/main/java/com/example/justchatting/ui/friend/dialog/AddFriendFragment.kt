@@ -15,7 +15,7 @@ import com.example.justchatting.R
 import com.example.justchatting.ui.friend.FriendViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class AddFriendFragment(tabPosition : Int, text: String) : DialogFragment() {
+class AddFriendFragment(tabPosition: Int, text: String) : DialogFragment() {
 
     private val viewModel: FriendViewModel by viewModel()
     private var mText = text
@@ -34,21 +34,22 @@ class AddFriendFragment(tabPosition : Int, text: String) : DialogFragment() {
 
         addButton.setOnClickListener { _ ->
             Log.d("AddFriendFragment", "onclick add")
-            when(mtabPosition) {
-                TabPosition.PHONE.value ->{
+            when (mtabPosition) {
+                TabPosition.PHONE.value -> {
                     Log.d("AddFriendFragment", "phone")
                     val re = Regex("[^A-Za-z0-9 ]")
-                    val input = re.replace(inputEditTextView.text.toString(),"")
+                    val input = re.replace(inputEditTextView.text.toString(), "")
                     viewModel.addFriendWithPhoneNumber(input)
                 }
                 TabPosition.ID.value -> {
                     Log.d("AddFriendFragment", "id")
                     val re = Regex("[^A-Za-z0-9 ]")
-                    val input = re.replace(inputEditTextView.text.toString(),"")
+                    val input = re.replace(inputEditTextView.text.toString(), "")
                     viewModel.addFriendWithId(input)
                 }
             }
         }
+
         cancelButton.setOnClickListener { _ ->
             Log.d("AddFriendFragment", "onclick cancel")
             deleteAddFriendDialog()
@@ -56,14 +57,15 @@ class AddFriendFragment(tabPosition : Int, text: String) : DialogFragment() {
 
         return view
     }
-    private fun deleteAddFriendDialog()
-    {
+
+    private fun deleteAddFriendDialog() {
         val fragment = requireParentFragment().parentFragmentManager.findFragmentByTag("dialog")
-        if(fragment != null) {
+        if (fragment != null) {
             (fragment as DialogFragment).dismiss()
         }
     }
-    enum class TabPosition(val value : Int){
+
+    enum class TabPosition(val value: Int) {
         PHONE(1),
         ID(2)
     }
