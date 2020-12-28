@@ -1,7 +1,7 @@
 package com.example.justchatting.repository.login
 
 import android.net.Uri
-import com.example.justchatting.data.login.AuthFirebaseSource
+import com.example.justchatting.data.Auth.AuthFirebaseSource
 
 class UserRepositoryImpl(
     private val authFirebaseSource: AuthFirebaseSource

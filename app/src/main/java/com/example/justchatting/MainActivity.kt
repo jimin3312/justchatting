@@ -4,9 +4,9 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -18,6 +18,8 @@ import com.example.justchatting.ui.login.RegisterActivity
 import com.example.justchatting.ui.settings.SettingsFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.messaging.FirebaseMessaging
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,18 +37,16 @@ class MainActivity : AppCompatActivity() {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
         } else {
+            setToken()
             setPermission()
         }
     }
 
-    private fun createFragment(){
-        friendFragment = FriendFragment()
-        chattingFragment = ChattingFragment()
-        settingFragment = SettingsFragment()
-
-        setListener()
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, friendFragment).commit()
+    private fun setToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener {
+            FirebaseDatabase.getInstance().getReference("/users/${FirebaseAuth.getInstance().uid}")
+                .child("token").setValue(it.result)
+        }
     }
 
     private fun setPermission() {
@@ -75,6 +75,16 @@ class MainActivity : AppCompatActivity() {
                 finish()
             }
         }
+    }
+
+    private fun createFragment(){
+        friendFragment = FriendFragment()
+        chattingFragment = ChattingFragment()
+        settingFragment = SettingsFragment()
+
+        setListener()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, friendFragment).commit()
     }
 
     private fun setListener() {

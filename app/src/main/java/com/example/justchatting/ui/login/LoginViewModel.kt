@@ -10,7 +10,9 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
+import kotlin.math.sign
 
 class LoginViewModel(
     private val repository: UserRepository
@@ -86,7 +88,6 @@ class LoginViewModel(
             })
         )
     }
-
 
     override fun onCleared() {
         super.onCleared()
