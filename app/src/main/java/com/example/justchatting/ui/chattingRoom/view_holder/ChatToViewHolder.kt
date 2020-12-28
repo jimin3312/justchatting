@@ -25,19 +25,26 @@ class ChatToViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
                 itemView.findViewById<CircleImageView>(R.id.chat_to_text_profile_image)
             val imageView = itemView.findViewById<ImageView>(R.id.chat_to_image_imageview)
             val timeStamp = itemView.findViewById<TextView>(R.id.chat_to_text_timestamp)
+            val name = itemView.findViewById<TextView>(R.id.chat_to_image_name)
 
             if (message!!.profileImageUrl.isEmpty())
                 profileImage.setImageResource(R.drawable.person)
             else
                 Picasso.get().load(message.profileImageUrl).into(profileImage)
 
+            name.text = message.name
             Picasso.get().load(message.imageUri).into(imageView)
-            timeStamp.text = message.timeStamp.toString()
+
+            try {
+                val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                timeStamp.text = simpleDateFormat.format(Date(message.timeStamp)).toString()
+            }catch (e: Exception){}
         } else {
             val profileImage =
                 itemView.findViewById<CircleImageView>(R.id.chat_to_text_profile_image)
             val textView = itemView.findViewById<TextView>(R.id.chat_to_text_textview)
             val timeStamp = itemView.findViewById<TextView>(R.id.chat_to_text_timestamp)
+            val name = itemView.findViewById<TextView>(R.id.chat_to_text_name)
 
             if (message!!.profileImageUrl.isEmpty())
                 profileImage.setImageResource(R.drawable.person)
@@ -46,6 +53,7 @@ class ChatToViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
                     .into(profileImage)
 
             textView.text = message.text
+            name.text = message.name
             try {
                 val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                 timeStamp.text = simpleDateFormat.format(Date(message.timeStamp)).toString()
