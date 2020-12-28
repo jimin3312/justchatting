@@ -32,8 +32,10 @@ class FriendFirebaseSource {
     fun addFriendWithEmail(email : String){
         if(email.isEmpty())
             return
+
         val uid = FirebaseAuth.getInstance().uid
         val friendEmailRef = FirebaseDatabase.getInstance().getReference("/email/$email")
+
         friendEmailRef.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onCancelled(error: DatabaseError) {
             }
@@ -50,10 +52,12 @@ class FriendFirebaseSource {
                         return
                     }
                 }
+
                 val fromUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$uid/$friendId")
                 fromUserFriendRef.setValue(true)
                 val toUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$friendId/$uid")
                 toUserFriendRef.setValue(true)
+
                 addFriend.postValue(1)
             }
         })
@@ -83,8 +87,6 @@ class FriendFirebaseSource {
             }
         })
     }
-
-
 
     fun setListener()
     {

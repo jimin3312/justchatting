@@ -47,6 +47,7 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
         })
+
         viewModel.errorToastMessage.observe(this, Observer {
             Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         })
@@ -57,7 +58,6 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
 
         if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS && resultCode == Activity.RESULT_OK && data != null )
         {
-            Log.d("RegisterActivity", "Photo was selected")
             viewModel.selectedPhotoUri = data.data
 
             val bitmap: Bitmap
