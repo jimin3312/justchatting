@@ -1,15 +1,18 @@
 package com.example.justchatting
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import com.example.justchatting.data.remote.NotificationAPI
 import com.example.justchatting.databinding.ActivityMainBinding
 import com.example.justchatting.ui.chatting.ChattingFragment
 import com.example.justchatting.ui.friend.FriendFragment
@@ -20,6 +23,17 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.gson.GsonBuilder
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.android.ext.android.inject
+import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,9 +58,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun setToken() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener {
-            FirebaseDatabase.getInstance().getReference("/users/${FirebaseAuth.getInstance().uid}")
-                .child("token").setValue(it.result)
+            FirebaseDatabase.getInstance().getReference("/users/${FirebaseAuth.getInstance().uid}").child("token").setValue(it.result)
         }
+
     }
 
     private fun setPermission() {
