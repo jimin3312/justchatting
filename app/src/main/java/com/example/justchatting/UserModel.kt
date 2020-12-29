@@ -9,6 +9,7 @@ data class UserModel(
     val username : String ="",
     val phoneNumber: String= "",
     val profileImageUrl : String? = null,
-    val email : String = ""
+    val email : String = "",
+    val token : String = ""
 ) : Parcelable
 

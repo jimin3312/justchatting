@@ -19,7 +19,6 @@ class ChattingRoomActivity : AppCompatActivity() {
 
     private val viewModel : ChattingRoomViewModel by viewModel()
     private var groupId : String? = null
-    private lateinit var groupMembers : HashMap<String, UserModel>
     private lateinit var chattingRoomAdapter: ChattingRoomAdapter
     private lateinit var binding : ActivityChattingRoomBinding
 
@@ -29,10 +28,10 @@ class ChattingRoomActivity : AppCompatActivity() {
 
         groupId = intent.getStringExtra("groupId")
         if(groupId ==""){
-            groupMembers = intent.getSerializableExtra("groupMembers") as HashMap<String, UserModel>
+            viewModel.groupMembers = intent.getSerializableExtra("groupMembers") as HashMap<String, UserModel>
+        } else {
+            viewModel.loadGroupMembers(groupId)
         }
-
-//        viewModel.loadGroupNameList(groupMembers)
 
         chattingRoomAdapter = ChattingRoomAdapter()
 
@@ -53,6 +52,18 @@ class ChattingRoomActivity : AppCompatActivity() {
             chatting_room_recyclerview.scrollToPosition(it.size-1)
         })
 
+
+        chatting_room_button_send.setOnClickListener {
+            if(chatting_room_edittext_input.text.isNotEmpty()){
+                if(groupId==""){
+                    viewModel.createGroupId()
+                } else{
+                    viewModel.sendText(chatting_room_edittext_input.text.toString(), groupId!!)
+                    chatting_room_edittext_input.setText("")
+                }
+            }
+        }
+
         viewModel.getNewGroupId().observe(this, Observer {newId->
             Log.d(TAG, "new group id : $newId")
             groupId = newId
@@ -61,16 +72,7 @@ class ChattingRoomActivity : AppCompatActivity() {
             chatting_room_edittext_input.setText("")
         })
 
-        chatting_room_button_send.setOnClickListener {
-            if(chatting_room_edittext_input.text.isNotEmpty()){
-                if(groupId==""){
-                    viewModel.createGroupId(groupMembers)
-                } else{
-                    viewModel.sendText(chatting_room_edittext_input.text.toString(), groupId!!)
-                    chatting_room_edittext_input.setText("")
-                }
-            }
-        }
+
     }
 
 }

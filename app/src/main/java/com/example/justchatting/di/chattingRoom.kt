@@ -1,6 +1,7 @@
 package com.example.justchatting.di
 
 import com.example.justchatting.data.chattingRoom.ChattingRoomFirebaseSource
+import com.example.justchatting.data.remote.NotificationAPI
 import com.example.justchatting.repository.chatting.SelectGroupRepository
 import com.example.justchatting.repository.chatting.SelectGroupRepositoryImpl
 import com.example.justchatting.repository.chattingRoom.ChattingRoomRepository

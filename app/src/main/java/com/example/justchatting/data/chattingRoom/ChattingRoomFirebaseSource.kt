@@ -3,18 +3,22 @@ package com.example.justchatting.data.chattingRoom
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.justchatting.Message
-import com.example.justchatting.ChattingRoom
-import com.example.justchatting.UserModel
+import com.example.justchatting.*
+import com.example.justchatting.data.remote.NotificationAPI
+import com.example.justchatting.repository.chattingRoom.TokenParser
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.lang.StringBuilder
 
-class ChattingRoomFirebaseSource {
+class ChattingRoomFirebaseSource : KoinComponent{
 
+    private val notificationAPI : NotificationAPI by inject()
     private var logArrayList: ArrayList<Message> = ArrayList()
-
-    private var groupNameList: ArrayList<String> = ArrayList()
 
     private var _chatLogs = MutableLiveData<ArrayList<Message>>()
     val logs: LiveData<ArrayList<Message>>
@@ -95,13 +99,13 @@ class ChattingRoomFirebaseSource {
         })
     }
 
-    fun createGroupId(groupMembersMap: HashMap<String, UserModel>) {
+    fun createGroupId(groupMembersMap: HashMap<String, UserModel>?) {
         val groupId = FirebaseDatabase.getInstance().getReference("/chatrooms").push().key
         val membersRef = FirebaseDatabase.getInstance().getReference("/members/$groupId")
         membersRef.setValue(groupMembersMap).addOnCompleteListener {
-            groupMembersMap.forEach {
+            groupMembersMap!!.forEach {
                 val userGroupRef = FirebaseDatabase.getInstance().getReference("/user_groups/${it.key}/$groupId")
-                userGroupRef.setValue(createGroupName(groupMembersMap, it))
+                userGroupRef.setValue(createGroupName(groupMembersMap!!, it))
             }
             _newGroupId.postValue(groupId)
         }
@@ -125,7 +129,10 @@ class ChattingRoomFirebaseSource {
         return stringBuilder.toString()
     }
 
-    fun sendText(text: String, groupId: String) {
+    fun sendText(
+        text: String,
+        groupId: String
+    ) {
         val uid = FirebaseAuth.getInstance().uid
         val userRef = FirebaseDatabase.getInstance().getReference("/users/$uid")
         userRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -165,8 +172,39 @@ class ChattingRoomFirebaseSource {
                 val chatRoomRef =
                     FirebaseDatabase.getInstance().getReference("/chatrooms/$groupId")
                 chatRoomRef.setValue(chattingRoom)
+
+
+
             }
         })
     }
 
+    fun loadGroupMembers(
+        groupMembers: HashMap<String, UserModel>?,
+        groupId: String?
+    ) {
+        val membersRef = FirebaseDatabase.getInstance().getReference("/members/$groupId")
+        membersRef.addListenerForSingleValueEvent(object  : ValueEventListener{
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val user = snapshot.getValue(UserModel::class.java)?: return
+                groupMembers!![user.uid] = user
+            }
+        })
+    }
+
+    fun pushFCM(
+        text : String,
+        groupMembers: HashMap<String, UserModel>?
+    ) : Completable {
+        var notificationInfo = NotificationInfo(groupMembers!![FirebaseAuth.getInstance().uid]!!.username, text)
+        var registrationIds  =  TokenParser().parser(groupMembers)
+
+        var notificationRequest : NotificationRequest = NotificationRequest(registrationIds, notificationInfo)
+
+        Log.d("테스트",notificationRequest.toString())
+        return notificationAPI.pushMessage(notificationRequest)
+    }
 }
