@@ -2,6 +2,7 @@ package com.example.justchatting.repository.friend
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.example.justchatting.UserModel
 import com.example.justchatting.repository.chatting.SelectGroupRepositoryImpl
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -12,7 +13,7 @@ import com.google.firebase.database.ValueEventListener
 class FriendChattingRepository {
     var groupId = MutableLiveData<String>()
 
-    fun loadGroupId(groupMembers: HashMap<String,Boolean>) {
+    fun loadGroupId(groupMembers: HashMap<String, UserModel>) {
         var find = false
         val uid = FirebaseAuth.getInstance().uid
         val ref = FirebaseDatabase.getInstance().getReference("/user_groups/$uid")

@@ -60,7 +60,6 @@ class MainActivity : AppCompatActivity() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener {
             FirebaseDatabase.getInstance().getReference("/users/${FirebaseAuth.getInstance().uid}").child("token").setValue(it.result)
         }
-
     }
 
     private fun setPermission() {

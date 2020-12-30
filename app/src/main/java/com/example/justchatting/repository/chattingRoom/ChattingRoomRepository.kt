@@ -14,15 +14,15 @@ interface ChattingRoomRepository {
         groupId: String
     )
     fun setListener(groupId: String)
-    fun createGroupId(groupMembersMap: HashMap<String, UserModel>?)
+    fun createGroupId(groupMembersMap: HashMap<String, UserModel>)
     fun loadGroupMembers(
-        groupMembers: java.util.HashMap<String, UserModel>?,
+        groupMembers: java.util.HashMap<String, UserModel>,
         groupId: String?
     )
 
     fun pushFCM(
         text : String,
-        groupMembers: HashMap<String, UserModel>?
+        groupMembers: HashMap<String, UserModel>
     ) : Completable
 //    fun loadGroupNameList(groupMembersMap: HashMap<String, UserModel>)
 //    fun fetchChatLog(groupId : String)

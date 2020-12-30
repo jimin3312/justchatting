@@ -15,4 +15,6 @@ interface UserRepository {
         firebaseImageResourcePath: String,
         email: String
     ): Single<Boolean>
+
+    fun updateToken(): Completable
 }

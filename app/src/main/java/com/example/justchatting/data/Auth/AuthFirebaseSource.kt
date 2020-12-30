@@ -99,4 +99,8 @@ class AuthFirebaseSource {
                     emitter.onError(it)
                 }
         }
+
+    fun updateToken(): Completable {
+        TODO("Not yet implemented")
+    }
 }
