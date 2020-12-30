@@ -77,6 +77,7 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         })
 
         friendAdapter.itemClick.observe(viewLifecycleOwner, Observer {
+            Log.d("그룹멤버", friendAdapter.groupMembers.toString())
             if(it == true)
                 viewModel.loadGroupId(friendAdapter.groupMembers)
         })
@@ -88,7 +89,7 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
                 intent.putExtra("groupId", groupId)
                 Log.d("FriendFragment", "groupMembers : ${friendAdapter.groupMembers}")
                 intent.putExtra("groupMembers", friendAdapter.groupMembers)
-                intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+//                intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
                 startActivity(intent)
                 friendAdapter.itemClick.postValue(false)
                 viewModel.getGroupId().postValue("-1")
