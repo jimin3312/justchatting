@@ -27,7 +27,7 @@ class ChattingRoomActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_chatting_room)
 
         groupId = intent.getStringExtra("groupId")
-        if(groupId ==""){
+        if(groupId == ""){
             viewModel.groupMembers = intent.getSerializableExtra("groupMembers") as HashMap<String, UserModel>
         } else {
             viewModel.loadGroupMembers(groupId)
@@ -51,7 +51,6 @@ class ChattingRoomActivity : AppCompatActivity() {
             chattingRoomAdapter.notifyDataSetChanged()
             chatting_room_recyclerview.scrollToPosition(it.size-1)
         })
-
 
         chatting_room_button_send.setOnClickListener {
             if(chatting_room_edittext_input.text.isNotEmpty()){

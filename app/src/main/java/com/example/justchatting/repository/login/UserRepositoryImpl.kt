@@ -2,6 +2,7 @@ package com.example.justchatting.repository.login
 
 import android.net.Uri
 import com.example.justchatting.data.Auth.AuthFirebaseSource
+import io.reactivex.Completable
 
 class UserRepositoryImpl(
     private val authFirebaseSource: AuthFirebaseSource
@@ -19,6 +20,8 @@ class UserRepositoryImpl(
         firebaseImageResourcePath: String,
         email: String
     ) = authFirebaseSource.saveUser(name, phoneNumber, firebaseImageResourcePath, email)
+
+    override fun updateToken(): Completable = authFirebaseSource.updateToken()
 
     override fun logout() = authFirebaseSource.logout()
 }

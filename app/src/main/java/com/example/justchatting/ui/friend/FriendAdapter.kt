@@ -21,7 +21,7 @@ class FriendAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
     }
     private var uid = FirebaseAuth.getInstance().uid
     private var mFriendList: ArrayList<UserModel>? = null
-    var groupMembers = HashMap<String, Boolean>()
+    var groupMembers = HashMap<String, UserModel>()
 
     var itemClick = MutableLiveData<Boolean>()
 
@@ -69,6 +69,7 @@ class FriendAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
         private val profileImg = itemView.findViewById<CircleImageView>(R.id.friend_my_imageview_profile_image)
         private val username=itemView.findViewById<TextView>(R.id.friend_my_textview_username)
         private val constraintLayout = itemView.findViewById<ConstraintLayout>(R.id.friend_my_item_constraint_layout)
+
         fun bind(userModel : UserModel?)
         {
             if(userModel == null) return
@@ -81,7 +82,7 @@ class FriendAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
 
             constraintLayout.setOnClickListener{
                 groupMembers.clear()
-                groupMembers[uid!!] = true
+                groupMembers[uid!!] = userModel
                 itemClick.postValue(true)
             }
         }
@@ -105,12 +106,10 @@ class FriendAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
 
             constraintLayout.setOnClickListener{
                 groupMembers.clear()
-                groupMembers[uid!!] = true
-                groupMembers[userModel.uid]= true
+                groupMembers[uid!!] = mFriendList!![0]
+                groupMembers[userModel.uid]= userModel
                 itemClick.postValue(true)
             }
         }
     }
-
-
 }

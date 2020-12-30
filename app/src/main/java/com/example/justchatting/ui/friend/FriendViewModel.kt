@@ -39,7 +39,7 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
     fun getGroupId() : MutableLiveData<String>{
         return  friendChattingRepository.groupId
     }
-    fun loadGroupId(groupMembers: HashMap<String,Boolean>) {
+    fun loadGroupId(groupMembers: HashMap<String, UserModel>) {
         friendChattingRepository.loadGroupId(groupMembers)
     }
 

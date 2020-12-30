@@ -31,12 +31,12 @@ class ChattingRoomRepositoryImpl(private val chattingRoomFirebaseSource: Chattin
         chattingRoomFirebaseSource.setListener(groupId)
     }
 
-    override fun createGroupId(groupMembersMap: HashMap<String, UserModel>?) {
+    override fun createGroupId(groupMembersMap: HashMap<String, UserModel>) {
         chattingRoomFirebaseSource.createGroupId(groupMembersMap)
     }
 
     override fun loadGroupMembers(
-        groupMembers: java.util.HashMap<String, UserModel>?,
+        groupMembers: java.util.HashMap<String, UserModel>,
         groupId: String?
     ) {
         chattingRoomFirebaseSource.loadGroupMembers(groupMembers, groupId)
@@ -44,7 +44,7 @@ class ChattingRoomRepositoryImpl(private val chattingRoomFirebaseSource: Chattin
 
     override fun pushFCM(
         text : String,
-        groupMembers: HashMap<String, UserModel>?
+        groupMembers: HashMap<String, UserModel>
     ): Completable = chattingRoomFirebaseSource.pushFCM(text, groupMembers)
 
 

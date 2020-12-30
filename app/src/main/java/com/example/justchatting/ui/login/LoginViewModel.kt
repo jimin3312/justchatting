@@ -51,6 +51,7 @@ class LoginViewModel(
         // loading event here
         disposables.add(
             repository.loginWithEmail(email!!, password!!)
+                .andThen(repository.updateToken())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
