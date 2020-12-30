@@ -4,7 +4,11 @@ import android.net.Uri
 import android.util.Log
 import com.example.justchatting.UserModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -100,7 +104,31 @@ class AuthFirebaseSource {
                 }
         }
 
-    fun updateToken(): Completable {
-        TODO("Not yet implemented")
+    fun updateToken(): Completable = Completable.create { emitter ->
+        FirebaseMessaging.getInstance().token.addOnCompleteListener {
+            val myUid = FirebaseAuth.getInstance().uid
+            val token = it.result
+
+            FirebaseDatabase.getInstance().getReference("/users/${FirebaseAuth.getInstance().uid}").child("token").setValue(token)
+
+            FirebaseDatabase.getInstance().getReference("/user_groups/$myUid")
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onCancelled(error: DatabaseError) {
+                        emitter.onError(Exception(error.message))
+                    }
+
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        snapshot.children.forEachIndexed { index: Int, chatRoom: DataSnapshot ->
+                            FirebaseDatabase.getInstance()
+                                .getReference("/members/${chatRoom.key}/$myUid").child("token")
+                                .setValue(token)
+                            if (index == snapshot.children.count() - 1)
+                                emitter.onComplete()
+                        }
+                    }
+
+                })
+        }
+
     }
 }
