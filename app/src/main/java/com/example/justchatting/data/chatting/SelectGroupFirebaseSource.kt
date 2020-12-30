@@ -16,11 +16,10 @@ class SelectGroupFirebaseSource {
     val users : LiveData<ArrayList<UserModel>>
         get() = _users
 
-    private var _groupId = MutableLiveData<String>()
-    val groupId: LiveData<String>
-        get() = _groupId
+    var groupId = MutableLiveData<String>()
 
     fun loadGroupId(groupMembers: HashMap<String, UserModel>) {
+        Log.d("멤버", "ㅁㅁㅁ")
 
         var find = false
         val uid = FirebaseAuth.getInstance().uid
@@ -33,6 +32,8 @@ class SelectGroupFirebaseSource {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val userModel = dataSnapshot.getValue(UserModel::class.java)?: return
                 groupMembers[uid!!]= userModel
+
+                Log.d("그룸멤버2", groupMembers.toString())
 
                 val ref = FirebaseDatabase.getInstance().getReference("/user_groups/$uid")
 
@@ -59,13 +60,13 @@ class SelectGroupFirebaseSource {
                                         return
 
                                     find = true
-                                    _groupId.postValue(snapshot.key!!)
+                                    groupId.postValue(snapshot.key!!)
                                 }
                             })
 
                         }
                         if (!find) {
-                            _groupId.postValue("")
+                            groupId.postValue("")
                         }
                     }
                 })

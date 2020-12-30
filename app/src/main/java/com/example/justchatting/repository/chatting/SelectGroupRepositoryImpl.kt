@@ -1,6 +1,7 @@
 package com.example.justchatting.repository.chatting
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.justchatting.UserModel
 import com.example.justchatting.data.chatting.SelectGroupFirebaseSource
 import com.example.justchatting.data.friend.FriendFirebaseSource
@@ -19,7 +20,7 @@ class SelectGroupRepositoryImpl(
     override fun getFriends(): LiveData<ArrayList<UserModel>> {
         return selectGroupFirebaseSource.users
     }
-    override fun getGroupId(): LiveData<String> {
+    override fun getGroupId(): MutableLiveData<String> {
         return selectGroupFirebaseSource.groupId
     }
 }
