@@ -38,8 +38,4 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
     fun loadGroupId(groupMembers: HashMap<String, UserModel>) {
         selectGroupRepository.loadGroupId(groupMembers)
     }
-
-    fun loadMyInfo() {
-        friendRepository.loadMyInfo()
-    }
 }

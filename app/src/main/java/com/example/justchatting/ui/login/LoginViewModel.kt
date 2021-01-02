@@ -47,7 +47,6 @@ class LoginViewModel(
             _errorToastMessage.value = "please enter your email and password"
             return
         }
-
         // loading event here
         disposables.add(
             repository.loginWithEmail(email!!, password!!)

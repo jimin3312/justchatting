@@ -131,9 +131,6 @@ class ChattingRoomFirebaseSource : KoinComponent{
                 val chatRoomRef =
                     FirebaseDatabase.getInstance().getReference("/chatrooms/$groupId")
                 chatRoomRef.setValue(chattingRoom)
-
-
-
             }
         })
     }

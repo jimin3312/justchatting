@@ -30,7 +30,6 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
 
     override fun getLayoutId(): Int = R.layout.fragment_friend
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -47,7 +46,6 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         }
 
         viewModel.sync()
-        viewModel.loadMyInfo()
         viewModel.setListener()
 
         viewModel.getUsers().observe(viewLifecycleOwner, Observer {
@@ -90,7 +88,6 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
                 intent.putExtra("groupId", groupId)
                 Log.d("FriendFragment", "groupMembers : ${friendAdapter.groupMembers}")
                 intent.putExtra("groupMembers", friendAdapter.groupMembers)
-//                intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
                 startActivity(intent)
                 friendAdapter.itemClick.postValue(false)
                 viewModel.getGroupId().postValue("-1")

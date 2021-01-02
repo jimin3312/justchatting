@@ -24,10 +24,13 @@ class AuthFirebaseSource {
     fun loginWithEmail(email: String, password: String): Completable =
         Completable.create { emitter ->
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
-                if (it.isSuccessful)
+                if (it.isSuccessful){
                     emitter.onComplete()
-                else
+                }
+                else{
                     emitter.onError(it.exception!!)
+                }
+
             }
         }
 
@@ -36,7 +39,6 @@ class AuthFirebaseSource {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener {
                 if (!it.isSuccessful) return@addOnCompleteListener
-                Log.d("계정 등록", "성공")
                 emitter.onComplete()
             }
             .addOnFailureListener {
@@ -118,6 +120,9 @@ class AuthFirebaseSource {
                     }
 
                     override fun onDataChange(snapshot: DataSnapshot) {
+
+                        if(!snapshot.exists()) emitter.onComplete()
+
                         snapshot.children.forEachIndexed { index: Int, chatRoom: DataSnapshot ->
                             FirebaseDatabase.getInstance()
                                 .getReference("/members/${chatRoom.key}/$myUid").child("token")

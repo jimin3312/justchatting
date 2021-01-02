@@ -3,8 +3,7 @@ package com.example.justchatting.data.friend
 import android.app.Application
 import android.database.Cursor
 import android.provider.ContactsContract
-import android.util.Log
-import com.example.justchatting.repository.friend.FriendRepository
+import com.example.justchatting.Friend
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -15,34 +14,62 @@ class ContactsDAO {
 
     fun makeFriendRelationships(application: Application){
         var uid = FirebaseAuth.getInstance().uid
-        val myUserRef = FirebaseDatabase.getInstance().getReference("/users/$uid")
 
-        myUserRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onCancelled(error: DatabaseError) {
-            }
-            override fun onDataChange(snapshot: DataSnapshot) {
+        val contactList = getContacts(application)
+        contactList.forEach { number ->
 
-                val contactList = getContacts(application)
-                contactList.forEach { number ->
+            val ref = FirebaseDatabase.getInstance().getReference("/phone/$number")
 
-                    val ref = FirebaseDatabase.getInstance().getReference("/phone/$number")
+            ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onCancelled(error: DatabaseError) {}
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val friendId = snapshot.getValue(String::class.java) ?: return
 
-                    ref.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onCancelled(error: DatabaseError) {}
+                    FirebaseDatabase.getInstance().getReference("/friends/${uid}/${friendId}").addListenerForSingleValueEvent(object : ValueEventListener{
+                        override fun onCancelled(error: DatabaseError) {
+                        }
+
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            val friendId = snapshot.getValue(String::class.java) ?: return
-
-                            val fromRef = FirebaseDatabase.getInstance().getReference("/friends/${uid}/${friendId}")
-                            fromRef.setValue(true)
-                            val toRef = FirebaseDatabase.getInstance().getReference("/friends/${friendId}/$uid")
-                            if(friendId != uid)
-                                toRef.setValue(true)
-
+                            val friend = snapshot.getValue(Friend::class.java)
+                            if(friend == null) {
+                                val fromRef = FirebaseDatabase.getInstance().getReference("/friends/${uid}/${friendId}")
+                                fromRef.setValue(Friend(true, ""))
+                                val toRef = FirebaseDatabase.getInstance().getReference("/friends/${friendId}/$uid")
+                                toRef.setValue(Friend(true, ""))
+                            }
                         }
                     })
                 }
-            }
-        })
+            })
+        }
+
+//        val myUserRef = FirebaseDatabase.getInstance().getReference("/users/$uid")
+//
+//        myUserRef.addListenerForSingleValueEvent(object : ValueEventListener {
+//            override fun onCancelled(error: DatabaseError) {
+//            }
+//            override fun onDataChange(snapshot: DataSnapshot) {
+//
+//                val contactList = getContacts(application)
+//                contactList.forEach { number ->
+//
+//                    val ref = FirebaseDatabase.getInstance().getReference("/phone/$number")
+//
+//                    ref.addListenerForSingleValueEvent(object : ValueEventListener {
+//                        override fun onCancelled(error: DatabaseError) {}
+//                        override fun onDataChange(snapshot: DataSnapshot) {
+//                            val friendId = snapshot.getValue(String::class.java) ?: return
+//
+//                            val fromRef = FirebaseDatabase.getInstance().getReference("/friends/${uid}/${friendId}")
+//                            fromRef.setValue(true)
+//                            val toRef = FirebaseDatabase.getInstance().getReference("/friends/${friendId}/$uid")
+//                            if(friendId != uid)
+//                                toRef.setValue(true)
+//                        }
+//                    })
+//                }
+//            }
+//        })
     }
 
     private fun getContacts(application: Application): ArrayList<String> {
