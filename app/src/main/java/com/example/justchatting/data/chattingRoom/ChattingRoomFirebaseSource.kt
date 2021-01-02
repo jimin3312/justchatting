@@ -57,6 +57,7 @@ class ChattingRoomFirebaseSource : KoinComponent{
     }
 
     fun createGroupId(groupMembersMap: HashMap<String, UserModel>) {
+
         val groupId = FirebaseDatabase.getInstance().getReference("/chatrooms").push().key
         val membersRef = FirebaseDatabase.getInstance().getReference("/members/$groupId")
         membersRef.setValue(groupMembersMap).addOnCompleteListener {
@@ -75,12 +76,13 @@ class ChattingRoomFirebaseSource : KoinComponent{
         val stringBuilder = StringBuilder()
 
         for( entry in groupMembersMap.entries){
-            if(member != entry)
+            if(member != entry || groupMembersMap.size == 1)
                 stringBuilder.append(entry.value.username+',')
 
             if(stringBuilder.length>=19)
                 break
         }
+
         stringBuilder.deleteCharAt(stringBuilder.length-1)
 
         return stringBuilder.toString()

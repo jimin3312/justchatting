@@ -17,6 +17,7 @@ class ChattingRoomActivity : AppCompatActivity() {
         val TAG ="ChattingRoomsActivity"
     }
 
+
     private val viewModel : ChattingRoomViewModel by viewModel()
     private var groupId : String? = null
     private lateinit var chattingRoomAdapter: ChattingRoomAdapter

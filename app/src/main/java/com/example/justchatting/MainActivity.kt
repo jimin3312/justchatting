@@ -51,14 +51,7 @@ class MainActivity : AppCompatActivity() {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
         } else {
-//            setToken()
             setPermission()
-        }
-    }
-
-    private fun setToken() {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener {
-            FirebaseDatabase.getInstance().getReference("/users/${FirebaseAuth.getInstance().uid}").child("token").setValue(it.result)
         }
     }
 

@@ -24,9 +24,7 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
         return friendRepository.getAddFriend()
     }
     fun sync() {
-        if(friendRepository.getUsers().value!!.isEmpty()) {
-            friendRepository.makeFriendRelationships(getApplication())
-        }
+        friendRepository.makeFriendRelationships(getApplication())
     }
     fun addFriendWithPhoneNumber(input: String) {
         friendRepository.addFriendWithPhoneNumber(input)

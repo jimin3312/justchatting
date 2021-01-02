@@ -43,7 +43,8 @@ class SelectGroupFirebaseSource {
 
                     override fun onDataChange(snapshot1: DataSnapshot) {
 
-                        snapshot1.children.forEach{ userChatRoomId ->
+                        snapshot1.children.forEachIndexed{ index, userChatRoomId ->
+
                             val chatRoomMembersRef = FirebaseDatabase.getInstance().getReference("/members/${userChatRoomId.key}")
                             chatRoomMembersRef.addListenerForSingleValueEvent(object : ValueEventListener {
                                 override fun onCancelled(error: DatabaseError) {
@@ -53,20 +54,29 @@ class SelectGroupFirebaseSource {
 
                                     val membersIdMap = snapshot.getValue(object : GenericTypeIndicator<HashMap<String, UserModel>>() {})
 
-                                    if (find || snapshot.childrenCount != groupMembers.size.toLong()) {
-                                        return
-                                    }
-                                    if(membersIdMap != groupMembers)
+                                    if(find)
                                         return
 
-                                    find = true
-                                    groupId.postValue(snapshot.key!!)
+                                    if(index.toLong() == snapshot1.childrenCount-1){
+                                        if(membersIdMap != groupMembers) {
+                                            groupId.postValue("")
+                                        } else
+                                            groupId.postValue(snapshot.key!!)
+
+                                    } else {
+                                        if (snapshot.childrenCount != groupMembers.size.toLong()) {
+                                            return
+                                        }
+                                        if(membersIdMap != groupMembers)
+                                            return
+                                        else {
+                                            find = true
+                                            groupId.postValue(snapshot.key!!)
+                                        }
+                                    }
+
                                 }
                             })
-
-                        }
-                        if (!find) {
-                            groupId.postValue("")
                         }
                     }
                 })

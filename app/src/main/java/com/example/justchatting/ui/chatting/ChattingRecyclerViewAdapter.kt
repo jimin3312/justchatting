@@ -52,7 +52,7 @@ class ChattingRecyclerViewAdapter :RecyclerView.Adapter<RecyclerView.ViewHolder>
             this.chattingModel = chattingRoom
             this.contents.text = chattingRoom.lastMessage
             try {
-                val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                val simpleDateFormat = SimpleDateFormat("yyyy-MM-ddHH:mm:ss")
                 timeStamp.text = simpleDateFormat.format(Date(chattingRoom.timeStamp)).toString()
             }catch (e: Exception){}
 

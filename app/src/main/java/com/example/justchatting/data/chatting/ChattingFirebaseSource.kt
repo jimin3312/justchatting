@@ -71,16 +71,14 @@ class ChattingFirebaseSource {
             }
 
             override fun onChildAdded(snapshot1: DataSnapshot, previousChildName: String?) {
-                Log.d(TAG,"setListener onChildAdded")
+
                 val groupId = snapshot1.key
-                Log.d(TAG,"groupID : ${snapshot1.key}")
                 val chatRoomRef = FirebaseDatabase.getInstance().getReference("/chatrooms/$groupId")
                 chatRoomRef.addValueEventListener(object : ValueEventListener {
                     override fun onCancelled(error: DatabaseError) {
                     }
                     override fun onDataChange(snapshot: DataSnapshot) {
                         val chattingRoom = snapshot.getValue(ChattingRoom::class.java) ?: return
-                        Log.d(TAG, "onChiledAdded, ${chattingRoom.lastMessage}")
 
                         val userGroupNameRef = FirebaseDatabase.getInstance().getReference("/user_groups/$uid/$groupId")
                         userGroupNameRef.addListenerForSingleValueEvent(object :ValueEventListener{

@@ -8,16 +8,10 @@ import com.example.justchatting.data.friend.ContactsDAO
 import com.example.justchatting.data.friend.FriendFirebaseSource
 
 class FriendRepository(private val contactsDAO: ContactsDAO, private val friendFirebaseSource: FriendFirebaseSource) {
-    companion object{
-        val TAG = "FriendRepository"
-    }
+
     fun getUsers(): LiveData<ArrayList<UserModel>> {
         return friendFirebaseSource.users
     }
-//    fun getMyInfo() : LiveData<UserModel>{
-//        return friendFirebaseSource.myInfo
-//    }
-
     fun makeFriendRelationships(application: Application) = contactsDAO.makeFriendRelationships(application)
 
     fun addFriendWithEmail(email : String){
@@ -32,7 +26,6 @@ class FriendRepository(private val contactsDAO: ContactsDAO, private val friendF
     fun getAddFriend(): MutableLiveData<Int> {
         return friendFirebaseSource.addFriend
     }
-
     fun loadMyInfo() {
         friendFirebaseSource.loadMyInfo()
     }

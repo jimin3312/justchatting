@@ -34,10 +34,10 @@ class ContactsDAO {
 
                             val fromRef = FirebaseDatabase.getInstance().getReference("/friends/${uid}/${friendId}")
                             fromRef.setValue(true)
-                            if (uid != friendId) {
-                                val toRef = FirebaseDatabase.getInstance().getReference("/friends/${friendId}/$uid")
+                            val toRef = FirebaseDatabase.getInstance().getReference("/friends/${friendId}/$uid")
+                            if(friendId != uid)
                                 toRef.setValue(true)
-                            }
+
                         }
                     })
                 }
