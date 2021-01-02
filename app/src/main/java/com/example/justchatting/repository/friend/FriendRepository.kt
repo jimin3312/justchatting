@@ -26,8 +26,4 @@ class FriendRepository(private val contactsDAO: ContactsDAO, private val friendF
     fun getAddFriend(): MutableLiveData<Int> {
         return friendFirebaseSource.addFriend
     }
-    fun loadMyInfo() {
-        friendFirebaseSource.loadMyInfo()
-    }
-
 }

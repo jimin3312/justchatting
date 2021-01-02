@@ -3,6 +3,7 @@ package com.example.justchatting.data.friend
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.justchatting.Friend
 import com.example.justchatting.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -18,15 +19,15 @@ class FriendFirebaseSource {
     val users : LiveData<ArrayList<UserModel>>
         get() = _users
 
-    private lateinit var myInfo : UserModel
-
     var addFriend : MutableLiveData<Int> = MutableLiveData()
 
+    var myInfo: UserModel? = null
+
     private fun mapToList() : ArrayList<UserModel>{
-        val arrayList = ArrayList(friendsMap.values)
-        arrayList.sortBy { it.username }
-        arrayList.add(0, myInfo)
-        return arrayList
+        val arr = ArrayList(friendsMap.values)
+        arr.sortBy { it.username }
+        if(myInfo != null) arr.add(0, myInfo)
+        return arr
     }
 
     fun addFriendWithEmail(email : String){
@@ -46,17 +47,15 @@ class FriendFirebaseSource {
                     return
                 }
 
-                friendsMap.forEach{
-                    if(it.key == friendId){
-                        addFriend.postValue(-2)
-                        return
-                    }
+                if(friendsMap.containsKey(friendId)) {
+                    addFriend.postValue(-2)
+                    return
                 }
 
                 val fromUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$uid/$friendId")
-                fromUserFriendRef.setValue(true)
+                fromUserFriendRef.setValue(Friend(true, ""))
                 val toUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$friendId/$uid")
-                toUserFriendRef.setValue(true)
+                toUserFriendRef.setValue(Friend(true, ""))
 
                 addFriend.postValue(1)
             }
@@ -74,15 +73,21 @@ class FriendFirebaseSource {
 
             }
             override fun onDataChange(snapshot: DataSnapshot) {
-                val friendId = snapshot.getValue(String()::class.java)
+                val friendId = snapshot.getValue(String::class.java)
                 if(friendId == null){
                     addFriend.postValue(-1)
                     return
                 }
+
+                if(friendsMap.containsKey(friendId)) {
+                    addFriend.postValue(-2)
+                    return
+                }
+
                 val fromUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$uid/$friendId")
-                fromUserFriendRef.setValue(true)
+                fromUserFriendRef.setValue(Friend(true, ""))
                 val toUserFriendRef = FirebaseDatabase.getInstance().getReference("/friends/$friendId/$uid")
-                toUserFriendRef.setValue(true)
+                toUserFriendRef.setValue(Friend(true, ""))
                 addFriend.postValue(1)
             }
         })
@@ -102,8 +107,8 @@ class FriendFirebaseSource {
             }
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
 
-                val isNotBlocked = snapshot.getValue(Boolean::class.java) ?: return
-                if(isNotBlocked) {
+                val friend = snapshot.getValue(Friend::class.java) ?: return
+                if(friend.isNotBlocked) {
                     val friendId = snapshot.key?: return
                     val ref = FirebaseDatabase.getInstance().getReference("/users/$friendId")
                     ref.addListenerForSingleValueEvent(object : ValueEventListener{
@@ -112,28 +117,14 @@ class FriendFirebaseSource {
 
                         override fun onDataChange(snapshot: DataSnapshot) {
                             val user = snapshot.getValue(UserModel::class.java)?:return
-                            friendsMap[user.uid] = user
+                            if(user.uid == uid) myInfo = user
+                            else friendsMap[user.uid] = user
                             _users.postValue(mapToList())
                         }
                     })
                 }
             }
             override fun onChildRemoved(snapshot: DataSnapshot) {
-            }
-        })
-    }
-
-    fun loadMyInfo() {
-        val uid = FirebaseAuth.getInstance().uid
-        val myRef = FirebaseDatabase.getInstance().getReference("/users/$uid")
-        myRef.addValueEventListener(object : ValueEventListener {
-            override fun onCancelled(error: DatabaseError) {
-            }
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val my = snapshot.getValue(UserModel::class.java) ?: return
-                myInfo = my
-                _users.postValue(mapToList())
             }
         })
     }
