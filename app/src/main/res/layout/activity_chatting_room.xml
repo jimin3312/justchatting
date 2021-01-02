@@ -11,42 +11,56 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:background="#D2E5BF"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <androidx.recyclerview.widget.RecyclerView
+            android:background="#D2E5BF"
             android:id="@+id/chatting_room_recyclerview"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/chatting_room_edittext_input"
+            app:layout_constraintBottom_toTopOf="@+id/constraint_input"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <EditText
-            android:id="@+id/chatting_room_edittext_input"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textPersonName"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:background="#FFFFFF"
+            android:id="@+id/constraint_input"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/chatting_room_button_send"
-            app:layout_constraintStart_toEndOf="@+id/chatting_room_button_camera_image" />
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/chatting_room_edittext_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textPersonName"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/chatting_room_button_send"
+                app:layout_constraintStart_toEndOf="@+id/chatting_room_button_camera_image" />
 
-        <Button
-            android:id="@+id/chatting_room_button_send"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="SEND"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            <Button
+                android:background="#FFFFFF"
+                android:id="@+id/chatting_room_button_send"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SEND"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
-        <ImageButton
-            android:id="@+id/chatting_room_button_camera_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@drawable/ic_baseline_photo_camera_24" />
+            <ImageButton
+                android:backgroundTint="#FFFFFF"
+                android:id="@+id/chatting_room_button_camera_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:srcCompat="@drawable/ic_baseline_photo_camera_24" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

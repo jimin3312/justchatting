@@ -13,7 +13,7 @@
         android:layout_marginTop="5dp"
         android:background="@drawable/rounded_edittext_login_register"
         android:maxWidth="240dp"
-        android:padding="16dp"
+        android:padding="8dp"
         app:layout_constraintStart_toEndOf="@+id/chat_from_text_profile_image"
         app:layout_constraintTop_toBottomOf="@+id/chat_from_text_name"
         tools:text="This is my message that will wrap into multiple lines and keep on going" />
@@ -24,12 +24,11 @@
         android:layout_height="50dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        app:civ_border_color="@android:color/white"
-        app:civ_border_width="2dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:textStyle="bold"
         android:id="@+id/chat_from_text_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -39,10 +38,11 @@
         tools:text="제리" />
 
     <TextView
+        android:textSize="10dp"
         android:id="@+id/chat_from_text_timestamp"
         android:layout_width="wrap_content"
-        android:layout_height="20dp"
-        app:layout_constraintEnd_toEndOf="@+id/chat_from_text_textview"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@+id/chat_from_text_name"
         app:layout_constraintTop_toBottomOf="@+id/chat_from_text_textview"
         tools:text="0000년00월00일" />
 </androidx.constraintlayout.widget.ConstraintLayout>
