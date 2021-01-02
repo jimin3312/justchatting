@@ -32,7 +32,7 @@ class SelectGroupFirebaseSource {
                 val userModel = dataSnapshot.getValue(UserModel::class.java)?: return
                 groupMembers[uid!!]= userModel
 
-                if(groupMembers.size ==2){
+                if(groupMembers.size <=2){
 
                     var friendId = ""
                     groupMembers.forEach{
@@ -40,6 +40,9 @@ class SelectGroupFirebaseSource {
                             friendId = it.key
                         }
                     }
+                    if(friendId =="")
+                        friendId = uid
+
 
                     val friendRef = FirebaseDatabase.getInstance().getReference("/friends/$uid/$friendId")
                     friendRef.addListenerForSingleValueEvent(object : ValueEventListener{
@@ -69,8 +72,8 @@ class SelectGroupFirebaseSource {
             override fun onDataChange(snapshot: DataSnapshot) {
 
                 snapshot.children.forEach{dataSnapshot ->
-                    val isNotBlocked = dataSnapshot.getValue(Boolean::class.java)?: return
-                    if(isNotBlocked)
+                    val friend = dataSnapshot.getValue(Friend::class.java)?: return
+                    if(friend.isNotBlocked)
                     {
                         val friendId = dataSnapshot.key
                         val friendUserRef =  FirebaseDatabase.getInstance().getReference("/users/$friendId")
@@ -79,6 +82,10 @@ class SelectGroupFirebaseSource {
                             }
                             override fun onDataChange(snapshot2: DataSnapshot) {
                                 val user = snapshot2.getValue(UserModel::class.java)?: return
+
+                                if(user.uid == uid)
+                                    return
+
                                 friends.add(user)
                                 friends.sortBy { it.username }
                                 _users.postValue(friends)
