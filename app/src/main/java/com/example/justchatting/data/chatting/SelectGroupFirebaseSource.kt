@@ -3,6 +3,7 @@ package com.example.justchatting.data.chatting
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.justchatting.Friend
 import com.example.justchatting.UserModel
 import com.example.justchatting.repository.chatting.SelectGroupRepositoryImpl
 import com.google.firebase.auth.FirebaseAuth
@@ -19,9 +20,7 @@ class SelectGroupFirebaseSource {
     var groupId = MutableLiveData<String>()
 
     fun loadGroupId(groupMembers: HashMap<String, UserModel>) {
-        Log.d("멤버", "ㅁㅁㅁ")
 
-        var find = false
         val uid = FirebaseAuth.getInstance().uid
 
         val userRef = FirebaseDatabase.getInstance().getReference("/users/$uid")
@@ -33,57 +32,30 @@ class SelectGroupFirebaseSource {
                 val userModel = dataSnapshot.getValue(UserModel::class.java)?: return
                 groupMembers[uid!!]= userModel
 
-                Log.d("그룸멤버2", groupMembers.toString())
+                if(groupMembers.size ==2){
 
-                val ref = FirebaseDatabase.getInstance().getReference("/user_groups/$uid")
-
-                ref.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onCancelled(error: DatabaseError) {
-                    }
-
-                    override fun onDataChange(snapshot1: DataSnapshot) {
-
-                        snapshot1.children.forEachIndexed{ index, userChatRoomId ->
-
-                            val chatRoomMembersRef = FirebaseDatabase.getInstance().getReference("/members/${userChatRoomId.key}")
-                            chatRoomMembersRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onCancelled(error: DatabaseError) {
-
-                                }
-                                override fun onDataChange(snapshot: DataSnapshot) {
-
-                                    val membersIdMap = snapshot.getValue(object : GenericTypeIndicator<HashMap<String, UserModel>>() {})
-
-                                    if(find)
-                                        return
-
-                                    if(index.toLong() == snapshot1.childrenCount-1){
-                                        if(membersIdMap != groupMembers) {
-                                            groupId.postValue("")
-                                        } else
-                                            groupId.postValue(snapshot.key!!)
-
-                                    } else {
-                                        if (snapshot.childrenCount != groupMembers.size.toLong()) {
-                                            return
-                                        }
-                                        if(membersIdMap != groupMembers)
-                                            return
-                                        else {
-                                            find = true
-                                            groupId.postValue(snapshot.key!!)
-                                        }
-                                    }
-
-                                }
-                            })
+                    var friendId = ""
+                    groupMembers.forEach{
+                        if(it.key != uid){
+                            friendId = it.key
                         }
                     }
-                })
+
+                    val friendRef = FirebaseDatabase.getInstance().getReference("/friends/$uid/$friendId")
+                    friendRef.addListenerForSingleValueEvent(object : ValueEventListener{
+                        override fun onCancelled(error: DatabaseError) {
+                        }
+
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            val friend = snapshot.getValue(Friend::class.java)?: return
+                            groupId.postValue(friend.groupId)
+                        }
+                    })
+                } else{
+                    groupId.postValue("")
+                }
             }
         })
-
-
     }
 
     fun loadFriends() {

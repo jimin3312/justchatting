@@ -66,7 +66,6 @@ class SelectGroupActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.select_confirm->{
-                val uid = FirebaseAuth.getInstance().uid
                 viewModel.loadGroupId(selectGroupRecyclerviewAdapter.groupMembers)
             }
         }
