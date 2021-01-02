@@ -17,44 +17,6 @@ class ChattingFirebaseSource {
     val chattingRooms : LiveData<ArrayList<ChattingRoom>>
         get() =  _chattingRooms
 
-//    fun loadChatRooms() {
-//        chattingRoomsList.clear()
-//        val uid = FirebaseAuth.getInstance().uid
-//        val userGroupRef = FirebaseDatabase.getInstance().getReference("/user_groups/$uid")
-//        userGroupRef.addListenerForSingleValueEvent(object : ValueEventListener {
-//            override fun onCancelled(error: DatabaseError) {
-//            }
-//
-//            override fun onDataChange(snapshot: DataSnapshot) {
-//                val cnt = snapshot.childrenCount.toInt()
-//                snapshot.children.forEach { dataSnapshot ->
-//                    Log.d(TAG,dataSnapshot.toString())
-//                    val data = dataSnapshot.getValue(Boolean::class.java) ?: return
-//                    if (data) {
-//                        val groupId = dataSnapshot.key
-//                        val chatRoomRef = FirebaseDatabase.getInstance().getReference("/chatrooms/$groupId")
-//                        chatRoomRef.addListenerForSingleValueEvent(object : ValueEventListener {
-//                            override fun onCancelled(error: DatabaseError) {
-//                            }
-//                            override fun onDataChange(snapshot: DataSnapshot) {
-//                                val chattingModel = snapshot.getValue(ChattingModel::class.java) ?: return
-//                                Log.d(TAG, "loadChat : ${chattingModel.lastMessage}")
-//                                chattingRoomsList.add(chattingModel)
-//
-//                                if(cnt == chattingRoomsList.size){
-//                                    chattingRoomsList.sortByDescending { it.timeStamp }
-//                                    _chattingRooms.postValue(chattingRoomsList)
-//                                }
-//                            }
-//                        })
-//                    }
-//                }
-//
-//            }
-//        })
-//    }
-
-
     fun setListener() {
 
         val uid = FirebaseAuth.getInstance().uid
