@@ -71,13 +71,17 @@ class ChattingRoomFirebaseSource : KoinComponent {
             _newGroupId.postValue(groupId)
         }
 
-        if (groupMembersMap.size == 2) {
+        if(groupMembersMap.size<=2){
             var friendId = ""
-            groupMembersMap.forEach {
-                if (it.key != uid) {
+
+            groupMembersMap.forEach{
+                if(it.key != uid){
                     friendId = it.key
                 }
             }
+            if(friendId=="")
+                friendId= uid!!
+
             val fromRef = FirebaseDatabase.getInstance().getReference("/friends/$uid/$friendId")
             fromRef.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onCancelled(error: DatabaseError) {
@@ -90,20 +94,20 @@ class ChattingRoomFirebaseSource : KoinComponent {
                 }
             })
 
-            val toRef = FirebaseDatabase.getInstance().getReference("/friends/$friendId/$uid")
-            toRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onCancelled(error: DatabaseError) {
-                }
+            if(friendId != uid) {
+                val toRef = FirebaseDatabase.getInstance().getReference("/friends/$friendId/$uid")
+                toRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onCancelled(error: DatabaseError) {
+                    }
 
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val data = snapshot.getValue(Friend::class.java) ?: return
-                    val changeData = Friend(data.isNotBlocked, groupId!!)
-                    toRef.setValue(changeData)
-                }
-            })
-
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val data = snapshot.getValue(Friend::class.java) ?: return
+                        val changeData = Friend(data.isNotBlocked, groupId!!)
+                        toRef.setValue(changeData)
+                    }
+                })
+            }
         }
-
     }
 
     private fun createGroupName(
