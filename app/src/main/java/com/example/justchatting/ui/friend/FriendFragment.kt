@@ -74,19 +74,15 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
         })
 
         friendAdapter.itemClick.observe(viewLifecycleOwner, Observer {
-            Log.d("그룹멤버", friendAdapter.groupMembers.toString())
             if(it == true) {
                 viewModel.loadGroupId(friendAdapter.groupMembers)
             }
         })
 
         viewModel.getGroupId().observe(viewLifecycleOwner, Observer {groupId->
-            Log.d("그룹ID: ", groupId)
             if(groupId != "-1") {
-                Log.d("FriendFragment", "groupID : $groupId")
                 val intent = Intent(requireContext(), ChattingRoomActivity::class.java)
                 intent.putExtra("groupId", groupId)
-                Log.d("FriendFragment", "groupMembers : ${friendAdapter.groupMembers}")
                 intent.putExtra("groupMembers", friendAdapter.groupMembers)
                 startActivity(intent)
                 friendAdapter.itemClick.postValue(false)

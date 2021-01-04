@@ -28,7 +28,6 @@ class ChattingRecyclerViewAdapter :RecyclerView.Adapter<RecyclerView.ViewHolder>
         return ChattingViewHolder(view)
     }
 
-
     override fun getItemCount(): Int {
         if(mChattingList == null)
             return 0

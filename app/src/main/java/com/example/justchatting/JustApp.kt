@@ -19,4 +19,8 @@ class JustApp : Application() {
             modules(listOf(viewModelModule, friendModule, loginModule, chattingModule, networkModule, chattingRoomModule))
         }
     }
+
+    companion object{
+        var roomId: String = ""
+    }
 }

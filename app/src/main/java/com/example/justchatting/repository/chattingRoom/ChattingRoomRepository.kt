@@ -21,8 +21,9 @@ interface ChattingRoomRepository {
     )
 
     fun pushFCM(
-        text : String,
-        groupMembers: HashMap<String, UserModel>
+        text: String,
+        groupMembers: HashMap<String, UserModel>,
+        groupId: String
     ) : Completable
 //    fun loadGroupNameList(groupMembersMap: HashMap<String, UserModel>)
 //    fun fetchChatLog(groupId : String)

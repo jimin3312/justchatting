@@ -9,6 +9,7 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.justchatting.repository.login.UserRepository
+import com.example.justchatting.ui.chattingRoom.ChattingRoomViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -16,9 +17,10 @@ import com.google.firebase.messaging.RemoteMessage
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.koin.android.ext.android.inject
+import org.koin.core.KoinComponent
 import kotlin.random.Random
 
-class ChatMessageService() : FirebaseMessagingService() {
+class ChatMessageService() : FirebaseMessagingService(), KoinComponent {
 
     val repository: UserRepository by inject()
 
@@ -29,8 +31,13 @@ class ChatMessageService() : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
         Log.d("메세지", "From: ${message.from}")
+        Log.d("메세지", "title: ${message.data["title"]}")
+        Log.d("메세지", "body: ${message.data["body"]}")
+        Log.d("메세지", "id: ${message.data["chatRoomId"]}")
 
-        sendNotification(message.data["title"], message.data["body"])
+        if(message.data["chatRoomId"] != JustApp.roomId){
+            sendNotification(message.data["title"], message.data["body"])
+        }
     }
 
     private fun sendNotification(title: String?, message: String?) {

@@ -13,19 +13,14 @@ class ChattingRoomRepositoryImpl(private val chattingRoomFirebaseSource: Chattin
     companion object {
         val TAG = "ChattingRoomRepo"
     }
+
     override fun getChatLogs(): LiveData<ArrayList<Message>> {
         return chattingRoomFirebaseSource.logs
     }
+
     override fun getNewGroupId(): LiveData<String> {
         return chattingRoomFirebaseSource.newGroupId
     }
-//    override fun loadGroupNameList(groupMembersMap: HashMap<String, UserModel>) {
-//        chattingRoomFirebaseSource.loadGroupNameList(groupMembersMap)
-//    }
-
-//    override fun fetchChatLog(groupId: String) {
-//        chattingRoomFirebaseSource.fetchChatLog(groupId)
-//    }
 
     override fun setListener(groupId: String) {
         chattingRoomFirebaseSource.setListener(groupId)
@@ -43,11 +38,10 @@ class ChattingRoomRepositoryImpl(private val chattingRoomFirebaseSource: Chattin
     }
 
     override fun pushFCM(
-        text : String,
-        groupMembers: HashMap<String, UserModel>
-    ): Completable = chattingRoomFirebaseSource.pushFCM(text, groupMembers)
-
-
+        text: String,
+        groupMembers: HashMap<String, UserModel>,
+        groupId: String
+    ): Completable = chattingRoomFirebaseSource.pushFCM(text, groupMembers, groupId)
 
     override fun sendText(
         text: String,

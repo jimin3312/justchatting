@@ -2,12 +2,10 @@ package com.example.justchatting.ui.chattingRoom
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import com.example.justchatting.JustApp
 import com.example.justchatting.Message
 import com.example.justchatting.UserModel
 import com.example.justchatting.repository.chattingRoom.ChattingRoomRepository
-import io.reactivex.Scheduler
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.internal.schedulers.ComputationScheduler
 import io.reactivex.schedulers.Schedulers
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -30,7 +28,7 @@ class ChattingRoomViewModel : ViewModel(), KoinComponent{
     }
     fun sendText(text: String, groupId: String) {
         chattingRoomRepository.sendText(text, groupId)
-        chattingRoomRepository.pushFCM(text, groupMembers).observeOn(Schedulers.io())
+        chattingRoomRepository.pushFCM(text, groupMembers, groupId).observeOn(Schedulers.io())
             .subscribeOn(Schedulers.computation())
             .subscribe({
 
@@ -41,6 +39,11 @@ class ChattingRoomViewModel : ViewModel(), KoinComponent{
 
     fun loadGroupMembers(groupId: String?) {
         chattingRoomRepository.loadGroupMembers(groupMembers, groupId)
+    }
+
+    override fun onCleared() {
+        JustApp.roomId = ""
+        super.onCleared()
     }
 
 }
