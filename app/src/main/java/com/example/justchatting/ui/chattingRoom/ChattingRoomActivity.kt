@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.justchatting.JustApp
 import com.example.justchatting.R
 import com.example.justchatting.UserModel
 import com.example.justchatting.databinding.ActivityChattingRoomBinding
@@ -16,7 +17,6 @@ class ChattingRoomActivity : AppCompatActivity() {
     companion object{
         val TAG ="ChattingRoomsActivity"
     }
-
 
     private val viewModel : ChattingRoomViewModel by viewModel()
     private var groupId : String? = null

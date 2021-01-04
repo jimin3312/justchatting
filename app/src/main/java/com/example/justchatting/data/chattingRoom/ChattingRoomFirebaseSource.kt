@@ -12,9 +12,9 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.lang.StringBuilder
 
-class ChattingRoomFirebaseSource : KoinComponent{
+class ChattingRoomFirebaseSource : KoinComponent {
 
-    private val notificationAPI : NotificationAPI by inject()
+    private val notificationAPI: NotificationAPI by inject()
     private var logArrayList: ArrayList<Message> = ArrayList()
 
     private var _chatLogs = MutableLiveData<ArrayList<Message>>()
@@ -59,10 +59,13 @@ class ChattingRoomFirebaseSource : KoinComponent{
 
         val uid = FirebaseAuth.getInstance().uid
         val groupId = FirebaseDatabase.getInstance().getReference("/chatrooms").push().key
+        JustApp.roomId = groupId!!
+
         val membersRef = FirebaseDatabase.getInstance().getReference("/members/$groupId")
         membersRef.setValue(groupMembersMap).addOnCompleteListener {
             groupMembersMap.forEach {
-                val userGroupRef = FirebaseDatabase.getInstance().getReference("/user_groups/${it.key}/$groupId")
+                val userGroupRef =
+                    FirebaseDatabase.getInstance().getReference("/user_groups/${it.key}/$groupId")
                 userGroupRef.setValue(createGroupName(groupMembersMap, it))
             }
             _newGroupId.postValue(groupId)
@@ -80,11 +83,12 @@ class ChattingRoomFirebaseSource : KoinComponent{
                 friendId= uid!!
 
             val fromRef = FirebaseDatabase.getInstance().getReference("/friends/$uid/$friendId")
-            fromRef.addListenerForSingleValueEvent(object : ValueEventListener{
+            fromRef.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onCancelled(error: DatabaseError) {
                 }
+
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val data = snapshot.getValue(Friend::class.java)?: return
+                    val data = snapshot.getValue(Friend::class.java) ?: return
                     val changeData = Friend(data.isNotBlocked, groupId!!)
                     fromRef.setValue(changeData)
                 }
@@ -103,26 +107,24 @@ class ChattingRoomFirebaseSource : KoinComponent{
                     }
                 })
             }
-
         }
-
     }
 
     private fun createGroupName(
         groupMembersMap: HashMap<String, UserModel>,
-        member : Map.Entry<String, UserModel>
+        member: Map.Entry<String, UserModel>
     ): String {
         val stringBuilder = StringBuilder()
 
-        for( entry in groupMembersMap.entries){
-            if(member != entry || groupMembersMap.size == 1)
-                stringBuilder.append(entry.value.username+',')
+        for (entry in groupMembersMap.entries) {
+            if (member != entry || groupMembersMap.size == 1)
+                stringBuilder.append(entry.value.username + ',')
 
-            if(stringBuilder.length>=19)
+            if (stringBuilder.length >= 19)
                 break
         }
 
-        stringBuilder.deleteCharAt(stringBuilder.length-1)
+        stringBuilder.deleteCharAt(stringBuilder.length - 1)
 
         return stringBuilder.toString()
     }
@@ -178,14 +180,16 @@ class ChattingRoomFirebaseSource : KoinComponent{
         groupMembers: HashMap<String, UserModel>,
         groupId: String?
     ) {
+        JustApp.roomId = groupId!!
+
         val membersRef = FirebaseDatabase.getInstance().getReference("/members/$groupId")
-        membersRef.addListenerForSingleValueEvent(object  : ValueEventListener{
+        membersRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
-                snapshot.children.forEach{
-                    val user = it.getValue(UserModel::class.java)?: return /* handle exception*/
+                snapshot.children.forEach {
+                    val user = it.getValue(UserModel::class.java) ?: return /* handle exception*/
                     groupMembers[user.uid] = user;
                 }
             }
@@ -193,16 +197,22 @@ class ChattingRoomFirebaseSource : KoinComponent{
     }
 
     fun pushFCM(
-        text : String,
-        groupMembers: HashMap<String, UserModel>
-    ) : Completable {
-        var notificationInfo = NotificationInfo(groupMembers[FirebaseAuth.getInstance().uid]!!.username, text)
-        var registrationIds  =  TokenParser()
+        text: String,
+        groupMembers: HashMap<String, UserModel>,
+        groupId: String
+    ): Completable {
+        var notificationInfo = NotificationInfo(
+            title = groupMembers[FirebaseAuth.getInstance().uid]!!.username,
+            body = text,
+            chatRoomId = groupId
+        )
+        var registrationIds = TokenParser()
             .parser(groupMembers)
 
-        var notificationRequest : NotificationRequest = NotificationRequest(registrationIds, notificationInfo)
+        var notificationRequest =
+            NotificationRequest(registrationIds, notificationInfo)
 
-        Log.d("테스트",notificationRequest.toString())
+        Log.d("테스트", notificationRequest.toString())
         return notificationAPI.pushMessage(notificationRequest)
     }
 }

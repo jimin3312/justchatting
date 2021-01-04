@@ -17,11 +17,12 @@ import kotlinx.android.synthetic.main.activity_select_group.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SelectGroupActivity : AppCompatActivity() {
-    companion object{
+    companion object {
         val TAG = "SelectGroupActivity"
     }
-    lateinit var binding : ActivitySelectGroupBinding
-    lateinit var menuItem : MenuItem
+
+    lateinit var binding: ActivitySelectGroupBinding
+    lateinit var menuItem: MenuItem
     val viewModel: SelectGroupViewModel by viewModel()
     lateinit var selectGroupRecyclerviewAdapter: SelectGroupRecyclerviewAdapter
 
@@ -38,17 +39,15 @@ class SelectGroupActivity : AppCompatActivity() {
 
         viewModel.load()
         viewModel.getFriends().observe(this, Observer {
-            Log.d(TAG,"getFriends : ${it.toString()}")
             selectGroupRecyclerviewAdapter.setFriendList(it)
             selectGroupRecyclerviewAdapter.notifyDataSetChanged()
         })
 
-        selectGroupRecyclerviewAdapter.checkedCnt.observe(this, Observer { cnt->
-            Log.d("SelectGroup", cnt.toString())
-            menuItem.isEnabled = cnt>0
+        selectGroupRecyclerviewAdapter.checkedCnt.observe(this, Observer { cnt ->
+            menuItem.isEnabled = cnt > 0
         })
-        viewModel.getGroupId().observe(this, Observer {groupId->
-            Log.d(TAG,"groupID : $groupId")
+
+        viewModel.getGroupId().observe(this, Observer { groupId ->
             val intent = Intent(this, ChattingRoomActivity::class.java)
             intent.putExtra("groupId", groupId)
             intent.putExtra("groupMembers", selectGroupRecyclerviewAdapter.groupMembers)
@@ -56,6 +55,7 @@ class SelectGroupActivity : AppCompatActivity() {
         })
 
     }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.select_menu, menu)
         menuItem = menu!!.findItem(R.id.select_confirm)
@@ -64,8 +64,8 @@ class SelectGroupActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.select_confirm->{
+        when (item.itemId) {
+            R.id.select_confirm -> {
                 viewModel.loadGroupId(selectGroupRecyclerviewAdapter.groupMembers)
             }
         }
