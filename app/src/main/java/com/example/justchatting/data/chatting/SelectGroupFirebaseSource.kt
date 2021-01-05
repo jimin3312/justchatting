@@ -62,7 +62,6 @@ class SelectGroupFirebaseSource {
     }
 
     fun loadFriends() {
-
         val uid = FirebaseAuth.getInstance().uid
         val ref = FirebaseDatabase.getInstance().getReference("/friends/$uid")
         ref.addListenerForSingleValueEvent(object : ValueEventListener{

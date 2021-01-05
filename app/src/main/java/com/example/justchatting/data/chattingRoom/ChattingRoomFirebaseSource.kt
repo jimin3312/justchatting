@@ -25,10 +25,6 @@ class ChattingRoomFirebaseSource : KoinComponent {
     val newGroupId: LiveData<String>
         get() = _newGroupId
 
-    companion object {
-        val TAG = "ChattingRoomRepo"
-    }
-
     fun setListener(groupId: String) {
         val chatLogRef = FirebaseDatabase.getInstance().getReference("/messages/$groupId")
         chatLogRef.addChildEventListener(object : ChildEventListener {
@@ -42,9 +38,7 @@ class ChattingRoomFirebaseSource : KoinComponent {
             }
 
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                Log.d(TAG, "Listener onChildAdd")
                 val chatMessage = snapshot.getValue(Message::class.java) ?: return
-                Log.d(TAG, "chat : ${chatMessage.text}")
 
                 logArrayList.add(chatMessage)
                 _chatLogs.postValue(logArrayList)
@@ -212,7 +206,6 @@ class ChattingRoomFirebaseSource : KoinComponent {
         var notificationRequest =
             NotificationRequest(registrationIds, notificationInfo)
 
-        Log.d("테스트", notificationRequest.toString())
         return notificationAPI.pushMessage(notificationRequest)
     }
 }

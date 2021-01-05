@@ -27,6 +27,7 @@
             android:noHistory="true"
             />
         <activity android:name=".ui.chattingRoom.ChattingRoomActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
             />
         <service
             android:name=".ChatMessageService"

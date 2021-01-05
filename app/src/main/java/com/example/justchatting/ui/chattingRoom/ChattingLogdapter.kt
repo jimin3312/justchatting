@@ -9,7 +9,7 @@ import com.example.justchatting.ui.chattingRoom.view_holder.ChatFromViewHolder
 import com.example.justchatting.ui.chattingRoom.view_holder.ChatToViewHolder
 import com.google.firebase.auth.FirebaseAuth
 
-class ChattingRoomAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+class ChattingLogdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
     companion object{
         val CHAT_FROM  = 0
