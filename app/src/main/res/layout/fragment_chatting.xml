@@ -13,7 +13,6 @@
         android:layout_height="match_parent"
         tools:context=".ui.chatting.ChattingFragment">
 
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/chatting_recyclerview"
             android:layout_width="match_parent"
