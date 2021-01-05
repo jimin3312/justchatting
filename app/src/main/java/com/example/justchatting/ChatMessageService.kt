@@ -20,7 +20,7 @@ import org.koin.android.ext.android.inject
 import org.koin.core.KoinComponent
 import kotlin.random.Random
 
-class ChatMessageService() : FirebaseMessagingService(), KoinComponent {
+class ChatMessageService() : FirebaseMessagingService() {
 
     val repository: UserRepository by inject()
 
@@ -38,6 +38,7 @@ class ChatMessageService() : FirebaseMessagingService(), KoinComponent {
         if(message.data["chatRoomId"] != JustApp.roomId){
             sendNotification(message.data["title"], message.data["body"])
         }
+
     }
 
     private fun sendNotification(title: String?, message: String?) {
