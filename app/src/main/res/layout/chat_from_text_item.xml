@@ -8,6 +8,7 @@
 
     <TextView
         android:id="@+id/chat_from_text_textview"
+        android:textColor="#000000"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
@@ -35,9 +36,11 @@
         android:layout_marginLeft="8dp"
         app:layout_constraintStart_toEndOf="@+id/chat_from_text_profile_image"
         app:layout_constraintTop_toTopOf="@+id/chat_from_text_profile_image"
+        android:textColor="#000000"
         tools:text="제리" />
 
     <TextView
+        android:textColor="#000000"
         android:layout_marginTop="3dp"
         android:textSize="10dp"
         android:id="@+id/chat_from_text_timestamp"

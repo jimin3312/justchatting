@@ -26,6 +26,9 @@ class ChattingRoomFirebaseSource : KoinComponent {
         get() = _newGroupId
 
     fun setListener(groupId: String) {
+        if(groupId == "")
+            return
+
         val chatLogRef = FirebaseDatabase.getInstance().getReference("/messages/$groupId")
         chatLogRef.addChildEventListener(object : ChildEventListener {
             override fun onCancelled(error: DatabaseError) {
