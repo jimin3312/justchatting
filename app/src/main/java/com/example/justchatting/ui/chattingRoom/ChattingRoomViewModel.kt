@@ -13,6 +13,7 @@ import org.koin.core.inject
 class ChattingRoomViewModel : ViewModel(), KoinComponent{
     val chattingRoomRepository : ChattingRoomRepository by inject()
     var groupMembers : HashMap<String, UserModel> = HashMap()
+    var groupId : String = ""
 
     fun getChatLogs() : LiveData<ArrayList<Message>>{
         return chattingRoomRepository.getChatLogs()

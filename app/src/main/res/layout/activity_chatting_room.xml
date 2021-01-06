@@ -31,80 +31,18 @@
 
             </com.google.android.material.appbar.AppBarLayout>
 
-<!--            <androidx.fragment.app.FragmentContainerView-->
-<!--                android:name="androidx.navigation.fragment.NavHostFragment"-->
-<!--                android:id="@+id/nav_host_fragment"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                app:defaultNavHost="true"-->
-<!--                app:navGraph="@navigation/nav_graph">-->
-<!--            </androidx.fragment.app.FragmentContainerView>-->
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:background="#D2E5BF"
+            <androidx.fragment.app.FragmentContainerView
+                android:name="androidx.navigation.fragment.NavHostFragment"
+                android:id="@+id/nav_host_fragment"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                app:defaultNavHost="true"
+                app:navGraph="@navigation/nav_graph">
+            </androidx.fragment.app.FragmentContainerView>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:background="#D2E5BF"
-                    android:id="@+id/chatting_room_recyclerview"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    app:layout_constraintBottom_toTopOf="@+id/constraint_input"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:background="#FFFFFF"
-                    android:id="@+id/constraint_input"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <EditText
-                        android:textColor="#000000"
-                        android:id="@+id/chatting_room_edittext_input"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:cursorVisible="true"
-                        android:ems="10"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintRight_toLeftOf="@+id/chatting_room_button_send"
-                        app:layout_constraintLeft_toRightOf="@+id/chatting_room_button_camera_image"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:background="#FFFFFF"
-                        android:id="@+id/chatting_room_button_send"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="8dp"
-                        android:text="SEND"
-                        android:textColor="#000000"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintLeft_toLeftOf="@id/chatting_room_edittext_input"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
-
-                    <ImageButton
-                        android:id="@+id/chatting_room_button_camera_image"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:backgroundTint="#FFFFFF"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_baseline_photo_camera_24" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
 
         <com.google.android.material.navigation.NavigationView
-            android:background="#FFFFFF"
             android:id="@+id/nav_view"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
