@@ -54,7 +54,6 @@
                     android:layout_height="wrap_content"
                     android:padding="8dp"
                     android:text="SEND"
-                    android:textColor="#000000"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintLeft_toLeftOf="@id/chatting_room_edittext_input"
                     app:layout_constraintBottom_toBottomOf="parent"

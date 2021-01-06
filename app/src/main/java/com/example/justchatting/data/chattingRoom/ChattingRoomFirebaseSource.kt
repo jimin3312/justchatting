@@ -25,6 +25,7 @@ class ChattingRoomFirebaseSource : KoinComponent {
     val newGroupId: LiveData<String>
         get() = _newGroupId
 
+
     fun setListener(groupId: String) {
         if(groupId == "")
             return
