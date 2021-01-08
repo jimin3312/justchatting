@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.justchatting.UserModel
 
 interface SelectGroupRepository {
-    fun loadFriends()
+    fun loadFriends(alreadyEnteredMember: HashMap<String, UserModel>)
     fun loadGroupId(groupMembers: HashMap<String,UserModel>)
     fun getFriends(): LiveData<ArrayList<UserModel>>
     fun getGroupId(): MutableLiveData<String>

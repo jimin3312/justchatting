@@ -9,6 +9,7 @@ interface ChattingRoomRepository {
 
     fun getNewGroupId(): LiveData<String>
     fun getChatLogs(): LiveData<ArrayList<Message>>
+    fun getMembers() : LiveData<ArrayList<UserModel>>
     fun sendText(
         text: String,
         groupId: String
@@ -25,6 +26,13 @@ interface ChattingRoomRepository {
         groupMembers: HashMap<String, UserModel>,
         groupId: String
     ) : Completable
+
+    fun addMember(
+        member: java.util.HashMap<String, UserModel>,
+        groupId: String
+    )
+
+    fun exit(groupId: String)
 //    fun loadGroupNameList(groupMembersMap: HashMap<String, UserModel>)
 //    fun fetchChatLog(groupId : String)
 }

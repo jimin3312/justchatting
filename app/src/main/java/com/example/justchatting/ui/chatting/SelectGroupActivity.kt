@@ -1,5 +1,6 @@
 package com.example.justchatting.ui.chatting
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +11,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.justchatting.R
+import com.example.justchatting.UserModel
 import com.example.justchatting.databinding.ActivitySelectGroupBinding
 import com.example.justchatting.ui.chattingRoom.ChattingRoomActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -29,6 +31,8 @@ class SelectGroupActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_select_group)
+
+        viewModel.addAlreadyEnteredMember(intent.getSerializableExtra("members") as? HashMap<String, UserModel>)
 
         selectGroupRecyclerviewAdapter = SelectGroupRecyclerviewAdapter()
         select_group_recyclerview.apply {
@@ -57,8 +61,14 @@ class SelectGroupActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.select_menu, menu)
-        menuItem = menu!!.findItem(R.id.select_confirm)
+
+        if(intent.getStringExtra("before")!= null){
+            menuInflater.inflate(R.menu.selcect_menu_from_chatting_room, menu)
+            menuItem = menu!!.findItem(R.id.select_invite)
+        } else {
+            menuInflater.inflate(R.menu.select_menu, menu)
+            menuItem = menu!!.findItem(R.id.select_confirm)
+        }
         menuItem.isEnabled = false
         return super.onCreateOptionsMenu(menu)
     }
@@ -67,6 +77,11 @@ class SelectGroupActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.select_confirm -> {
                 viewModel.loadGroupId(selectGroupRecyclerviewAdapter.groupMembers)
+            }
+            R.id.select_invite -> {
+                intent.putExtra("invited member",selectGroupRecyclerviewAdapter.groupMembers)
+                setResult(Activity.RESULT_OK, intent)
+                finish()
             }
         }
         return super.onOptionsItemSelected(item)

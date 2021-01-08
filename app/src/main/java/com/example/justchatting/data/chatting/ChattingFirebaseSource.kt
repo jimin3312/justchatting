@@ -8,18 +8,15 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
 class ChattingFirebaseSource {
-    companion object{
-        val TAG = "ChattingRepository"
-    }
-    private var chattingRoomMap = HashMap<String, ChattingRoom>()
 
+    private var chattingRoomMap = HashMap<String, ChattingRoom>()
+    val uid = FirebaseAuth.getInstance().uid
     private var _chattingRooms : MutableLiveData<ArrayList<ChattingRoom>> = MutableLiveData()
     val chattingRooms : LiveData<ArrayList<ChattingRoom>>
         get() =  _chattingRooms
 
     fun setListener() {
 
-        val uid = FirebaseAuth.getInstance().uid
         val userGroupRef = FirebaseDatabase.getInstance().getReference("/user_groups/$uid")
         userGroupRef.addChildEventListener(object : ChildEventListener {
             override fun onCancelled(error: DatabaseError) {
@@ -29,38 +26,46 @@ class ChattingFirebaseSource {
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-
+                updateChattingRoom(snapshot)
             }
 
-            override fun onChildAdded(snapshot1: DataSnapshot, previousChildName: String?) {
-
-                val groupId = snapshot1.key
-                val chatRoomRef = FirebaseDatabase.getInstance().getReference("/chatrooms/$groupId")
-                chatRoomRef.addValueEventListener(object : ValueEventListener {
-                    override fun onCancelled(error: DatabaseError) {
-                    }
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        val chattingRoom = snapshot.getValue(ChattingRoom::class.java) ?: return
-
-                        val userGroupNameRef = FirebaseDatabase.getInstance().getReference("/user_groups/$uid/$groupId")
-                        userGroupNameRef.addListenerForSingleValueEvent(object :ValueEventListener{
-                            override fun onCancelled(error: DatabaseError) {
-                            }
-                            override fun onDataChange(snapshot: DataSnapshot) {
-                                val groupName = snapshot.getValue(String::class.java)?: return
-                                chattingRoom.groupName = groupName
-                                chattingRoomMap[groupId!!] = chattingRoom
-                                _chattingRooms.postValue(getChattingArrayList())
-                            }
-                        })
-                    }
-                })
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                updateChattingRoom(snapshot)
             }
             override fun onChildRemoved(snapshot: DataSnapshot) {
+                if( snapshot.childrenCount  == 0L){
+                    chattingRoomMap.clear()
+                    _chattingRooms.postValue(getChattingArrayList())
+                } else {
+                    updateChattingRoom(snapshot)
+                }
             }
         })
     }
 
+    private fun updateChattingRoom(snapshot1: DataSnapshot){
+        val groupId = snapshot1.key
+        val chatRoomRef = FirebaseDatabase.getInstance().getReference("/chatrooms/$groupId")
+        chatRoomRef.addValueEventListener(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError) {
+            }
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val chattingRoom = snapshot.getValue(ChattingRoom::class.java) ?: return
+
+                val userGroupNameRef = FirebaseDatabase.getInstance().getReference("/user_groups/$uid/$groupId")
+                userGroupNameRef.addListenerForSingleValueEvent(object :ValueEventListener{
+                    override fun onCancelled(error: DatabaseError) {
+                    }
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val groupName = snapshot.getValue(String::class.java)?: return
+                        chattingRoom.groupName = groupName
+                        chattingRoomMap[groupId!!] = chattingRoom
+                        _chattingRooms.postValue(getChattingArrayList())
+                    }
+                })
+            }
+        })
+    }
     private fun getChattingArrayList(): ArrayList<ChattingRoom> {
         val arrayList = ArrayList(chattingRoomMap.values)
         arrayList.sortByDescending { it.timeStamp }
