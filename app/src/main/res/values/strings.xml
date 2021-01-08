@@ -7,4 +7,5 @@
     <string name="item_chatting_title">chatting</string>
     <string name="item_setttings_title">settings</string>
     <string name="confirm">확인</string>
+    <string name="invite">초대</string>
 </resources>

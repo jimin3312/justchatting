@@ -42,9 +42,21 @@ class ChattingRoomViewModel : ViewModel(), KoinComponent{
         chattingRoomRepository.loadGroupMembers(groupMembers, groupId)
     }
 
+    fun getMembers(): LiveData<ArrayList<UserModel>> {
+        return chattingRoomRepository.getMembers()
+    }
+
     override fun onCleared() {
         JustApp.roomId = ""
         super.onCleared()
+    }
+
+    fun addMember() {
+        chattingRoomRepository.addMember(groupMembers, groupId)
+    }
+
+    fun exit() {
+        chattingRoomRepository.exit(groupId)
     }
 
 }

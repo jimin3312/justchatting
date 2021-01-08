@@ -1,11 +1,9 @@
 package com.example.justchatting.data.chatting
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.justchatting.Friend
 import com.example.justchatting.UserModel
-import com.example.justchatting.repository.chatting.SelectGroupRepositoryImpl
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
@@ -61,7 +59,7 @@ class SelectGroupFirebaseSource {
         })
     }
 
-    fun loadFriends() {
+    fun loadFriends(alreadyEnteredMember: HashMap<String, UserModel>) {
         val uid = FirebaseAuth.getInstance().uid
         val ref = FirebaseDatabase.getInstance().getReference("/friends/$uid")
         ref.addListenerForSingleValueEvent(object : ValueEventListener{
@@ -82,7 +80,7 @@ class SelectGroupFirebaseSource {
                             override fun onDataChange(snapshot2: DataSnapshot) {
                                 val user = snapshot2.getValue(UserModel::class.java)?: return
 
-                                if(user.uid == uid)
+                                if(user.uid == uid || alreadyEnteredMember.containsKey(user.uid))
                                     return
 
                                 friends.add(user)

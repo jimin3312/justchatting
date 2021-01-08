@@ -10,4 +10,6 @@
         android:name="com.example.justchatting.ui.chattingRoom.ChattingLogFragment"
         android:label="ChattingLogFragment" >
     </fragment>
+
+
 </navigation>

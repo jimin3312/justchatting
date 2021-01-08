@@ -4,14 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.justchatting.UserModel
 import com.example.justchatting.data.chatting.SelectGroupFirebaseSource
-import com.example.justchatting.data.friend.FriendFirebaseSource
 
 class SelectGroupRepositoryImpl(
     private val selectGroupFirebaseSource: SelectGroupFirebaseSource
 ) : SelectGroupRepository {
 
-    override fun loadFriends() {
-        selectGroupFirebaseSource.loadFriends()
+    override fun loadFriends(alreadyEnteredMember: HashMap<String, UserModel>) {
+        selectGroupFirebaseSource.loadFriends(alreadyEnteredMember)
     }
     override fun loadGroupId(groupMembers: HashMap<String, UserModel>) {
         selectGroupFirebaseSource.loadGroupId(groupMembers)

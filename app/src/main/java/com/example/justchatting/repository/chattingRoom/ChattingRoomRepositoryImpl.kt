@@ -14,8 +14,13 @@ class ChattingRoomRepositoryImpl(private val chattingRoomFirebaseSource: Chattin
         val TAG = "ChattingRoomRepo"
     }
 
+
     override fun getChatLogs(): LiveData<ArrayList<Message>> {
         return chattingRoomFirebaseSource.logs
+    }
+
+    override fun getMembers(): LiveData<ArrayList<UserModel>> {
+        return chattingRoomFirebaseSource.members
     }
 
     override fun getNewGroupId(): LiveData<String> {
@@ -42,6 +47,17 @@ class ChattingRoomRepositoryImpl(private val chattingRoomFirebaseSource: Chattin
         groupMembers: HashMap<String, UserModel>,
         groupId: String
     ): Completable = chattingRoomFirebaseSource.pushFCM(text, groupMembers, groupId)
+
+    override fun addMember(
+        member: java.util.HashMap<String, UserModel>,
+        groupId: String
+    ) {
+        chattingRoomFirebaseSource.addMember(member, groupId)
+    }
+
+    override fun exit(groupId: String) {
+        chattingRoomFirebaseSource.exit(groupId)
+    }
 
     override fun sendText(
         text: String,

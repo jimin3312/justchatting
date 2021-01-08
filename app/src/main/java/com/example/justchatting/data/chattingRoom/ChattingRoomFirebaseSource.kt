@@ -1,6 +1,5 @@
 package com.example.justchatting.data.chattingRoom
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.justchatting.*
@@ -25,6 +24,15 @@ class ChattingRoomFirebaseSource : KoinComponent {
     val newGroupId: LiveData<String>
         get() = _newGroupId
 
+    private var _members = MutableLiveData<ArrayList<UserModel>>()
+    val members: LiveData<ArrayList<UserModel>>
+        get() = _members
+
+    fun toArrayList(groupMembers: HashMap<String, UserModel>){
+        var arrayList = ArrayList(groupMembers.values)
+        arrayList.sortedBy { it.username }
+        _members.postValue(arrayList)
+    }
 
     fun setListener(groupId: String) {
         if(groupId == "")
@@ -61,6 +69,8 @@ class ChattingRoomFirebaseSource : KoinComponent {
 
         val membersRef = FirebaseDatabase.getInstance().getReference("/members/$groupId")
         membersRef.setValue(groupMembersMap).addOnCompleteListener {
+            loadGroupMembers(groupMembersMap, groupId)
+
             groupMembersMap.forEach {
                 val userGroupRef =
                     FirebaseDatabase.getInstance().getReference("/user_groups/${it.key}/$groupId")
@@ -118,12 +128,15 @@ class ChattingRoomFirebaseSource : KoinComponent {
             if (member != entry || groupMembersMap.size == 1)
                 stringBuilder.append(entry.value.username + ',')
 
-            if (stringBuilder.length >= 19)
+            if (stringBuilder.length >= 19){
                 break
+            }
         }
 
         stringBuilder.deleteCharAt(stringBuilder.length - 1)
-
+        if(stringBuilder.length>=19){
+            stringBuilder.append(" ...")
+        }
         return stringBuilder.toString()
     }
 
@@ -181,15 +194,23 @@ class ChattingRoomFirebaseSource : KoinComponent {
         JustApp.roomId = groupId!!
 
         val membersRef = FirebaseDatabase.getInstance().getReference("/members/$groupId")
-        membersRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        membersRef.addChildEventListener(object : ChildEventListener {
             override fun onCancelled(error: DatabaseError) {
             }
 
-            override fun onDataChange(snapshot: DataSnapshot) {
-                snapshot.children.forEach {
-                    val user = it.getValue(UserModel::class.java) ?: return /* handle exception*/
-                    groupMembers[user.uid] = user;
-                }
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+            }
+
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val user = snapshot.getValue(UserModel::class.java) ?: return
+                groupMembers[user.uid] = user
+                toArrayList(groupMembers)
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
             }
         })
     }
@@ -211,5 +232,42 @@ class ChattingRoomFirebaseSource : KoinComponent {
             NotificationRequest(registrationIds, notificationInfo)
 
         return notificationAPI.pushMessage(notificationRequest)
+    }
+
+    fun addMember(
+        member: java.util.HashMap<String, UserModel>,
+        groupId: String
+    ) {
+        val membersRef = FirebaseDatabase.getInstance().getReference("/members/$groupId")
+        membersRef.setValue(member).addOnCompleteListener {
+            loadGroupMembers(member, groupId)
+
+            member.forEach {
+                val userGroupRef =
+                    FirebaseDatabase.getInstance().getReference("/user_groups/${it.key}/$groupId")
+                userGroupRef.setValue(createGroupName(member, it))
+            }
+        }
+
+    }
+
+    fun exit(groupId: String) {
+        val uid = FirebaseAuth.getInstance().uid
+        FirebaseDatabase.getInstance().getReference("/members/$groupId/$uid").removeValue()
+        FirebaseDatabase.getInstance().getReference("/user_groups/$uid/$groupId").removeValue()
+
+        FirebaseDatabase.getInstance().getReference("/members").child(groupId).addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(snapshot.childrenCount.toInt() == 0){
+                    snapshot.ref.removeValue()
+                    FirebaseDatabase.getInstance().getReference("/messages/$groupId").removeValue()
+                    FirebaseDatabase.getInstance().getReference("/chatrooms/$groupId").removeValue()
+                }
+            }
+        })
+
     }
 }
