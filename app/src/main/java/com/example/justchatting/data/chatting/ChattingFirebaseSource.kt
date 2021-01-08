@@ -33,12 +33,8 @@ class ChattingFirebaseSource {
                 updateChattingRoom(snapshot)
             }
             override fun onChildRemoved(snapshot: DataSnapshot) {
-                if( snapshot.childrenCount  == 0L){
-                    chattingRoomMap.clear()
-                    _chattingRooms.postValue(getChattingArrayList())
-                } else {
-                    updateChattingRoom(snapshot)
-                }
+                chattingRoomMap.remove(snapshot.key)
+                _chattingRooms.postValue(getChattingArrayList())
             }
         })
     }

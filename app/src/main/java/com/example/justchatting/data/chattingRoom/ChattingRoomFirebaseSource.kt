@@ -10,6 +10,9 @@ import io.reactivex.Completable
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.lang.StringBuilder
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class ChattingRoomFirebaseSource : KoinComponent {
 
@@ -30,7 +33,9 @@ class ChattingRoomFirebaseSource : KoinComponent {
 
     fun toArrayList(groupMembers: HashMap<String, UserModel>){
         var arrayList = ArrayList(groupMembers.values)
-        arrayList.sortedBy { it.username }
+        arrayList.sortWith(Comparator { o1,o2->
+            o1.username.compareTo(o2.username)
+        })
         _members.postValue(arrayList)
     }
 
@@ -211,6 +216,9 @@ class ChattingRoomFirebaseSource : KoinComponent {
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
+                val user = snapshot.getValue(UserModel::class.java) ?: return
+                groupMembers.remove(user.uid)
+                toArrayList(groupMembers)
             }
         })
     }

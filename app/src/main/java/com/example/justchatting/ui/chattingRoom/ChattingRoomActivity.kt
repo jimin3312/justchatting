@@ -58,6 +58,7 @@ class ChattingRoomActivity : BaseActivity<ActivityChattingRoomBinding>() {
         binding.navView.getHeaderView(0).findViewById<ImageView>(R.id.chtting_room_drawer_exit).setOnClickListener {
             Log.d("나가기","나가기")
             viewModel.exit()
+            finish()
         }
 
         groupId = intent.getStringExtra("groupId")
@@ -80,6 +81,7 @@ class ChattingRoomActivity : BaseActivity<ActivityChattingRoomBinding>() {
             .setupWithNavController(navController)
 
         viewModel.getMembers().observe(this, Observer {
+
             friendsAdapter.setUsers(it)
             friendsAdapter.notifyDataSetChanged()
         })
