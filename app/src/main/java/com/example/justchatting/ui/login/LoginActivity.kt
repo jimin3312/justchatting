@@ -32,7 +32,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>()
             Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         })
 
-        back_to_register_button_login.setOnClickListener{
+        binding.backToRegisterButtonLogin.setOnClickListener{
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }

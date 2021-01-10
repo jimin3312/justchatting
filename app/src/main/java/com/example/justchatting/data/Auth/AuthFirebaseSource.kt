@@ -19,8 +19,6 @@ class AuthFirebaseSource {
         FirebaseAuth.getInstance()
     }
 
-    fun logout() = auth.signOut()
-
     fun loginWithEmail(email: String, password: String): Completable =
         Completable.create { emitter ->
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
@@ -34,7 +32,6 @@ class AuthFirebaseSource {
             }
         }
 
-
     fun signUp(email: String, password: String): Completable = Completable.create { emitter ->
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener {
@@ -46,7 +43,7 @@ class AuthFirebaseSource {
             }
     }
 
-    fun uploadProfile(uri: Uri?): Single<String> {
+    fun uploadProfileImage(uri: Uri?): Single<String> {
         return Single.create { emitter ->
             if (uri == null) {
                 emitter.onSuccess("")

@@ -4,26 +4,17 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.justchatting.UserModel
-import com.example.justchatting.data.friend.ContactsDAO
-import com.example.justchatting.data.friend.FriendFirebaseSource
 
-class FriendRepository(private val contactsDAO: ContactsDAO, private val friendFirebaseSource: FriendFirebaseSource) {
+interface FriendRepository {
+    fun getUsers(): LiveData<ArrayList<UserModel>>
 
-    fun getUsers(): LiveData<ArrayList<UserModel>> {
-        return friendFirebaseSource.users
-    }
-    fun makeFriendRelationships(application: Application) = contactsDAO.makeFriendRelationships(application)
+    fun makeFriendRelationships(application: Application)
 
-    fun addFriendWithEmail(email : String){
-        friendFirebaseSource.addFriendWithEmail(email)
-    }
-    fun addFriendWithPhoneNumber(phoneNum : String){
-        friendFirebaseSource.addFriendWithPhoneNumber(phoneNum)
-    }
-    fun setListener() {
-        friendFirebaseSource.setListener()
-    }
-    fun getAddFriend(): MutableLiveData<Int> {
-        return friendFirebaseSource.addFriend
-    }
+    fun addFriendWithEmail(email : String, friends: HashMap<String, UserModel>)
+
+    fun addFriendWithPhoneNumber(phoneNum : String, friends: HashMap<String, UserModel>)
+
+    fun setFriendListChangeListener(friends: HashMap<String, UserModel>)
+
+    fun isValidToAdd(): MutableLiveData<Int>
 }

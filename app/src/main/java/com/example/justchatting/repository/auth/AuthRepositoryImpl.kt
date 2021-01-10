@@ -1,18 +1,18 @@
-package com.example.justchatting.repository.login
+package com.example.justchatting.repository.auth
 
 import android.net.Uri
 import com.example.justchatting.data.Auth.AuthFirebaseSource
 import io.reactivex.Completable
 
-class UserRepositoryImpl(
+class AuthRepositoryImpl(
     private val authFirebaseSource: AuthFirebaseSource
-) : UserRepository {
+) : AuthRepository {
 
     override fun loginWithEmail(email: String, password: String) = authFirebaseSource.loginWithEmail(email, password)
 
     override fun signUpWithEmail(email: String, password: String) = authFirebaseSource.signUp(email, password)
 
-    override fun uploadProfile(uri: Uri?) = authFirebaseSource.uploadProfile(uri)
+    override fun uploadProfile(uri: Uri?) = authFirebaseSource.uploadProfileImage(uri)
 
     override fun saveUser(
         name: String,
@@ -22,6 +22,4 @@ class UserRepositoryImpl(
     ) = authFirebaseSource.saveUser(name, phoneNumber, firebaseImageResourcePath, email)
 
     override fun updateToken(): Completable = authFirebaseSource.updateToken()
-
-    override fun logout() = authFirebaseSource.logout()
 }

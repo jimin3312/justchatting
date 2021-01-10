@@ -12,64 +12,39 @@ import com.google.firebase.database.ValueEventListener
 
 class ContactsDAO {
 
-    fun makeFriendRelationships(application: Application){
+    fun makeFriendRelationships(application: Application) {
         var uid = FirebaseAuth.getInstance().uid
 
         val contactList = getContacts(application)
         contactList.forEach { number ->
 
-            val ref = FirebaseDatabase.getInstance().getReference("/phone/$number")
+            FirebaseDatabase.getInstance().getReference("/phone/$number")
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onCancelled(error: DatabaseError) {}
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val friendId = snapshot.getValue(String::class.java) ?: return
 
-            ref.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onCancelled(error: DatabaseError) {}
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val friendId = snapshot.getValue(String::class.java) ?: return
+                        FirebaseDatabase.getInstance().getReference("/friends/${uid}/${friendId}")
+                            .addListenerForSingleValueEvent(object : ValueEventListener {
+                                override fun onCancelled(error: DatabaseError) {
+                                }
 
-                    FirebaseDatabase.getInstance().getReference("/friends/${uid}/${friendId}").addListenerForSingleValueEvent(object : ValueEventListener{
-                        override fun onCancelled(error: DatabaseError) {
-                        }
+                                override fun onDataChange(snapshot: DataSnapshot) {
+                                    val friend = snapshot.getValue(Friend::class.java)
+                                    if (friend == null) {
+                                        val fromRef = FirebaseDatabase.getInstance()
+                                            .getReference("/friends/${uid}/${friendId}")
+                                        fromRef.setValue(Friend(true, ""))
 
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            val friend = snapshot.getValue(Friend::class.java)
-                            if(friend == null) {
-                                val fromRef = FirebaseDatabase.getInstance().getReference("/friends/${uid}/${friendId}")
-                                fromRef.setValue(Friend(true, ""))
-                                val toRef = FirebaseDatabase.getInstance().getReference("/friends/${friendId}/$uid")
-                                toRef.setValue(Friend(true, ""))
-                            }
-                        }
-                    })
-                }
-            })
+                                        val toRef = FirebaseDatabase.getInstance()
+                                            .getReference("/friends/${friendId}/$uid")
+                                        toRef.setValue(Friend(true, ""))
+                                    }
+                                }
+                            })
+                    }
+                })
         }
-
-//        val myUserRef = FirebaseDatabase.getInstance().getReference("/users/$uid")
-//
-//        myUserRef.addListenerForSingleValueEvent(object : ValueEventListener {
-//            override fun onCancelled(error: DatabaseError) {
-//            }
-//            override fun onDataChange(snapshot: DataSnapshot) {
-//
-//                val contactList = getContacts(application)
-//                contactList.forEach { number ->
-//
-//                    val ref = FirebaseDatabase.getInstance().getReference("/phone/$number")
-//
-//                    ref.addListenerForSingleValueEvent(object : ValueEventListener {
-//                        override fun onCancelled(error: DatabaseError) {}
-//                        override fun onDataChange(snapshot: DataSnapshot) {
-//                            val friendId = snapshot.getValue(String::class.java) ?: return
-//
-//                            val fromRef = FirebaseDatabase.getInstance().getReference("/friends/${uid}/${friendId}")
-//                            fromRef.setValue(true)
-//                            val toRef = FirebaseDatabase.getInstance().getReference("/friends/${friendId}/$uid")
-//                            if(friendId != uid)
-//                                toRef.setValue(true)
-//                        }
-//                    })
-//                }
-//            }
-//        })
     }
 
     private fun getContacts(application: Application): ArrayList<String> {
@@ -79,7 +54,7 @@ class ContactsDAO {
         if ((cur?.count ?: 0) > 0) {
             while (cur != null && cur.moveToNext()) {
                 val id: String = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID))
-                val name: String = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
+
                 if (cur.getInt(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
                     val pCur: Cursor? = cr.query(
                         ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
@@ -89,11 +64,12 @@ class ContactsDAO {
                         null
                     )
                     while (pCur!!.moveToNext()) {
-                        val temp : String = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
-                        var phoneNo : String = ""
+                        val temp: String =
+                            pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                        var phoneNo: String = ""
                         temp.forEach {
-                            if(it.isDigit())
-                                phoneNo+=it
+                            if (it.isDigit())
+                                phoneNo += it
                         }
                         contactList.add(phoneNo)
                     }

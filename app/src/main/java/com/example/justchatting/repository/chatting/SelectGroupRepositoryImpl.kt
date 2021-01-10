@@ -12,7 +12,7 @@ class SelectGroupRepositoryImpl(
     override fun loadFriends(alreadyEnteredMember: HashMap<String, UserModel>) {
         selectGroupFirebaseSource.loadFriends(alreadyEnteredMember)
     }
-    override fun loadGroupId(groupMembers: HashMap<String, UserModel>) {
+    override fun loadGroupId(groupMembers: HashMap<String, UserModel?>) {
         selectGroupFirebaseSource.loadGroupId(groupMembers)
     }
 

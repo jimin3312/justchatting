@@ -8,21 +8,18 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.example.justchatting.repository.login.UserRepository
-import com.example.justchatting.ui.chattingRoom.ChattingRoomViewModel
+import com.example.justchatting.repository.auth.AuthRepository
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.koin.android.ext.android.inject
-import org.koin.core.KoinComponent
 import kotlin.random.Random
 
 class ChatMessageService() : FirebaseMessagingService() {
 
-    val repository: UserRepository by inject()
+    val repository: AuthRepository by inject()
 
     companion object{
         val CHANNEL_ID = "1234"

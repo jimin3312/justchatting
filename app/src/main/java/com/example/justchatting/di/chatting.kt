@@ -8,9 +8,9 @@ import com.example.justchatting.repository.chatting.SelectGroupRepository
 import com.example.justchatting.repository.chatting.SelectGroupRepositoryImpl
 import org.koin.dsl.module
 
-val chattingModule = module{
+val chattingModule = module {
     factory { SelectGroupFirebaseSource() }
     factory { ChattingFirebaseSource() }
     factory<SelectGroupRepository> { SelectGroupRepositoryImpl(get()) }
-    single<ChattingRepository>{ChattingRepositoryImpl(get())}
+    factory<ChattingRepository> { ChattingRepositoryImpl(get()) }
 }

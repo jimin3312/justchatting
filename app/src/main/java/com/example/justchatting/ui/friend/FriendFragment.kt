@@ -45,8 +45,8 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
             adapter = friendAdapter
         }
 
-        viewModel.sync()
-        viewModel.setListener()
+        viewModel.syncWithContacts()
+        viewModel.setFriendListChangeListener()
 
         viewModel.getUsers().observe(viewLifecycleOwner, Observer {
             Log.d("Friend", it.toString())
@@ -54,20 +54,20 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
             friendAdapter.notifyDataSetChanged()
         })
 
-        viewModel.getAddFriend().observe(viewLifecycleOwner, Observer {friendAddSuccess->
+        viewModel.isValidToAdd().observe(viewLifecycleOwner, Observer {friendAddSuccess->
             when (friendAddSuccess) {
                 1 -> {
                     resultDialog("친구추가 성공", "확인")
-                    viewModel.getAddFriend().postValue(0)
+                    viewModel.isValidToAdd().postValue(0)
                     deleteAddFriendDialog()
                 }
                 -1 -> {
                     resultDialog("친구추가 실패", "확인")
-                    viewModel.getAddFriend().postValue(0)
+                    viewModel.isValidToAdd().postValue(0)
                 }
                 -2 -> {
                     resultDialog("이미 있는 친구입니다.", "확인")
-                    viewModel.getAddFriend().postValue(0)
+                    viewModel.isValidToAdd().postValue(0)
                 }
             }
 
@@ -98,7 +98,7 @@ class FriendFragment : BaseFragment<FragmentFriendBinding>() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.friend_sync_button -> {
-                viewModel.sync()
+                viewModel.syncWithContacts()
             }
             R.id.friend_add_friend_button -> {
                 var fragmentManager = childFragmentManager

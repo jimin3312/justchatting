@@ -12,30 +12,31 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
 
     private val selectGroupRepository : SelectGroupRepository by inject()
     private val friendRepository : FriendRepository by inject()
+    private var friends : HashMap<String, UserModel> = HashMap()
 
-    fun setListener(){
-        friendRepository.setListener()
+    fun setFriendListChangeListener(){
+        friendRepository.setFriendListChangeListener(friends)
     }
     fun getUsers() : LiveData<ArrayList<UserModel>> {
         return friendRepository.getUsers()
     }
 
-    fun getAddFriend() : MutableLiveData<Int>{
-        return friendRepository.getAddFriend()
+    fun isValidToAdd() : MutableLiveData<Int>{
+        return friendRepository.isValidToAdd()
     }
-    fun sync() {
+    fun syncWithContacts() {
         friendRepository.makeFriendRelationships(getApplication())
     }
     fun addFriendWithPhoneNumber(input: String) {
-        friendRepository.addFriendWithPhoneNumber(input)
+        friendRepository.addFriendWithPhoneNumber(input, friends)
     }
     fun addFriendWithId(input: String) {
-        friendRepository.addFriendWithEmail(input)
+        friendRepository.addFriendWithEmail(input, friends)
     }
     fun getGroupId() : MutableLiveData<String>{
         return  selectGroupRepository.getGroupId()
     }
-    fun loadGroupId(groupMembers: HashMap<String, UserModel>) {
+    fun loadGroupId(groupMembers: HashMap<String, UserModel?>) {
         selectGroupRepository.loadGroupId(groupMembers)
     }
 }
