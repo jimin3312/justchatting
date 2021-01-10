@@ -13,7 +13,6 @@
         android:layout_height="match_parent"
         tools:context=".ui.friend.FriendFragment">
 
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/friend_recyclerview"
             android:layout_width="match_parent"

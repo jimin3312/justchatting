@@ -3,10 +3,9 @@
 <layout>
 
     <data>
-
         <variable
             name="viewModel"
-            type="com.example.justchatting.ui.login.LoginViewModel" />
+            type="com.example.justchatting.ui.login.RegisterViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -32,7 +31,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/select_photo_button_register" />
+            app:layout_constraintTop_toBottomOf="@+id/select_photo_image_view_register" />
 
         <EditText
             android:id="@+id/email_edittext_register"
@@ -110,29 +109,16 @@
             app:layout_constraintStart_toStartOf="@+id/register_button_register"
             app:layout_constraintTop_toBottomOf="@+id/register_button_register" />
 
-        <Button
-            android:id="@+id/select_photo_button_register"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/select_photo_image_view_register"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/rounded_select_photo_button"
-            android:onClick="@{()->viewModel.selectPhoto()}"
-            android:text="profile\nimage"
-            app:layout_constraintBottom_toTopOf="@+id/username_edittext_register"
+            android:src="@drawable/person_pale_blue"
+            app:civ_border_color="#7FB174"
+            app:civ_border_width="4dp"
+            android:layout_marginTop="48dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/select_photo_imageview_register"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            app:civ_border_width="4dp"
-            app:layout_constraintBottom_toBottomOf="@+id/select_photo_button_register"
-            app:layout_constraintEnd_toEndOf="@+id/select_photo_button_register"
-            app:layout_constraintStart_toStartOf="@+id/select_photo_button_register"
-            app:layout_constraintTop_toTopOf="@+id/select_photo_button_register" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -1,6 +1,5 @@
 package com.example.justchatting.ui.friend.dialog
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,7 +9,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 import com.example.justchatting.R
 import com.example.justchatting.ui.friend.FriendViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel

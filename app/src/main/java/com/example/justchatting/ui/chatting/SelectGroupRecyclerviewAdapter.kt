@@ -21,7 +21,7 @@ class SelectGroupRecyclerviewAdapter : RecyclerView.Adapter<RecyclerView.ViewHol
     val checkedCnt : LiveData<Int>
         get()=_checkedCnt
 
-    var groupMembers = HashMap<String, UserModel>()
+    var groupMembers = HashMap<String, UserModel?>()
 
     fun setFriendList(friendList : ArrayList<UserModel>){
         mFriendList = friendList

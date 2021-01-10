@@ -17,7 +17,7 @@ class SelectGroupFirebaseSource {
 
     var groupId = MutableLiveData<String>()
 
-    fun loadGroupId(groupMembers: HashMap<String, UserModel>) {
+    fun loadGroupId(groupMembers: HashMap<String, UserModel?>) {
 
         val uid = FirebaseAuth.getInstance().uid
 

@@ -12,7 +12,6 @@ class SelectGroupViewModel : ViewModel() ,KoinComponent{
     private val selectGroupRepository : SelectGroupRepository by inject()
     val alreadyEnteredMember : HashMap<String, UserModel> = HashMap()
 
-
     fun load(){
         selectGroupRepository.loadFriends(alreadyEnteredMember)
     }
@@ -20,7 +19,7 @@ class SelectGroupViewModel : ViewModel() ,KoinComponent{
         return selectGroupRepository.getFriends()
     }
 
-    fun loadGroupId(groupMembers : HashMap<String, UserModel>){
+    fun loadGroupId(groupMembers : HashMap<String, UserModel?>){
         selectGroupRepository.loadGroupId(groupMembers)
     }
     fun getGroupId() : LiveData<String>{

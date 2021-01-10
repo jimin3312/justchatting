@@ -56,12 +56,11 @@ class ChattingRoomActivity : BaseActivity<ActivityChattingRoomBinding>() {
             startActivityForResult(intent, REQUEST_CODE)
         }
         binding.navView.getHeaderView(0).findViewById<ImageView>(R.id.chtting_room_drawer_exit).setOnClickListener {
-            Log.d("나가기","나가기")
             viewModel.exit()
+            finish()
         }
 
         groupId = intent.getStringExtra("groupId")
-        Log.d("그룹아이디", groupId)
         if(groupId == ""){
             viewModel.groupMembers = intent.getSerializableExtra("groupMembers") as HashMap<String, UserModel>
             friendsAdapter.setUsers(mapToArrayList(viewModel.groupMembers))
@@ -70,7 +69,6 @@ class ChattingRoomActivity : BaseActivity<ActivityChattingRoomBinding>() {
             viewModel.groupId = groupId!!
             viewModel.loadGroupMembers(groupId)
         }
-
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
@@ -83,7 +81,6 @@ class ChattingRoomActivity : BaseActivity<ActivityChattingRoomBinding>() {
             friendsAdapter.setUsers(it)
             friendsAdapter.notifyDataSetChanged()
         })
-
     }
 
     override fun getLayoutId() = R.layout.activity_chatting_room

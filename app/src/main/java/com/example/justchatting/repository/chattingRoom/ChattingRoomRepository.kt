@@ -31,8 +31,5 @@ interface ChattingRoomRepository {
         member: java.util.HashMap<String, UserModel>,
         groupId: String
     )
-
     fun exit(groupId: String)
-//    fun loadGroupNameList(groupMembersMap: HashMap<String, UserModel>)
-//    fun fetchChatLog(groupId : String)
 }
