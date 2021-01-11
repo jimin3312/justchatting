@@ -2,17 +2,15 @@ package com.example.justchatting.ui.friend
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
+import com.example.justchatting.Event
 import com.example.justchatting.R
-import com.example.justchatting.UserModel
+import com.example.justchatting.data.DTO.UserModel
 import com.example.justchatting.databinding.FriendItemBinding
 import com.example.justchatting.databinding.FriendMyItemBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
-import de.hdodenhof.circleimageview.CircleImageView
 
 class FriendAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     companion object {
@@ -24,7 +22,7 @@ class FriendAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var mFriendList: ArrayList<UserModel>? = null
     var groupMembers = HashMap<String, UserModel?>()
 
-    var itemClick = MutableLiveData<Boolean>()
+    var itemClick = MutableLiveData<Event<Boolean>>()
 
     fun setUsers(friendList: ArrayList<UserModel>) {
         mFriendList = friendList
@@ -79,7 +77,7 @@ class FriendAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             binding.setClickListener {
                 groupMembers.clear()
                 groupMembers[uid!!] = userModel
-                itemClick.postValue(true)
+                itemClick.postValue(Event(true))
             }
         }
 
@@ -105,7 +103,8 @@ class FriendAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 groupMembers.clear()
                 groupMembers[uid!!] = mFriendList!![0]
                 groupMembers[userModel!!.uid] = userModel
-                itemClick.postValue(true)
+                itemClick.postValue(Event(true))
+
             }
         }
 

@@ -3,8 +3,8 @@ package com.example.justchatting.ui.chattingRoom
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.example.justchatting.JustApp
-import com.example.justchatting.Message
-import com.example.justchatting.UserModel
+import com.example.justchatting.data.DTO.Message
+import com.example.justchatting.data.DTO.UserModel
 import com.example.justchatting.repository.chattingRoom.ChattingRoomRepository
 import io.reactivex.schedulers.Schedulers
 import org.koin.core.KoinComponent

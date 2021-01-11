@@ -3,7 +3,7 @@ package com.example.justchatting.data.friend
 import android.app.Application
 import android.database.Cursor
 import android.provider.ContactsContract
-import com.example.justchatting.Friend
+import com.example.justchatting.data.DTO.Friend
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -34,11 +34,21 @@ class ContactsDAO {
                                     if (friend == null) {
                                         val fromRef = FirebaseDatabase.getInstance()
                                             .getReference("/friends/${uid}/${friendId}")
-                                        fromRef.setValue(Friend(true, ""))
+                                        fromRef.setValue(
+                                            Friend(
+                                                true,
+                                                ""
+                                            )
+                                        )
 
                                         val toRef = FirebaseDatabase.getInstance()
                                             .getReference("/friends/${friendId}/$uid")
-                                        toRef.setValue(Friend(true, ""))
+                                        toRef.setValue(
+                                            Friend(
+                                                true,
+                                                ""
+                                            )
+                                        )
                                     }
                                 }
                             })

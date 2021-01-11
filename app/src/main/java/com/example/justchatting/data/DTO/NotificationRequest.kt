@@ -1,5 +1,6 @@
-package com.example.justchatting
+package com.example.justchatting.data.DTO
 
+import com.example.justchatting.data.DTO.NotificationInfo
 import com.google.gson.annotations.SerializedName
 
 data class NotificationRequest(

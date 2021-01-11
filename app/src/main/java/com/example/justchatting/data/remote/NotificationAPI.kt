@@ -1,6 +1,6 @@
 package com.example.justchatting.data.remote
 
-import com.example.justchatting.NotificationRequest
+import com.example.justchatting.data.DTO.NotificationRequest
 import io.reactivex.Completable
 import retrofit2.http.Body
 import retrofit2.http.Headers

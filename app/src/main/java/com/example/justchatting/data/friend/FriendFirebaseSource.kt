@@ -2,8 +2,8 @@ package com.example.justchatting.data.friend
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.justchatting.Friend
-import com.example.justchatting.UserModel
+import com.example.justchatting.data.DTO.Friend
+import com.example.justchatting.data.DTO.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import kotlin.collections.ArrayList

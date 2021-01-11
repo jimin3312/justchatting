@@ -1,9 +1,8 @@
 package com.example.justchatting.data.chatting
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.justchatting.ChattingRoom
+import com.example.justchatting.data.DTO.ChattingRoom
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
@@ -15,7 +14,7 @@ class ChattingFirebaseSource {
     val chattingRooms : LiveData<ArrayList<ChattingRoom>>
         get() =  _chattingRooms
 
-    fun setListener() {
+    fun chattingRoomListChangeListener() {
 
         val userGroupRef = FirebaseDatabase.getInstance().getReference("/user_groups/$uid")
         userGroupRef.addChildEventListener(object : ChildEventListener {

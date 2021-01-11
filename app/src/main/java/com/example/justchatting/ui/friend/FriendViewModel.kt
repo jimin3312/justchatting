@@ -2,11 +2,13 @@ package com.example.justchatting.ui.friend
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.example.justchatting.UserModel
+import com.example.justchatting.Event
+import com.example.justchatting.data.DTO.UserModel
 import com.example.justchatting.repository.chatting.SelectGroupRepository
 import com.example.justchatting.repository.friend.FriendRepository
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import com.example.justchatting.ui.friend.FriendFragment.AddResult
 
 class FriendViewModel(application: Application) : AndroidViewModel(application), KoinComponent{
 
@@ -20,8 +22,7 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
     fun getUsers() : LiveData<ArrayList<UserModel>> {
         return friendRepository.getUsers()
     }
-
-    fun isValidToAdd() : MutableLiveData<Int>{
+    fun isValidToAdd() : MutableLiveData<Event<AddResult>>{
         return friendRepository.isValidToAdd()
     }
     fun syncWithContacts() {
@@ -33,7 +34,7 @@ class FriendViewModel(application: Application) : AndroidViewModel(application),
     fun addFriendWithId(input: String) {
         friendRepository.addFriendWithEmail(input, friends)
     }
-    fun getGroupId() : MutableLiveData<String>{
+    fun getGroupId() : MutableLiveData<Event<String>>{
         return  selectGroupRepository.getGroupId()
     }
     fun loadGroupId(groupMembers: HashMap<String, UserModel?>) {

@@ -1,8 +1,8 @@
 package com.example.justchatting.repository.chattingRoom
 
 import androidx.lifecycle.LiveData
-import com.example.justchatting.Message
-import com.example.justchatting.UserModel
+import com.example.justchatting.data.DTO.Message
+import com.example.justchatting.data.DTO.UserModel
 import com.example.justchatting.data.chattingRoom.ChattingRoomFirebaseSource
 import io.reactivex.Completable
 import kotlin.collections.ArrayList
