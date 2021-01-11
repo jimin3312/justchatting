@@ -2,7 +2,8 @@ package com.example.justchatting.ui.chatting
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.example.justchatting.UserModel
+import com.example.justchatting.Event
+import com.example.justchatting.data.DTO.UserModel
 import com.example.justchatting.repository.chatting.SelectGroupRepository
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -12,7 +13,7 @@ class SelectGroupViewModel : ViewModel() ,KoinComponent{
     private val selectGroupRepository : SelectGroupRepository by inject()
     val alreadyEnteredMember : HashMap<String, UserModel> = HashMap()
 
-    fun load(){
+    fun loadFriends(){
         selectGroupRepository.loadFriends(alreadyEnteredMember)
     }
     fun getFriends(): LiveData<ArrayList<UserModel>> {
@@ -22,7 +23,7 @@ class SelectGroupViewModel : ViewModel() ,KoinComponent{
     fun loadGroupId(groupMembers : HashMap<String, UserModel?>){
         selectGroupRepository.loadGroupId(groupMembers)
     }
-    fun getGroupId() : LiveData<String>{
+    fun getGroupId() : LiveData<Event<String>>{
         return selectGroupRepository.getGroupId()
     }
 

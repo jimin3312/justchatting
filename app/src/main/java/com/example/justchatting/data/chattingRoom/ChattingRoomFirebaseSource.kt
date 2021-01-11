@@ -3,6 +3,7 @@ package com.example.justchatting.data.chattingRoom
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.justchatting.*
+import com.example.justchatting.data.DTO.*
 import com.example.justchatting.data.remote.NotificationAPI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -30,6 +31,8 @@ class ChattingRoomFirebaseSource : KoinComponent {
     private var _members = MutableLiveData<ArrayList<UserModel>>()
     val members: LiveData<ArrayList<UserModel>>
         get() = _members
+
+    val uid = FirebaseAuth.getInstance().uid
 
     fun toArrayList(groupMembers: HashMap<String, UserModel>){
         var arrayList = ArrayList(groupMembers.values)
@@ -66,60 +69,29 @@ class ChattingRoomFirebaseSource : KoinComponent {
         })
     }
 
-    fun createGroupId(groupMembersMap: HashMap<String, UserModel>) {
+    fun createGroupId(groupMembers: HashMap<String, UserModel>) {
 
-        val uid = FirebaseAuth.getInstance().uid
         val groupId = FirebaseDatabase.getInstance().getReference("/chatrooms").push().key
         JustApp.roomId = groupId!!
 
         val membersRef = FirebaseDatabase.getInstance().getReference("/members/$groupId")
-        membersRef.setValue(groupMembersMap).addOnCompleteListener {
-            loadGroupMembers(groupMembersMap, groupId)
+        membersRef.setValue(groupMembers).addOnCompleteListener {
+            loadGroupMembers(groupMembers, groupId)
 
-            groupMembersMap.forEach {
+            groupMembers.forEach {
                 val userGroupRef =
                     FirebaseDatabase.getInstance().getReference("/user_groups/${it.key}/$groupId")
-                userGroupRef.setValue(createGroupName(groupMembersMap, it))
+                userGroupRef.setValue(createGroupName(groupMembers, it))
             }
             _newGroupId.postValue(groupId)
         }
 
-        if(groupMembersMap.size<=2){
-            var friendId = ""
-
-            groupMembersMap.forEach{
-                if(it.key != uid){
-                    friendId = it.key
-                }
-            }
-            if(friendId=="")
-                friendId= uid!!
-
-            val fromRef = FirebaseDatabase.getInstance().getReference("/friends/$uid/$friendId")
-            fromRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onCancelled(error: DatabaseError) {
-                }
-
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val data = snapshot.getValue(Friend::class.java) ?: return
-                    val changeData = Friend(data.isNotBlocked, groupId!!)
-                    fromRef.setValue(changeData)
-                }
-            })
-
-            if(friendId != uid) {
-                val toRef = FirebaseDatabase.getInstance().getReference("/friends/$friendId/$uid")
-                toRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onCancelled(error: DatabaseError) {
-                    }
-
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        val data = snapshot.getValue(Friend::class.java) ?: return
-                        val changeData = Friend(data.isNotBlocked, groupId!!)
-                        toRef.setValue(changeData)
-                    }
-                })
-            }
+        if(isAlone(groupMembers)){
+            insertAloneChattingRoomId(uid!!, groupId)
+        } else if(isOneToOne(groupMembers)){
+            val friendId = getFriendId(groupMembers)
+            insertAloneChattingRoomId(friendId, groupId)
+            insertOneToOneChattingRoomId(friendId, groupId)
         }
     }
 
@@ -228,16 +200,20 @@ class ChattingRoomFirebaseSource : KoinComponent {
         groupMembers: HashMap<String, UserModel>,
         groupId: String
     ): Completable {
-        var notificationInfo = NotificationInfo(
-            title = groupMembers[FirebaseAuth.getInstance().uid]!!.username,
-            body = text,
-            chatRoomId = groupId
-        )
+        var notificationInfo =
+            NotificationInfo(
+                title = groupMembers[FirebaseAuth.getInstance().uid]!!.username,
+                body = text,
+                chatRoomId = groupId
+            )
         var registrationIds = TokenParser()
             .parser(groupMembers)
 
         var notificationRequest =
-            NotificationRequest(registrationIds, notificationInfo)
+            NotificationRequest(
+                registrationIds,
+                notificationInfo
+            )
 
         return notificationAPI.pushMessage(notificationRequest)
     }
@@ -277,5 +253,50 @@ class ChattingRoomFirebaseSource : KoinComponent {
             }
         })
 
+    }
+    private fun isOneToOne(groupMembers: HashMap<String, UserModel>) = groupMembers.size == 2
+    private fun isAlone(groupMembers: HashMap<String, UserModel>) = groupMembers.size == 1
+    private fun insertAloneChattingRoomId(friendId : String, groupId: String){
+        val fromRef = FirebaseDatabase.getInstance().getReference("/friends/$uid/$friendId")
+        fromRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val data = snapshot.getValue(Friend::class.java) ?: return
+                val changeData = Friend(
+                    data.isNotBlocked,
+                    groupId!!
+                )
+                fromRef.setValue(changeData)
+            }
+        })
+    }
+    private fun insertOneToOneChattingRoomId(friendId : String, groupId: String){
+        val toRef = FirebaseDatabase.getInstance().getReference("/friends/$friendId/$uid")
+        toRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val data = snapshot.getValue(Friend::class.java) ?: return
+                val changeData =
+                    Friend(
+                        data.isNotBlocked,
+                        groupId!!
+                    )
+                toRef.setValue(changeData)
+            }
+        })
+    }
+
+    private fun getFriendId(groupMembers: HashMap<String, UserModel>): String {
+        var friendId = ""
+        groupMembers.forEach {
+            if (it.key != uid) {
+                friendId = it.key
+            }
+        }
+        return friendId
     }
 }

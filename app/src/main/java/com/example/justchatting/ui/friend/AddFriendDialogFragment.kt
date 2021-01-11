@@ -1,4 +1,4 @@
-package com.example.justchatting.ui.friend.dialog
+package com.example.justchatting.ui.friend
 
 import android.os.Bundle
 import android.util.Log
@@ -10,10 +10,9 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.example.justchatting.R
-import com.example.justchatting.ui.friend.FriendViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class AddFriendFragment(tabPosition: Int, text: String) : DialogFragment() {
+class AddFriendDialogFragment(tabPosition: Int, text: String) : DialogFragment() {
 
     private val viewModel: FriendViewModel by viewModel()
     private var mText = text
@@ -30,7 +29,7 @@ class AddFriendFragment(tabPosition: Int, text: String) : DialogFragment() {
         val inputEditTextView = view.findViewById<EditText>(R.id.dialog_edittext_input)
         detailTextView.text = mText
 
-        addButton.setOnClickListener { _ ->
+        addButton.setOnClickListener {
             Log.d("AddFriendFragment", "onclick add")
             when (mtabPosition) {
                 TabPosition.PHONE.value -> {

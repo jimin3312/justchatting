@@ -3,7 +3,9 @@ package com.example.justchatting.repository.friend
 import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.justchatting.UserModel
+import com.example.justchatting.Event
+import com.example.justchatting.data.DTO.UserModel
+import com.example.justchatting.ui.friend.FriendFragment
 
 interface FriendRepository {
     fun getUsers(): LiveData<ArrayList<UserModel>>
@@ -16,5 +18,5 @@ interface FriendRepository {
 
     fun setFriendListChangeListener(friends: HashMap<String, UserModel>)
 
-    fun isValidToAdd(): MutableLiveData<Int>
+    fun isValidToAdd(): MutableLiveData<Event<FriendFragment.AddResult>>
 }

@@ -1,4 +1,4 @@
-package com.example.justchatting
+package com.example.justchatting.data.DTO
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize

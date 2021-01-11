@@ -5,7 +5,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.justchatting.Message
+import com.example.justchatting.data.DTO.Message
 import com.example.justchatting.R
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView

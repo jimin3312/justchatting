@@ -3,10 +3,12 @@ package com.example.justchatting.repository.friend
 import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.justchatting.UserModel
+import com.example.justchatting.Event
+import com.example.justchatting.data.DTO.UserModel
 import com.example.justchatting.data.friend.ContactsDAO
 import com.example.justchatting.data.friend.FriendAdditionFirebaseSource
 import com.example.justchatting.data.friend.FriendFirebaseSource
+import com.example.justchatting.ui.friend.FriendFragment.AddResult
 
 class FriendRepositoryImpl(
     private val contactsDAO: ContactsDAO,
@@ -33,7 +35,7 @@ class FriendRepositoryImpl(
         friendFirebaseSource.setFriendListChangeListener(friends)
     }
 
-    override fun isValidToAdd(): MutableLiveData<Int> {
+    override fun isValidToAdd(): MutableLiveData<Event<AddResult>> {
         return friendAdditionFirebaseSource.isValidToAdd
     }
 }

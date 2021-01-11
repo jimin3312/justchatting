@@ -1,4 +1,4 @@
-package com.example.justchatting
+package com.example.justchatting.data.DTO
 
 data class ChattingRoom(
     val lastMessage : String ="",

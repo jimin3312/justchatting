@@ -3,7 +3,7 @@ package com.example.justchatting.ui.chattingRoom
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.justchatting.Message
+import com.example.justchatting.data.DTO.Message
 import com.example.justchatting.R
 import com.example.justchatting.ui.chattingRoom.view_holder.ChatFromViewHolder
 import com.example.justchatting.ui.chattingRoom.view_holder.ChatToViewHolder

@@ -1,8 +1,7 @@
-package com.example.justchatting.data.Auth
+package com.example.justchatting.data.auth
 
 import android.net.Uri
-import android.util.Log
-import com.example.justchatting.UserModel
+import com.example.justchatting.data.DTO.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError

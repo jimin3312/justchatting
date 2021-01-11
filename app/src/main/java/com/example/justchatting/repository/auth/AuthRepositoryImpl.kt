@@ -1,7 +1,7 @@
 package com.example.justchatting.repository.auth
 
 import android.net.Uri
-import com.example.justchatting.data.Auth.AuthFirebaseSource
+import com.example.justchatting.data.auth.AuthFirebaseSource
 import io.reactivex.Completable
 
 class AuthRepositoryImpl(

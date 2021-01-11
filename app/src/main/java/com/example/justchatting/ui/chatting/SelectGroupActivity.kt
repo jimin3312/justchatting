@@ -3,27 +3,19 @@ package com.example.justchatting.ui.chatting
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.justchatting.R
-import com.example.justchatting.UserModel
+import com.example.justchatting.data.DTO.UserModel
+import com.example.justchatting.base.BaseActivity
 import com.example.justchatting.databinding.ActivitySelectGroupBinding
 import com.example.justchatting.ui.chattingRoom.ChattingRoomActivity
-import com.google.firebase.auth.FirebaseAuth
-import kotlinx.android.synthetic.main.activity_select_group.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SelectGroupActivity : AppCompatActivity() {
-    companion object {
-        val TAG = "SelectGroupActivity"
-    }
+class SelectGroupActivity : BaseActivity<ActivitySelectGroupBinding>() {
 
-    lateinit var binding: ActivitySelectGroupBinding
     lateinit var menuItem: MenuItem
     val viewModel: SelectGroupViewModel by viewModel()
     lateinit var selectGroupRecyclerviewAdapter: SelectGroupRecyclerviewAdapter
@@ -32,16 +24,16 @@ class SelectGroupActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_select_group)
 
-        viewModel.addAlreadyEnteredMember(intent.getSerializableExtra("members") as? HashMap<String, UserModel>)
+        viewModel.addAlreadyEnteredMember(intent.getSerializableExtra(resources.getString(R.string.alreadyEnteredMember)) as? HashMap<String, UserModel>)
 
         selectGroupRecyclerviewAdapter = SelectGroupRecyclerviewAdapter()
-        select_group_recyclerview.apply {
+
+        binding.selectGroupRecyclerview.apply {
             setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(context)
             adapter = selectGroupRecyclerviewAdapter
         }
 
-        viewModel.load()
+        viewModel.loadFriends()
         viewModel.getFriends().observe(this, Observer {
             selectGroupRecyclerviewAdapter.setFriendList(it)
             selectGroupRecyclerviewAdapter.notifyDataSetChanged()
@@ -51,18 +43,20 @@ class SelectGroupActivity : AppCompatActivity() {
             menuItem.isEnabled = cnt > 0
         })
 
-        viewModel.getGroupId().observe(this, Observer { groupId ->
-            val intent = Intent(this, ChattingRoomActivity::class.java)
-            intent.putExtra("groupId", groupId)
-            intent.putExtra("groupMembers", selectGroupRecyclerviewAdapter.groupMembers)
-            startActivity(intent)
+        viewModel.getGroupId().observe(this, Observer {
+            it.getContentIfNotHandled()?.let { groupId ->
+                val intent = Intent(this, ChattingRoomActivity::class.java)
+                intent.putExtra("groupId", groupId)
+                intent.putExtra("groupMembers", selectGroupRecyclerviewAdapter.groupMembers)
+                startActivity(intent)
+            }
         })
 
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
 
-        if(intent.getStringExtra("before")!= null){
+        if (intent.getStringExtra("before") != null) {
             menuInflater.inflate(R.menu.selcect_menu_from_chatting_room, menu)
             menuItem = menu!!.findItem(R.id.select_invite)
         } else {
@@ -79,11 +73,15 @@ class SelectGroupActivity : AppCompatActivity() {
                 viewModel.loadGroupId(selectGroupRecyclerviewAdapter.groupMembers)
             }
             R.id.select_invite -> {
-                intent.putExtra("invited member",selectGroupRecyclerviewAdapter.groupMembers)
+                intent.putExtra("invited member", selectGroupRecyclerviewAdapter.groupMembers)
                 setResult(Activity.RESULT_OK, intent)
                 finish()
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun getLayoutId(): Int {
+        return R.layout.activity_select_group
     }
 }
