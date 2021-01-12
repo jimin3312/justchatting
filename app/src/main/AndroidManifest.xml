@@ -15,7 +15,8 @@
         android:name=".JustApp"
         tools:ignore="GoogleAppIndexingWarning">
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:theme="@style/Theme.JustChatting.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -27,7 +28,7 @@
             android:noHistory="true"
             />
         <activity android:name=".ui.chattingRoom.ChattingRoomActivity"
-            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:theme="@style/Theme.JustChatting.NoActionBar"
             />
         <service
             android:name=".ChatMessageService"

@@ -21,6 +21,6 @@ class JustApp : Application() {
     }
 
     companion object{
-        var roomId: String = ""
+         var roomId: String= ""
     }
 }
