@@ -32,7 +32,7 @@ class ChatMessageService() : FirebaseMessagingService() {
         Log.d("메세지", "body: ${message.data["body"]}")
         Log.d("메세지", "id: ${message.data["chatRoomId"]}")
 
-        if(message.data["chatRoomId"] != JustApp.roomId){
+        if(message.data["chatRoomId"] != JustApp.roomId) {
             sendNotification(message.data["title"], message.data["body"])
         }
 
