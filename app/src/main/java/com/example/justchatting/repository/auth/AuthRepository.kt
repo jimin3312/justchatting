@@ -15,4 +15,5 @@ interface AuthRepository {
         email: String
     ): Single<Boolean>
     fun updateToken(): Completable
+    fun saveProfileImageToCache() : Completable
 }

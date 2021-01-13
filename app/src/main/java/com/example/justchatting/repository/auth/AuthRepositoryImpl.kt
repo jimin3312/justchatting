@@ -22,4 +22,6 @@ class AuthRepositoryImpl(
     ) = authFirebaseSource.saveUser(name, phoneNumber, firebaseImageResourcePath, email)
 
     override fun updateToken(): Completable = authFirebaseSource.updateToken()
+    override fun saveProfileImageToCache(): Completable = authFirebaseSource.saveProfileImageToCache()
+
 }

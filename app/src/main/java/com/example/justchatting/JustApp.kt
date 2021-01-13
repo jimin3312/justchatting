@@ -16,7 +16,7 @@ class JustApp : Application() {
         FirebaseDatabase.getInstance().setPersistenceEnabled(true)
         startKoin {
             androidContext(this@JustApp)
-            modules(listOf(viewModelModule, friendModule, loginModule, chattingModule, networkModule, chattingRoomModule))
+            modules(listOf(viewModelModule, friendModule, loginModule, chattingModule, networkModule, chattingRoomModule, cacheModule,settingsModule))
         }
     }
 

@@ -1,12 +1,19 @@
 package com.example.justchatting.ui.settings
 
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.graphics.ImageDecoder
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.justchatting.R
 import com.example.justchatting.base.BaseFragment
 import com.example.justchatting.databinding.FragmentSettingsBinding
+import com.example.justchatting.ui.login.RegisterActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
@@ -20,5 +27,38 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         binding.lifecycleOwner = this.viewLifecycleOwner
 
         (activity as AppCompatActivity).setSupportActionBar(binding.settingsToolbar)
+
+        viewModel.loadMyProfileImage()
+
+        binding.settingsNotificationConfig.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.setNotificationConfig(isChecked)
+        }
+
+        binding.settingsEdit.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            startActivityForResult(intent, RegisterActivity.PERMISSIONS_REQUEST_READ_CONTACTS)
+        }
+    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == RegisterActivity.PERMISSIONS_REQUEST_READ_CONTACTS && resultCode == Activity.RESULT_OK && data != null) {
+            viewModel.profileImage =
+                if (Build.VERSION.SDK_INT < 28) {
+                    MediaStore.Images.Media.getBitmap(
+                        requireActivity().contentResolver,
+                        data.data
+                    )
+                } else {
+                    val source = ImageDecoder.createSource(
+                        requireActivity().contentResolver,
+                        data.data!!
+                    )
+                    ImageDecoder.decodeBitmap(source)
+                }
+
+            viewModel.uploadProfileImage(data.data)
+        }
     }
 }

@@ -1,6 +1,9 @@
 package com.example.justchatting.data.auth
 
+import android.content.SharedPreferences
+import android.graphics.BitmapFactory
 import android.net.Uri
+import com.example.justchatting.Cache
 import com.example.justchatting.data.DTO.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -8,12 +11,15 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.storage.FileDownloadTask
 import com.google.firebase.storage.FirebaseStorage
 import io.reactivex.Completable
 import io.reactivex.Single
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.util.*
 
-class AuthFirebaseSource {
+class AuthFirebaseSource : KoinComponent{
     private val auth: FirebaseAuth by lazy {
         FirebaseAuth.getInstance()
     }
@@ -49,6 +55,7 @@ class AuthFirebaseSource {
             } else {
                 val filename = UUID.randomUUID().toString()
                 val ref = FirebaseStorage.getInstance().getReference("/profileImages/$filename")
+
                 ref.putFile(uri)
                     .addOnSuccessListener {
                         ref.downloadUrl.addOnSuccessListener {
@@ -131,5 +138,29 @@ class AuthFirebaseSource {
                 })
         }
 
+    }
+
+    fun saveProfileImageToCache(): Completable = Completable.create{ emitter->
+        val myUid = FirebaseAuth.getInstance().uid
+        FirebaseDatabase.getInstance().getReference("/users/$myUid").addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val user = snapshot.getValue(UserModel::class.java)?: return
+
+                if( user.profileImageUrl != ""){
+                    val ONE_MEGABYTE: Long = 1024 * 1024
+                    FirebaseStorage.getInstance().getReferenceFromUrl(user.profileImageUrl!!).getBytes(ONE_MEGABYTE).addOnSuccessListener {
+                        val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
+                        val cache : Cache by inject()
+                        cache.saveBitmap("profileImage", bitmap)
+                        emitter.onComplete()
+                    }.addOnFailureListener{
+                        emitter.onError(it)
+                    }
+                }
+            }
+        })
     }
 }
