@@ -5,9 +5,11 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.example.justchatting.di.PREF
 import com.example.justchatting.repository.auth.AuthRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -20,7 +22,7 @@ import kotlin.random.Random
 class ChatMessageService() : FirebaseMessagingService() {
 
     val repository: AuthRepository by inject()
-
+    val sharedPreferences : SharedPreferences = getSharedPreferences(PREF,0)
     companion object{
         val CHANNEL_ID = "1234"
     }
@@ -32,7 +34,7 @@ class ChatMessageService() : FirebaseMessagingService() {
         Log.d("메세지", "body: ${message.data["body"]}")
         Log.d("메세지", "id: ${message.data["chatRoomId"]}")
 
-        if(message.data["chatRoomId"] != JustApp.roomId) {
+        if(sharedPreferences.getBoolean("notification", true) && message.data["chatRoomId"] != JustApp.roomId) {
             sendNotification(message.data["title"], message.data["body"])
         }
 
