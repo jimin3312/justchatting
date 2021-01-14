@@ -14,6 +14,7 @@ import com.example.justchatting.R
 import com.example.justchatting.base.BaseFragment
 import com.example.justchatting.databinding.FragmentSettingsBinding
 import com.example.justchatting.ui.login.RegisterActivity
+import kotlinx.android.synthetic.main.chat_to_image_item.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
@@ -25,6 +26,8 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = this.viewLifecycleOwner
+        binding.viewModel = viewModel
+
 
         (activity as AppCompatActivity).setSupportActionBar(binding.settingsToolbar)
 
@@ -39,17 +42,17 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
             intent.type = "image/*"
             startActivityForResult(intent, RegisterActivity.PERMISSIONS_REQUEST_READ_CONTACTS)
         }
+
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == RegisterActivity.PERMISSIONS_REQUEST_READ_CONTACTS && resultCode == Activity.RESULT_OK && data != null) {
-            viewModel.profileImage =
-                if (Build.VERSION.SDK_INT < 28) {
-                    MediaStore.Images.Media.getBitmap(
+
+                viewModel.profileImage.value = if (Build.VERSION.SDK_INT < 28) {
+                     MediaStore.Images.Media.getBitmap(
                         requireActivity().contentResolver,
-                        data.data
-                    )
+                        data.data)
                 } else {
                     val source = ImageDecoder.createSource(
                         requireActivity().contentResolver,
@@ -58,6 +61,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                     ImageDecoder.decodeBitmap(source)
                 }
 
+            viewModel.saveProfileImageToCache()
             viewModel.uploadProfileImage(data.data)
         }
     }
