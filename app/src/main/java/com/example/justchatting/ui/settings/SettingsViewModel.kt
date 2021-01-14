@@ -1,23 +1,47 @@
 package com.example.justchatting.ui.settings
 
+import android.R
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import androidx.databinding.ObservableField
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.justchatting.repository.settings.SettingsRepository
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 
-class SettingsViewModel(private val settingsRepository: SettingsRepository) : ViewModel(){
 
-    var profileImage: Bitmap? = null
-    var name : String = ""
-    var email : String = ""
-    fun loadMyProfileImage(){
-        profileImage = settingsRepository.loadImage()
+class SettingsViewModel(private val settingsRepository: SettingsRepository) : ViewModel() {
+    val disposable = CompositeDisposable()
+    var profileImage: MutableLiveData<Bitmap?> = MutableLiveData()
+    val notificationConfig: MutableLiveData<Boolean> = MutableLiveData()
+
+    init {
+        notificationConfig.value = settingsRepository.getNotificationConfig()
     }
-    fun setNotificationConfig(boolean: Boolean){
+
+    fun loadMyProfileImage() {
+        profileImage.value = settingsRepository.loadImage()
+    }
+
+    fun setNotificationConfig(boolean: Boolean) {
         settingsRepository.setNotificationConfig(boolean)
     }
 
+    fun saveProfileImageToCache() {
+        settingsRepository.saveProfileImageToCache(profileImage.value!!)
+    }
+
     fun uploadProfileImage(data: Uri?) {
-        settingsRepository.uploadProfileImage(data)
+        disposable.add(settingsRepository.uploadProfileImage(data)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+            }, {
+
+            })
+        )
     }
 }

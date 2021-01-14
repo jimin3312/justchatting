@@ -22,18 +22,20 @@ import kotlin.random.Random
 class ChatMessageService() : FirebaseMessagingService() {
 
     val repository: AuthRepository by inject()
-    val sharedPreferences : SharedPreferences = getSharedPreferences(PREF,0)
     companion object{
         val CHANNEL_ID = "1234"
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
+
         Log.d("메세지", "From: ${message.from}")
         Log.d("메세지", "title: ${message.data["title"]}")
         Log.d("메세지", "body: ${message.data["body"]}")
         Log.d("메세지", "id: ${message.data["chatRoomId"]}")
 
+
+        val sharedPreferences : SharedPreferences = getSharedPreferences(PREF, 0)
         if(sharedPreferences.getBoolean("notification", true) && message.data["chatRoomId"] != JustApp.roomId) {
             sendNotification(message.data["title"], message.data["body"])
         }

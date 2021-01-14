@@ -5,11 +5,20 @@ import android.graphics.Bitmap
 import android.net.Uri
 import com.example.justchatting.Cache
 import com.example.justchatting.data.auth.AuthFirebaseSource
+import io.reactivex.Single
 
 
 class SettingsRepositoryImpl(private val cache: Cache, private val sharedPreferences: SharedPreferences, private val authFirebaseSource: AuthFirebaseSource) : SettingsRepository {
     override fun loadImage(): Bitmap? {
         return cache.loadBitmap("profileImage")
+    }
+    override fun saveProfileImageToCache(bitmap: Bitmap){
+
+        cache.saveBitmap("profileImage", bitmap)
+    }
+
+    override fun getNotificationConfig(): Boolean? {
+        return sharedPreferences.getBoolean("notification", true)
     }
 
     override fun setNotificationConfig(boolean: Boolean) {
@@ -19,8 +28,8 @@ class SettingsRepositoryImpl(private val cache: Cache, private val sharedPrefere
         }
     }
 
-    override fun uploadProfileImage(data: Uri?) {
-        authFirebaseSource.uploadProfileImage(data)
+    override fun uploadProfileImage(data: Uri?): Single<String> {
+        return authFirebaseSource.uploadProfileImage(data)
     }
 
 }

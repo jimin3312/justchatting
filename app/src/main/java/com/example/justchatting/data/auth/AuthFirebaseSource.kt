@@ -53,8 +53,8 @@ class AuthFirebaseSource : KoinComponent{
             if (uri == null) {
                 emitter.onSuccess("")
             } else {
-                val filename = UUID.randomUUID().toString()
-                val ref = FirebaseStorage.getInstance().getReference("/profileImages/$filename")
+                val uid = FirebaseAuth.getInstance().uid
+                val ref = FirebaseStorage.getInstance().getReference("/profileImages/$uid")
 
                 ref.putFile(uri)
                     .addOnSuccessListener {
@@ -159,6 +159,8 @@ class AuthFirebaseSource : KoinComponent{
                     }.addOnFailureListener{
                         emitter.onError(it)
                     }
+                } else {
+                    emitter.onComplete()
                 }
             }
         })
