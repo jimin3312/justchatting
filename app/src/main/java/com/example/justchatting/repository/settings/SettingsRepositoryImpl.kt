@@ -1,5 +1,6 @@
 package com.example.justchatting.repository.settings
 
+import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.net.Uri
@@ -9,12 +10,11 @@ import io.reactivex.Single
 
 
 class SettingsRepositoryImpl(private val cache: Cache, private val sharedPreferences: SharedPreferences, private val authFirebaseSource: AuthFirebaseSource) : SettingsRepository {
-    override fun loadImage(): Bitmap? {
-        return cache.loadBitmap("profileImage")
+    override fun loadImage(context: Context): Bitmap? {
+        return cache.loadBitmap(context)
     }
-    override fun saveProfileImageToCache(bitmap: Bitmap){
-
-        cache.saveBitmap("profileImage", bitmap)
+    override fun saveProfileImageToCache(context: Context, bitmap: Bitmap){
+        cache.saveBitmap(context, bitmap)
     }
 
     override fun getNotificationConfig(): Boolean? {

@@ -1,5 +1,6 @@
 package com.example.justchatting.repository.auth
 
+import android.content.Context
 import android.net.Uri
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -15,5 +16,5 @@ interface AuthRepository {
         email: String
     ): Single<Boolean>
     fun updateToken(): Completable
-    fun saveProfileImageToCache() : Completable
+    fun saveProfileImageToCache(applicationContext: Context): Completable
 }

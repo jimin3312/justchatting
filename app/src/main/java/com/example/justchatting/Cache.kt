@@ -1,30 +1,22 @@
 package com.example.justchatting
 
+import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import android.util.LruCache
 
 class Cache {
-    private lateinit var memoryCache: LruCache<String, Bitmap>
-    init {
-        val maxMemory = (Runtime.getRuntime().maxMemory() / 1024).toInt()
-
-        // Use 1/8th of the available memory for this memory cache.
-        val cacheSize = maxMemory / 8
-        memoryCache = object : LruCache<String, Bitmap>(cacheSize) {
-            override fun sizeOf(key: String, bitmap: Bitmap): Int {
-                return bitmap.byteCount / 1024
-            }
+    fun saveBitmap(context: Context, bitmap: Bitmap?){
+        context.openFileOutput("profile", Context.MODE_PRIVATE).use { os->
+            bitmap?.let { it.compress(Bitmap.CompressFormat.PNG, 100, os) }
         }
     }
-
-    fun saveBitmap(key: String, bitmap: Bitmap){
-        Log.d("비트맵저장", bitmap.toString())
-        memoryCache.put(key, bitmap)
-    }
-    fun loadBitmap(key: String): Bitmap? {
-        if(memoryCache.get(key) != null)
-            Log.d("비트맵로드", memoryCache.get(key).toString())
-        return memoryCache.get(key)
+    fun loadBitmap(context: Context): Bitmap? {
+        val file = context.getFileStreamPath("profile")
+        if(file.exists())
+            return BitmapFactory.decodeStream(file.inputStream())
+        else
+            return null
     }
 }
