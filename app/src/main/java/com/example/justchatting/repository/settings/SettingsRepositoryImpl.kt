@@ -17,6 +17,10 @@ class SettingsRepositoryImpl(private val cache: Cache, private val sharedPrefere
         cache.saveBitmap(context, bitmap)
     }
 
+    override fun editProfileImageUrl(url: String) {
+        authFirebaseSource.editProfileImageUrl(url)
+    }
+
     override fun getNotificationConfig(): Boolean? {
         return sharedPreferences.getBoolean("notification", true)
     }
@@ -31,5 +35,6 @@ class SettingsRepositoryImpl(private val cache: Cache, private val sharedPrefere
     override fun uploadProfileImage(data: Uri?): Single<String> {
         return authFirebaseSource.uploadProfileImage(data)
     }
+
 
 }

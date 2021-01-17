@@ -11,4 +11,5 @@ interface SettingsRepository {
     fun getNotificationConfig(): Boolean?
     fun loadImage(context: Context): Bitmap?
     fun saveProfileImageToCache(context: Context, bitmap: Bitmap)
+    fun editProfileImageUrl(url: String)
 }
