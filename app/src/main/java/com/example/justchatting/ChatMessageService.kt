@@ -9,8 +9,10 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.app.TaskStackBuilder
 import com.example.justchatting.di.PREF
 import com.example.justchatting.repository.auth.AuthRepository
+import com.example.justchatting.ui.chattingRoom.ChattingRoomActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -37,23 +39,35 @@ class ChatMessageService() : FirebaseMessagingService() {
 
         val sharedPreferences : SharedPreferences = getSharedPreferences(PREF, 0)
         if(sharedPreferences.getBoolean("notification", true) && message.data["chatRoomId"] != JustApp.roomId) {
-            sendNotification(message.data["title"], message.data["body"])
+            sendNotification(message.data["title"], message.data["body"], message.data["chatRoomId"])
         }
 
     }
 
-    private fun sendNotification(title: String?, message: String?) {
+    private fun sendNotification(title: String?, message: String?, chatRoomId: String?) {
 
-        val intent = Intent(this, MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        // Create an Intent for the activity you want to start
+        val intent = Intent(this, ChattingRoomActivity::class.java)
+        intent.putExtra("groupId", chatRoomId)
+        // Create the TaskStackBuilder
+        val pendingIntent: PendingIntent? = TaskStackBuilder.create(this).run {
+            // Add the intent, which inflates the back stack
+            addNextIntentWithParentStack(intent)
+            // Get the PendingIntent containing the entire back stack
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+
+
+//        val intent = Intent(this, MainActivity::class.java)
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
         val notificationManager: NotificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notificationID = Random.nextInt()
 
         createNotificationChannel()
 
-        var pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT)
-        var notification = NotificationCompat.Builder(this, CHANNEL_ID)
+//        var pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT)
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(title)
             .setContentText(message)
