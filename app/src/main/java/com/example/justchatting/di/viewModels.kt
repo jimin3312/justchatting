@@ -16,7 +16,7 @@ val viewModelModule = module {
     viewModel { SelectGroupViewModel()}
     viewModel { ChattingRoomViewModel() }
     single { FriendViewModel(androidApplication())}
-    viewModel { SettingsViewModel(get()) }
-    viewModel { LoginViewModel(get()) }
+    viewModel { SettingsViewModel(get(), androidApplication()) }
+    viewModel { LoginViewModel(get(), androidApplication()) }
     viewModel { RegisterViewModel(get()) }
 }

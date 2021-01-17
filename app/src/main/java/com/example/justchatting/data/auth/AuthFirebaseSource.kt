@@ -1,6 +1,6 @@
 package com.example.justchatting.data.auth
 
-import android.content.SharedPreferences
+import android.content.Context
 import android.graphics.BitmapFactory
 import android.net.Uri
 import com.example.justchatting.Cache
@@ -11,13 +11,11 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.storage.FileDownloadTask
 import com.google.firebase.storage.FirebaseStorage
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import java.util.*
 
 class AuthFirebaseSource : KoinComponent{
     private val auth: FirebaseAuth by lazy {
@@ -140,7 +138,7 @@ class AuthFirebaseSource : KoinComponent{
 
     }
 
-    fun saveProfileImageToCache(): Completable = Completable.create{ emitter->
+    fun saveProfileImageToCache(context: Context): Completable = Completable.create{ emitter->
         val myUid = FirebaseAuth.getInstance().uid
         FirebaseDatabase.getInstance().getReference("/users/$myUid").addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onCancelled(error: DatabaseError) {
@@ -152,9 +150,10 @@ class AuthFirebaseSource : KoinComponent{
                 if( user.profileImageUrl != ""){
                     val ONE_MEGABYTE: Long = 1024 * 1024
                     FirebaseStorage.getInstance().getReferenceFromUrl(user.profileImageUrl!!).getBytes(ONE_MEGABYTE).addOnSuccessListener {
+
                         val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
                         val cache : Cache by inject()
-                        cache.saveBitmap("profileImage", bitmap)
+                        cache.saveBitmap(context, bitmap)
                         emitter.onComplete()
                     }.addOnFailureListener{
                         emitter.onError(it)
