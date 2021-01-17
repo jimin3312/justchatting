@@ -41,6 +41,7 @@ class SettingsViewModel(private val settingsRepository: SettingsRepository, appl
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
+                settingsRepository.editProfileImageUrl(it)
             }, {
 
             })
