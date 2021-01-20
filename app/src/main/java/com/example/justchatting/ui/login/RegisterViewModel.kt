@@ -22,9 +22,7 @@ class RegisterViewModel(
     var phoneNumber: String? = null
     var selectedPhotoUri : Uri? = null
 
-    private val _successSignUp = MutableLiveData<Boolean>()
-    val successSignUp: LiveData<Boolean>
-        get() = _successSignUp
+    val successSignUp = MutableLiveData<Boolean>()
 
 
     private val _errorToastMessage = MutableLiveData<String>()
@@ -48,7 +46,7 @@ class RegisterViewModel(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                _successSignUp.value = true
+                successSignUp.value = true
             }, {
                 _errorToastMessage.value = it.message
             })
