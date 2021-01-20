@@ -1,10 +1,12 @@
 package com.example.justchatting.ui.settings
 
 import android.R
+import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.databinding.ObservableField
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.justchatting.repository.settings.SettingsRepository
@@ -13,7 +15,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
 
-class SettingsViewModel(private val settingsRepository: SettingsRepository) : ViewModel() {
+class SettingsViewModel(private val settingsRepository: SettingsRepository, application: Application) : AndroidViewModel(application){
     val disposable = CompositeDisposable()
     var profileImage: MutableLiveData<Bitmap?> = MutableLiveData()
     val notificationConfig: MutableLiveData<Boolean> = MutableLiveData()
@@ -23,7 +25,7 @@ class SettingsViewModel(private val settingsRepository: SettingsRepository) : Vi
     }
 
     fun loadMyProfileImage() {
-        profileImage.value = settingsRepository.loadImage()
+        profileImage.value = settingsRepository.loadImage(getApplication<Application>().applicationContext)
     }
 
     fun setNotificationConfig(boolean: Boolean) {
@@ -31,7 +33,7 @@ class SettingsViewModel(private val settingsRepository: SettingsRepository) : Vi
     }
 
     fun saveProfileImageToCache() {
-        settingsRepository.saveProfileImageToCache(profileImage.value!!)
+        settingsRepository.saveProfileImageToCache(getApplication<Application>().applicationContext, profileImage.value!!)
     }
 
     fun uploadProfileImage(data: Uri?) {
@@ -39,6 +41,7 @@ class SettingsViewModel(private val settingsRepository: SettingsRepository) : Vi
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
+                settingsRepository.editProfileImageUrl(it)
             }, {
 
             })

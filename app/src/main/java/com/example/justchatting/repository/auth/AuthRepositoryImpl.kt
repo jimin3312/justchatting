@@ -1,5 +1,6 @@
 package com.example.justchatting.repository.auth
 
+import android.content.Context
 import android.net.Uri
 import com.example.justchatting.data.auth.AuthFirebaseSource
 import io.reactivex.Completable
@@ -22,6 +23,6 @@ open class AuthRepositoryImpl(
     ) = authFirebaseSource.saveUser(name, phoneNumber, firebaseImageResourcePath, email)
 
     override fun updateToken(): Completable = authFirebaseSource.updateToken()
-    override fun saveProfileImageToCache(): Completable = authFirebaseSource.saveProfileImageToCache()
+    override fun saveProfileImageToCache(applicationContext: Context): Completable = authFirebaseSource.saveProfileImageToCache(applicationContext)
 
 }

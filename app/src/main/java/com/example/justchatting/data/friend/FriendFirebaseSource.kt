@@ -16,6 +16,7 @@ class FriendFirebaseSource {
         get() = _users
 
     var myInfo: UserModel? = null
+    val myUid = FirebaseAuth.getInstance().uid
 
     private fun mapToList(friends: HashMap<String, UserModel>) : ArrayList<UserModel>{
         val arr = ArrayList(friends.values)
@@ -26,8 +27,6 @@ class FriendFirebaseSource {
 
     fun setFriendListChangeListener(friends : HashMap<String, UserModel>)
     {
-        val myUid = FirebaseAuth.getInstance().uid
-
         val ref = FirebaseDatabase.getInstance().getReference("/friends/$myUid")
         ref.addChildEventListener(object : ChildEventListener {
             override fun onCancelled(error: DatabaseError) {
@@ -35,27 +34,32 @@ class FriendFirebaseSource {
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
             }
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                notify(snapshot, friends)
             }
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                val friend = snapshot.getValue(Friend::class.java) ?: return
-                if(friend.isNotBlocked) {
-                    val friendId = snapshot.key?: return
-                    val ref = FirebaseDatabase.getInstance().getReference("/users/$friendId")
-                    ref.addListenerForSingleValueEvent(object : ValueEventListener{
-                        override fun onCancelled(error: DatabaseError) {
-                        }
-
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            val user = snapshot.getValue(UserModel::class.java)?:return
-                            if(user.uid == myUid) myInfo = user
-                            else friends[user.uid] = user
-                            _users.postValue(mapToList(friends))
-                        }
-                    })
-                }
+                notify(snapshot, friends)
             }
             override fun onChildRemoved(snapshot: DataSnapshot) {
             }
         })
+    }
+
+    fun notify(snapshot: DataSnapshot, friends: HashMap<String, UserModel>){
+        val friend = snapshot.getValue(Friend::class.java) ?: return
+        if(friend.isNotBlocked) {
+            val friendId = snapshot.key?: return
+            val ref = FirebaseDatabase.getInstance().getReference("/users/$friendId")
+            ref.addListenerForSingleValueEvent(object : ValueEventListener{
+                override fun onCancelled(error: DatabaseError) {
+                }
+
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val user = snapshot.getValue(UserModel::class.java)?:return
+                    if(user.uid == myUid) myInfo = user
+                    else friends[user.uid] = user
+                    _users.postValue(mapToList(friends))
+                }
+            })
+        }
     }
 }
