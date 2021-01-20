@@ -1,6 +1,7 @@
 package com.example.justchatting.base
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ abstract class BaseFragment<T: ViewDataBinding> : Fragment(){
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, getLayoutId(), container, false)
+        Log.d("생성", "생성")
         return binding.root
     }
 }

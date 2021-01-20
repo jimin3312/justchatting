@@ -17,6 +17,7 @@ class ChattingLogdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
     }
     private var messages : ArrayList<Message>? = null
     private var uid = FirebaseAuth.getInstance().uid
+
     fun setChattingLog(chattingLog : ArrayList<Message>){
         this.messages = chattingLog
     }

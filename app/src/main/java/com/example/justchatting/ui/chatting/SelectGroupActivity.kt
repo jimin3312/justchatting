@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import androidx.room.Room
 import com.example.justchatting.R
 import com.example.justchatting.data.DTO.UserModel
 import com.example.justchatting.base.BaseActivity
@@ -51,7 +52,6 @@ class SelectGroupActivity : BaseActivity<ActivitySelectGroupBinding>() {
                 startActivity(intent)
             }
         })
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

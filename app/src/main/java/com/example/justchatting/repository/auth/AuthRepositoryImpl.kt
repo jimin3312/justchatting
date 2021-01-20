@@ -5,8 +5,8 @@ import android.net.Uri
 import com.example.justchatting.data.auth.AuthFirebaseSource
 import io.reactivex.Completable
 
-class AuthRepositoryImpl(
-    private val authFirebaseSource: AuthFirebaseSource
+open class AuthRepositoryImpl(
+    val authFirebaseSource: AuthFirebaseSource
 ) : AuthRepository {
 
     override fun loginWithEmail(email: String, password: String) = authFirebaseSource.loginWithEmail(email, password)
