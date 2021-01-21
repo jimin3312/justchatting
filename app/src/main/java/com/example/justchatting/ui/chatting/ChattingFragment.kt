@@ -40,7 +40,7 @@ class ChattingFragment : BaseFragment<FragmentChattingBinding>() {
             addItemDecoration(DividerItemDecoration(requireContext(),LinearLayoutManager.VERTICAL))
         }
 
-        viewModel.chattingRoomListChangeListener()
+        viewModel.setChattingRoomListChangeListener()
 
         viewModel.getChattingRooms().observe(viewLifecycleOwner, Observer {
             chattingRecyclerviewAdapter.setChattingList(it)

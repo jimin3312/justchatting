@@ -13,7 +13,7 @@ class ChattingViewModel : ViewModel(), KoinComponent{
     fun getChattingRooms(): LiveData<ArrayList<ChattingRoom>> {
         return chattingRepository.getChattingRooms()
     }
-    fun chattingRoomListChangeListener() {
-        chattingRepository.chattingRoomListChangeListener()
+    fun setChattingRoomListChangeListener() {
+        chattingRepository.setChattingRoomListChangeListener()
     }
 }

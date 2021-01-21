@@ -6,8 +6,8 @@ import com.example.justchatting.data.chatting.ChattingFirebaseSource
 
 class ChattingRepositoryImpl(private val chattingFirebaseSource: ChattingFirebaseSource) : ChattingRepository{
 
-    override fun chattingRoomListChangeListener() {
-        chattingFirebaseSource.chattingRoomListChangeListener()
+    override fun setChattingRoomListChangeListener() {
+        chattingFirebaseSource.setChattingRoomListChangeListener()
     }
     override fun getChattingRooms(): LiveData<ArrayList<ChattingRoom>> {
         return chattingFirebaseSource.chattingRooms
