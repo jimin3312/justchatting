@@ -14,7 +14,7 @@ class ChattingFirebaseSource {
     val chattingRooms : LiveData<ArrayList<ChattingRoom>>
         get() =  _chattingRooms
 
-    fun chattingRoomListChangeListener() {
+    fun setChattingRoomListChangeListener() {
 
         val userGroupRef = FirebaseDatabase.getInstance().getReference("/user_groups/$uid")
         userGroupRef.addChildEventListener(object : ChildEventListener {

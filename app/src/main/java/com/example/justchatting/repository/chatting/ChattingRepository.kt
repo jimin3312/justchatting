@@ -4,6 +4,6 @@ import androidx.lifecycle.LiveData
 import com.example.justchatting.data.DTO.ChattingRoom
 
 interface ChattingRepository {
-    fun chattingRoomListChangeListener()
+    fun setChattingRoomListChangeListener()
     fun getChattingRooms() : LiveData<ArrayList<ChattingRoom>>
 }
