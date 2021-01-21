@@ -1,92 +1,133 @@
 package com.example.justchatting
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.justchatting.di.loginModule
-import com.example.justchatting.di.viewModelModule
 import com.example.justchatting.repository.auth.AuthRepository
 import com.example.justchatting.ui.login.RegisterViewModel
 import io.reactivex.Completable
 import io.reactivex.Single
-import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.koin.test.KoinTest
+import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.dsl.module
+import org.koin.test.AutoCloseKoinTest
 import org.koin.test.KoinTestRule
 import org.koin.test.inject
-import org.koin.test.mock.MockProviderRule
+import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
+import org.mockito.MockitoAnnotations
 
-class RegisterViewModelTest : KoinTest {
+class RegisterViewModelTest : AutoCloseKoinTest() {
 
-    val registerViewModel: RegisterViewModel by inject()
+    val mockRepository: AuthRepository by inject()
+//    val registerViewModel: RegisterViewModel by inject()
 
     @get:Rule
     val koinTestRule = KoinTestRule.create {
         printLogger()
-        modules(viewModelModule, loginModule)
+        modules(
+            module{
+                factory { mock(AuthRepository::class.java) }
+            }
+        )
     }
 
-    @get:Rule
-    val mockProvider = MockProviderRule.create { clazz ->
-        mock(clazz.java)
-    }
+    @Rule
+    @JvmField
+    var testSchedulerRule = RxImmediateSchedulerRule()
 
-    @get:Rule
-    var instantExecutorRule = InstantTaskExecutorRule()
+    @Rule
+    @JvmField
+    val ruleForLivaData = InstantTaskExecutorRule()
 
     @Test
     fun 회원가입_성공() {
-        registerViewModel.email = "tom@gamil.com"
-        registerViewModel.name = "tom"
-        registerViewModel.password = "123123"
-        registerViewModel.phoneNumber = "010"
-
-        val mockRepository = mock(AuthRepository::class.java)
-
+        //given
         Mockito.`when`(
             mockRepository.signUpWithEmail(
-                registerViewModel.email!!,
-                registerViewModel.password!!
+                "tom@gmail.com",
+                "123123"
             )
         ).thenReturn(Completable.complete())
 
         Mockito.`when`(
             mockRepository.uploadProfile(
-                registerViewModel.selectedPhotoUri
+                null
             )
         ).thenReturn(Single.just(""))
 
         Mockito.`when`(
             mockRepository.saveUser(
-                registerViewModel.name!!,
-                registerViewModel.phoneNumber!!,
+                "tom",
+                "010",
                 "",
-                registerViewModel.email!!
+                "tom@gmail.com"
             )
         ).thenReturn(Single.just(true))
 
-        mockRepository.signUpWithEmail(
-            registerViewModel.email!!,
-            registerViewModel.password!!
-        ).andThen(mockRepository. uploadProfile(
-            registerViewModel.selectedPhotoUri
-        )).flatMap { imagePath ->
-            mockRepository.saveUser(
-                registerViewModel.name!!,
-                registerViewModel.phoneNumber!!,
-                imagePath,
-                registerViewModel.email!!
-            )
-        }.doOnSuccess { _ ->
-            registerViewModel.successSignUp.value = true
-        }.test()
+        val registerViewModel = RegisterViewModel(mockRepository)
 
-        Assert.assertEquals(registerViewModel.successSignUp.value, true)
+        registerViewModel.email = "tom@gmail.com"
+        registerViewModel.name = "tom"
+        registerViewModel.password = "123123"
+        registerViewModel.phoneNumber = "010"
+
+        //when
+        registerViewModel.signUp()
+
+        //then
+        assertEquals(registerViewModel.successSignUp.value, true)
+    }
+
+    @Test
+    fun 회원가입_실패_미입력(){
+
+        val registerViewModel = RegisterViewModel(mockRepository)
+
+        registerViewModel.name = "tom"
+        registerViewModel.password = "123123"
+        registerViewModel.phoneNumber = "010"
+
+        registerViewModel.signUp()
+
+        assertEquals(registerViewModel.errorToastMessage.value, "please check username, email, password, phone number")
+    }
+
+    @Test
+    fun 회원가입_GooglSignUp_실패(){
+        val registerViewModel = RegisterViewModel(mockRepository)
+
+        registerViewModel.email = "tom@gmail.com"
+        registerViewModel.name = "tom"
+        registerViewModel.password = "123123"
+        registerViewModel.phoneNumber = "010"
+
+        Mockito.`when`(
+            mockRepository.signUpWithEmail(
+                "tom@gmail.com",
+                "123123"
+            )
+        ).thenReturn(Completable.error(Throwable("fail message")))
+
+        Mockito.`when`(
+            mockRepository.uploadProfile(
+                null
+            )
+        ).thenReturn(Single.just(""))
+
+        Mockito.`when`(
+            mockRepository.saveUser(
+                "tom",
+                "010",
+                "",
+                "tom@gmail.com"
+            )
+        ).thenReturn(Single.just(true))
+
+        registerViewModel.signUp()
+
+        assertEquals(registerViewModel.errorToastMessage.value,"fail message")
     }
 }
-
-//@Test
-//fun 회원가입_실패() {
-//
-//}

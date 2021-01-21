@@ -24,14 +24,11 @@ class RegisterViewModel(
 
     val successSignUp = MutableLiveData<Boolean>()
 
-
-    private val _errorToastMessage = MutableLiveData<String>()
-    val errorToastMessage: LiveData<String>
-        get() = _errorToastMessage
+    val errorToastMessage = MutableLiveData<String>()
 
     fun signUp() {
         if (name.isNullOrEmpty() || email.isNullOrEmpty() || password.isNullOrEmpty() || phoneNumber.isNullOrEmpty()) {
-            _errorToastMessage.value = "please enter your username, email, password, phone number"
+            errorToastMessage.value = "please check username, email, password, phone number"
             return
         }
 
@@ -43,12 +40,15 @@ class RegisterViewModel(
                 .flatMap { imagePath ->
                     repository.saveUser(name!!, phoneNumber!!, imagePath, email!!)
                 })
+            .doOnSuccess{
+                successSignUp.value = true
+            }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 successSignUp.value = true
             }, {
-                _errorToastMessage.value = it.message
+                errorToastMessage.value = it.message
             })
         )
     }

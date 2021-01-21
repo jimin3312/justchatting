@@ -13,6 +13,7 @@ class SettingsRepositoryImpl(private val cache: Cache, private val sharedPrefere
     override fun loadImage(context: Context): Bitmap? {
         return cache.loadBitmap(context)
     }
+
     override fun saveProfileImageToCache(context: Context, bitmap: Bitmap){
         cache.saveBitmap(context, bitmap)
     }
