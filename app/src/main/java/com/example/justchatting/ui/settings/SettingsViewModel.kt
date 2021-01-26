@@ -23,13 +23,12 @@ class SettingsViewModel(private val settingsRepository: SettingsRepository, appl
     init {
         notificationConfig.value = settingsRepository.getNotificationConfig()
     }
-
-    fun loadMyProfileImage() {
-        profileImage.value = settingsRepository.loadImage(getApplication<Application>().applicationContext)
-    }
-
     fun setNotificationConfig(boolean: Boolean) {
         settingsRepository.setNotificationConfig(boolean)
+    }
+
+    fun loadMyProfileImage() {
+        profileImage.value = settingsRepository.loadImage(getApplication())
     }
 
     fun saveProfileImageToCache() {

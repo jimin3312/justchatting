@@ -12,10 +12,10 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val viewModelModule = module {
-    viewModel { ChattingViewModel() }
+    viewModel { ChattingViewModel(get()) }
     viewModel { SelectGroupViewModel()}
     viewModel { ChattingRoomViewModel() }
-    single { FriendViewModel(androidApplication())}
+    single { FriendViewModel(androidApplication(), get())}
     viewModel { SettingsViewModel(get(), androidApplication()) }
     viewModel { LoginViewModel(get(), androidApplication()) }
     viewModel { RegisterViewModel(get()) }
