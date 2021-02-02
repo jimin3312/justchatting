@@ -19,8 +19,10 @@ import org.koin.test.KoinTestRule
 import org.koin.test.inject
 import org.mockito.Mock
 import org.mockito.Mockito
+import org.mockito.Mockito.times
 import org.mockito.MockitoAnnotations
 import java.lang.Exception
+import kotlin.text.Typography.times
 
 class SettingsTest : AutoCloseKoinTest(){
     val settingsRepository: SettingsRepository by inject()
@@ -53,15 +55,22 @@ class SettingsTest : AutoCloseKoinTest(){
 
     @Test
     fun 프로필_이미지_변경_성공() {
+
+        val settingsViewModel = SettingsViewModel(settingsRepository, application)
         Mockito.`when`(settingsRepository.uploadProfileImage(null)).thenReturn(Single.just(""))
-        settingsRepository.uploadProfileImage(null).test().assertResult("")
+
+        settingsViewModel.uploadProfileImage(null)
+        Mockito.verify(settingsRepository, times(1)).editProfileImageUrl("")
     }
 
     @Test
     fun 프로필_이미지_변경_실패() {
         val exception = Exception()
+        val settingsViewModel = SettingsViewModel(settingsRepository, application)
         Mockito.`when`(settingsRepository.uploadProfileImage(null)).thenReturn(Single.error(exception))
-        settingsRepository.uploadProfileImage(null).test().assertError(exception)
+
+        settingsViewModel.uploadProfileImage(null)
+        Assert.assertEquals(settingsViewModel.errorToastMessage.value!! , "failed to upload profile image")
     }
     @Test
     fun 프로필_캐시_이미지_불러오기(){

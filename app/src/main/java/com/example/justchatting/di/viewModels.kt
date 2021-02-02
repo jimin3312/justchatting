@@ -1,5 +1,6 @@
 package com.example.justchatting.di
 
+import android.os.Bundle
 import com.example.justchatting.ui.chatting.ChattingViewModel
 import com.example.justchatting.ui.chatting.SelectGroupViewModel
 import com.example.justchatting.ui.chattingRoom.ChattingRoomViewModel
@@ -14,8 +15,8 @@ import org.koin.dsl.module
 val viewModelModule = module {
     viewModel { ChattingViewModel(get()) }
     viewModel { SelectGroupViewModel()}
-    viewModel { ChattingRoomViewModel() }
-    single { FriendViewModel(androidApplication(), get())}
+    viewModel { (intent: Bundle)->ChattingRoomViewModel(get(), intent) }
+    single { FriendViewModel(get(), androidApplication())}
     viewModel { SettingsViewModel(get(), androidApplication()) }
     viewModel { LoginViewModel(get(), androidApplication()) }
     viewModel { RegisterViewModel(get()) }
